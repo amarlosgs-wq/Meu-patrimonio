@@ -1053,35 +1053,61 @@
             document.getElementById('prev-dem').innerText = formatBRL(v * (config.perc_demais / 100));
         }
 
-        // ==================== CRUD INVESTIMENTOS ====================
+        // ==================== CRUD INVESTIMENTOS (CORRIGIDO E BLINDADO) ====================
         async function salvarInvestimento(e) {
             e.preventDefault();
+            const btn = document.getElementById('btn-submit-inv');
+            const textoOriginal = btn.innerText;
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+
             const id = document.getElementById('inv-id').value;
+            const valorAplicado = parseFloat(String(document.getElementById('inv-aplicado').value).replace(',', '.')) || 0;
+            const saldoAtual = parseFloat(String(document.getElementById('inv-atual').value).replace(',', '.')) || 0;
+
             const payload = {
                 nome: document.getElementById('inv-nome').value.trim(),
                 classe: document.getElementById('inv-classe').value,
-                instituicao: document.getElementById('inv-instituicao').value.trim(),
-                valor_aplicado: parseFloat(document.getElementById('inv-aplicado').value) || 0,
-                saldo_atual: parseFloat(document.getElementById('inv-atual').value) || 0
+                instituicao: document.getElementById('inv-instituicao').value.trim() || 'Carteira Própria',
+                valor_aplicado: valorAplicado,
+                saldo_atual: saldoAtual
             };
 
-            if (supabaseClient) {
-                if (id) await supabaseClient.from('investimentos').update(payload).eq('id', id);
-                else await supabaseClient.from('investimentos').insert([payload]);
-            } else {
-                if (id) {
-                    const idx = investimentos.findIndex(i => i.id === id);
-                    if (idx > -1) investimentos[idx] = { ...investimentos[idx], ...payload };
-                } else {
-                    investimentos.push({ id: crypto.randomUUID(), ...payload });
-                }
-                localStorage.setItem('mp_local_investimentos', JSON.stringify(investimentos));
-            }
+            try {
+                if (supabaseClient) {
+                    let res;
+                    if (id) {
+                        res = await supabaseClient.from('investimentos').update(payload).eq('id', id).select();
+                    } else {
+                        res = await supabaseClient.from('investimentos').insert([payload]).select();
+                    }
 
-            document.getElementById('form-investimento').reset();
-            document.getElementById('inv-id').value = '';
-            document.getElementById('btn-submit-inv').innerText = 'Salvar na Carteira';
-            await loadAllData();
+                    if (res.error) {
+                        throw new Error(res.error.message);
+                    }
+                } else {
+                    if (id) {
+                        const idx = investimentos.findIndex(i => i.id === id);
+                        if (idx > -1) investimentos[idx] = { ...investimentos[idx], ...payload };
+                    } else {
+                        investimentos.push({ id: crypto.randomUUID(), ...payload });
+                    }
+                    localStorage.setItem('mp_local_investimentos', JSON.stringify(investimentos));
+                }
+
+                // Limpar formulário apenas após confirmação de sucesso
+                document.getElementById('form-investimento').reset();
+                document.getElementById('inv-id').value = '';
+                btn.innerText = 'Salvar na Carteira';
+                await loadAllData();
+
+            } catch (err) {
+                console.error('Erro ao salvar no Supabase:', err);
+                alert('Aviso do Banco de Dados: ' + err.message + '\n\nCertifique-se de que executou o novo script SQL no Supabase.');
+                btn.innerText = textoOriginal;
+            } finally {
+                btn.disabled = false;
+            }
         }
 
         function editarInvestimento(id) {
@@ -1098,15 +1124,15 @@
 
         async function excluirInvestimento(id) {
             if (!confirm('Remover este ativo da carteira?')) return;
-            if (supabaseClient) await supabaseClient.from('investimentos').delete().eq('id', id);
-            else {
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('investimentos').delete().eq('id', id);
+                if (error) alert('Erro ao excluir: ' + error.message);
+            } else {
                 investimentos = investimentos.filter(i => i.id !== id);
                 localStorage.setItem('mp_local_investimentos', JSON.stringify(investimentos));
             }
             await loadAllData();
         }
-
-        // ==================== CRUD RESERVA DE EMERGÊNCIA ====================
         async function salvarMovimentacaoReserva(e) {
             e.preventDefault();
             const payload = {

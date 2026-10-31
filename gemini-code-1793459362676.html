@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Patrimônio — Gestão Financeira Pessoal</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        bgLight: '#F8F9FA',
+                        sage: {
+                            50: '#F2F6F3',
+                            100: '#E1ECE4',
+                            500: '#7C9A82', // Verde-sálvia destaque
+                            600: '#638269',
+                        },
+                        forest: '#1B4332',   // Verde-escuro positivo
+                        crimson: '#C94A4A',  // Vermelho discreto alerta/despesa
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body { background-color: #F8F9FA; color: #1E293B; -webkit-tap-highlight-color: transparent; }
+        .card-shadow { box-shadow: 0 4px 20px -2px rgba(27, 67, 50, 0.05); }
+        .nav-active { background-color: #E1ECE4; color: #1B4332; font-weight: 600; }
+        .mobile-nav-active { color: #1B4332; font-weight: 600; }
+        /* Esconder barra de rolagem mantendo funcionalidade */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+
+    <!-- MENU LATERAL (DESKTOP) -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-slate-100 p-6 fixed h-full z-20">
+        <div class="flex items-center gap-3 mb-10">
+            <div class="w-10 h-10 rounded-xl bg-sage-500 flex items-center justify-center text-white font-bold text-xl">
+                M
+            </div>
+            <div>
+                <h1 class="font-bold text-slate-800 text-lg leading-tight">Meu Patrimônio</h1>
+                <span class="text-xs text-slate-400">Controle Pessoal</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 space-y-1.5" id="desktop-nav">
+            <button onclick="switchTab('dashboard')" data-tab="dashboard" class="nav-btn nav-active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+            </button>
+            <button onclick="switchTab('entradas')" data-tab="entradas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="arrow-up-circle" class="w-5 h-5 text-forest"></i> Entradas
+            </button>
+            <button onclick="switchTab('saidas')" data-tab="saidas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="arrow-down-circle" class="w-5 h-5 text-crimson"></i> Saídas
+            </button>
+            <button onclick="switchTab('investimentos')" data-tab="investimentos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="trending-up" class="w-5 h-5"></i> Investimentos
+            </button>
+            <button onclick="switchTab('reserva')" data-tab="reserva" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="shield-check" class="w-5 h-5"></i> Reserva de Emergência
+            </button>
+            <button onclick="switchTab('sonhos')" data-tab="sonhos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="target" class="w-5 h-5"></i> Sonhos
+            </button>
+        </nav>
+
+        <div class="pt-6 border-t border-slate-100 space-y-2">
+            <button onclick="openModal('modal-planejamento')" class="w-full flex items-center gap-2 text-xs text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="Sliders" class="w-4 h-4"></i> Regra 10/10/1/79
+            </button>
+            <button onclick="openModal('modal-db')" class="w-full flex items-center gap-2 text-xs text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="database" class="w-4 h-4"></i> <span id="db-status-text">Configurar Supabase</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 md:ml-64 p-4 md:p-8 max-w-6xl mx-auto w-full">
+        
+        <!-- HEADER MOBILE & DESKTOP -->
+        <header class="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <div>
+                <p class="text-xs font-medium text-sage-600 uppercase tracking-wider" id="current-date-label">Resumo Mensal</p>
+                <h2 class="text-2xl font-bold text-slate-800" id="page-title">Dashboard</h2>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <!-- Seletor de Mês -->
+                <input type="month" id="month-filter" onchange="loadAllData()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:border-sage-500">
+                
+                <!-- Botão Config Mobile -->
+                <button onclick="openModal('modal-db')" class="md:hidden p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                </button>
+
+                <!-- Botão Destaque + Nova Movimentação -->
+                <button onclick="openNovaMovimentacao('entrada')" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-sm transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Nova movimentação</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- AVISO DE CONEXÃO SUPABASE -->
+        <div id="supabase-alert" class="hidden mb-6 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                <p class="text-xs md:text-sm">Conecte suas credenciais do <strong>Supabase</strong> para salvar seus dados na nuvem permanentemente.</p>
+            </div>
+            <button onclick="openModal('modal-db')" class="text-xs font-bold bg-amber-200/60 hover:bg-amber-200 px-3 py-1.5 rounded-lg shrink-0">Conectar</button>
+        </div>
+
+        <!-- ==================== ABA 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            
+            <!-- CARD PRINCIPAL: RESUMO FINANCEIRO -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-sage-500"></span>
+                        <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wider">Resumo Financeiro</h3>
+                    </div>
+                    <button onclick="openModal('modal-planejamento')" class="text-xs text-sage-600 hover:underline flex items-center gap-1 font-medium">
+                        <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> Ver Planejamento (10/10/1/79)
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b border-slate-100">
+                    <!-- Saldo Disponível -->
+                    <div class="bg-sage-50/70 p-5 rounded-2xl border border-sage-100">
+                        <span class="text-xs font-medium text-slate-500">Saldo Disponível (Geral)</span>
+                        <p class="text-3xl font-bold text-forest mt-1" id="ind-saldo">R$ 0,00</p>
+                        <span class="text-[11px] text-slate-400 mt-1 block">Entradas totais menos saídas totais</span>
+                    </div>
+
+                    <!-- Entradas do Mês -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-medium text-slate-500">Entradas do Mês</span>
+                            <p class="text-2xl font-bold text-forest mt-1" id="ind-entradas-mes">R$ 0,00</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-forest">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <!-- Saídas do Mês -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-medium text-slate-500">Saídas do Mês</span>
+                            <p class="text-2xl font-bold text-crimson mt-1" id="ind-saidas-mes">R$ 0,00</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-crimson">
+                            <i data-lucide="trending-down" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Segunda linha de indicadores -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+                    <div class="flex items-center gap-3.5 px-3 py-2">
+                        <div class="w-9 h-9 rounded-lg bg-sage-100 text-forest flex items-center justify-center shrink-0">
+                            <i data-lucide="piggy-bank" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">Economizado no Mês</span>
+                            <strong class="text-base text-slate-800" id="ind-economizado">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3.5 px-3 py-2">
+                        <div class="w-9 h-9 rounded-lg bg-sage-100 text-forest flex items-center justify-center shrink-0">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">Total Investido</span>
+                            <strong class="text-base text-slate-800" id="ind-investido">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3.5 px-3 py-2">
+                        <div class="w-9 h-9 rounded-lg bg-sage-100 text-forest flex items-center justify-center shrink-0">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 block">Reserva de Emergência</span>
+                            <strong class="text-base text-slate-800" id="ind-reserva">R$ 0,00</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD PLANEJAMENTO FINANCEIRO AUTOMÁTICO (10/10/1/79) -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Distribuição Automática da Renda do Mês</h3>
+                        <p class="text-xs text-slate-400">Calculado em tempo real sobre as entradas de <span class="font-semibold text-slate-600" id="plan-income-ref">R$ 0,00</span></p>
+                    </div>
+                    <button onclick="openModal('modal-planejamento')" class="text-xs bg-sage-50 hover:bg-sage-100 text-forest font-semibold px-3 py-1.5 rounded-lg transition">
+                        Editar Percentuais
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex justify-between items-center text-xs text-slate-500 mb-1">
+                            <span>Economia / Invest.</span>
+                            <span class="font-bold text-forest" id="lbl-perc-eco">10%</span>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800" id="val-perc-eco">R$ 0,00</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Meta mínima sugerida</p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex justify-between items-center text-xs text-slate-500 mb-1">
+                            <span>Entretenimento</span>
+                            <span class="font-bold text-sage-600" id="lbl-perc-ent">10%</span>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800" id="val-perc-ent">R$ 0,00</p>
+                        <p class="text-[11px] text-slate-400 mt-1" id="gasto-ent-status">Gasto atual: R$ 0,00</p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex justify-between items-center text-xs text-slate-500 mb-1">
+                            <span>Doações (Lei AMRA)</span>
+                            <span class="font-bold text-sage-600" id="lbl-perc-doa">1%</span>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800" id="val-perc-doa">R$ 0,00</p>
+                        <p class="text-[11px] text-slate-400 mt-1"> Contribuição proporcional</p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div class="flex justify-between items-center text-xs text-slate-500 mb-1">
+                            <span>Demais Despesas</span>
+                            <span class="font-bold text-slate-700" id="lbl-perc-dem">79%</span>
+                        </div>
+                        <p class="text-lg font-bold text-slate-800" id="val-perc-dem">R$ 0,00</p>
+                        <p class="text-[11px] text-slate-400 mt-1" id="gasto-dem-status">Gasto essencial/geral</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO DE GRÁFICOS -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Gráfico de Evolução (Com alternância Semanal / Mensal) -->
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm">Entradas vs Saídas & Evolução</h3>
+                        <div class="inline-flex rounded-xl bg-slate-100 p-1">
+                            <button onclick="setChartPeriod('semanal')" id="btn-chart-semanal" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition">Semanal</button>
+                            <button onclick="setChartPeriod('mensal')" id="btn-chart-mensal" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition">Mensal</button>
+                        </div>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="evolutionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Despesas por Categoria -->
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm">Despesas por Categoria</h3>
+                        <span class="text-xs text-slate-400">Mês selecionado</span>
+                    </div>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="categoryChart"></canvas>
+                        <p id="no-expense-msg" class="hidden text-xs text-slate-400 absolute">Nenhuma saída registrada neste período.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÚLTIMAS MOVIMENTAÇÕES NO DASHBOARD -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-slate-800 text-sm">Movimentações do Mês</h3>
+                    <span class="text-xs text-slate-400" id="total-registros-count">0 registros</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400">
+                                <th class="py-3 px-2">Data</th>
+                                <th class="py-3 px-2">Descrição</th>
+                                <th class="py-3 px-2">Categoria</th>
+                                <th class="py-3 px-2">Detalhes</th>
+                                <th class="py-3 px-2 text-right">Valor</th>
+                                <th class="py-3 px-2 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-transactions-list" class="divide-y divide-slate-100 text-sm">
+                            <!-- Renderizado via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABA 2: ENTRADAS ==================== -->
+        <section id="tab-entradas" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Formulário de Entrada -->
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 h-fit">
+                    <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-forest"></i> Cadastrar Receita
+                    </h3>
+                    <form id="form-entrada" onsubmit="salvarTransacao(event, 'entrada')" class="space-y-4">
+                        <input type="hidden" id="ent-id">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Valor (R$)</label>
+                            <input type="number" step="0.01" min="0.01" id="ent-valor" required oninput="calcularPreviaDistribuicao(this.value)" placeholder="0,00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-forest focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <!-- Prévia automática da regra 10/10/1/79 ao digitar entrada -->
+                        <div id="ent-preview-box" class="hidden bg-sage-50/80 border border-sage-100 rounded-xl p-3 text-xs space-y-1">
+                            <p class="font-semibold text-forest mb-1">Cálculo Automático desta Entrada:</p>
+                            <div class="flex justify-between"><span>Economia/Invest. (<span class="p-eco-lbl">10</span>%):</span> <strong id="prev-eco">R$ 0,00</strong></div>
+                            <div class="flex justify-between"><span>Entretenimento (<span class="p-ent-lbl">10</span>%):</span> <strong id="prev-ent">R$ 0,00</strong></div>
+                            <div class="flex justify-between"><span>Doações AMRA (<span class="p-doa-lbl">1</span>%):</span> <strong id="prev-doa">R$ 0,00</strong></div>
+                            <div class="flex justify-between"><span>Demais Despesas (<span class="p-dem-lbl">79</span>%):</span> <strong id="prev-dem">R$ 0,00</strong></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
+                            <input type="text" id="ent-descricao" required placeholder="Ex: Plantão noturno, Bolsa..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-medium text-slate-600">Categoria</label>
+                                <button type="button" onclick="novaCategoriaPrompt('entrada')" class="text-[11px] text-sage-600 font-semibold hover:underline">+ Nova categoria</button>
+                            </div>
+                            <select id="ent-categoria" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Data</label>
+                                <input type="date" id="ent-data" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Recorrência</label>
+                                <select id="ent-recorrencia" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                                    <option value="Unica">Única</option>
+                                    <option value="Mensal">Mensal</option>
+                                    <option value="Semanal">Semanal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-entrada" class="w-full bg-forest hover:bg-emerald-900 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
+                            Salvar Entrada
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Lista de Entradas -->
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Entradas do Mês</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400">
+                                    <th class="py-3 px-2">Data</th>
+                                    <th class="py-3 px-2">Descrição</th>
+                                    <th class="py-3 px-2">Categoria</th>
+                                    <th class="py-3 px-2">Recorrência</th>
+                                    <th class="py-3 px-2 text-right">Valor</th>
+                                    <th class="py-3 px-2 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-entradas-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABA 3: SAÍDAS ==================== -->
+        <section id="tab-saidas" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Formulário de Saída -->
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 h-fit">
+                    <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+                        <i data-lucide="minus-circle" class="w-5 h-5 text-crimson"></i> Registrar Despesa
+                    </h3>
+                    <form id="form-saida" onsubmit="salvarTransacao(event, 'saida')" class="space-y-4">
+                        <input type="hidden" id="sai-id">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Valor (R$)</label>
+                            <input type="number" step="0.01" min="0.01" id="sai-valor" required placeholder="0,00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-crimson focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
+                            <input type="text" id="sai-descricao" required placeholder="Ex: Compras da semana, Corte de cabelo..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-medium text-slate-600">Categoria</label>
+                                <button type="button" onclick="novaCategoriaPrompt('saida')" class="text-[11px] text-sage-600 font-semibold hover:underline">+ Nova categoria</button>
+                            </div>
+                            <select id="sai-categoria" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Tipo de Gasto</label>
+                                <select id="sai-natureza" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                                    <option value="Variavel">Variável</option>
+                                    <option value="Fixa">Fixa</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Classificação</label>
+                                <select id="sai-essencialidade" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                                    <option value="Essencial">Essencial</option>
+                                    <option value="Nao Essencial">Não essencial</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Pagamento</label>
+                                <select id="sai-pagamento" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                                    <option value="Pix">Pix</option>
+                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                    <option value="Cartão de Débito">Cartão de Débito</option>
+                                    <option value="Boleto">Boleto</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Data</label>
+                                <input type="date" id="sai-data" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-saida" class="w-full bg-crimson hover:bg-red-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
+                            Salvar Saída
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Lista de Saídas -->
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Despesas do Mês</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400">
+                                    <th class="py-3 px-2">Data</th>
+                                    <th class="py-3 px-2">Descrição</th>
+                                    <th class="py-3 px-2">Categoria</th>
+                                    <th class="py-3 px-2">Perfil / Pgto</th>
+                                    <th class="py-3 px-2 text-right">Valor</th>
+                                    <th class="py-3 px-2 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-saidas-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABAS PREPARADAS PARA PRÓXIMAS ETAPAS ==================== -->
+        <section id="tab-investimentos" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-8 card-shadow border border-slate-100 max-w-xl mx-auto text-center space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-sage-100 text-forest flex items-center justify-center mx-auto">
+                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Módulo de Investimentos</h3>
+                <p class="text-xs text-slate-500">Você já pode definir seu saldo acumulado atual para compor o card principal do Dashboard enquanto estruturamos a carteira detalhada na Etapa 2.</p>
+                <div class="flex gap-2 max-w-xs mx-auto pt-2">
+                    <input type="number" step="0.01" id="input-saldo-investido" placeholder="Saldo investido (R$)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    <button onclick="atualizarAtivoManual('investido')" class="bg-forest text-white px-4 py-2 rounded-xl text-xs font-semibold shrink-0">Atualizar</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-reserva" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-8 card-shadow border border-slate-100 max-w-xl mx-auto text-center space-y-4">
+                <div class="w-12 h-12 rounded-2xl bg-sage-100 text-forest flex items-center justify-center mx-auto">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Reserva de Emergência</h3>
+                <p class="text-xs text-slate-500">Informe o montante atual da sua Reserva de Emergência para acompanhamento direto no seu Resumo Financeiro.</p>
+                <div class="flex gap-2 max-w-xs mx-auto pt-2">
+                    <input type="number" step="0.01" id="input-saldo-reserva" placeholder="Saldo na reserva (R$)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm">
+                    <button onclick="atualizarAtivoManual('reserva')" class="bg-forest text-white px-4 py-2 rounded-xl text-xs font-semibold shrink-0">Atualizar</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-sonhos" class="tab-content hidden">
+            <div class="bg-white rounded-3xl p-8 card-shadow border border-slate-100 max-w-xl mx-auto text-center space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-sage-100 text-forest flex items-center justify-center mx-auto">
+                    <i data-lucide="target" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Sonhos e Objetivos Financeiros</h3>
+                <p class="text-xs text-slate-500">Arquitetura pronta no banco de dados para receber metas com prazos e barras de progresso na próxima etapa de evolução.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR (MOBILE) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex justify-around items-center z-30">
+        <button onclick="switchTab('dashboard')" data-tab="dashboard" class="mobile-nav-btn mobile-nav-active flex flex-col items-center gap-1 text-[10px] text-slate-500">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Início</span>
+        </button>
+        <button onclick="switchTab('entradas')" data-tab="entradas" class="mobile-nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-500">
+            <i data-lucide="arrow-up-circle" class="w-5 h-5"></i><span>Entradas</span>
+        </button>
+        <button onclick="switchTab('saidas')" data-tab="saidas" class="mobile-nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-500">
+            <i data-lucide="arrow-down-circle" class="w-5 h-5"></i><span>Saídas</span>
+        </button>
+        <button onclick="switchTab('investimentos')" data-tab="investimentos" class="mobile-nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-500">
+            <i data-lucide="trending-up" class="w-5 h-5"></i><span>Invest.</span>
+        </button>
+        <button onclick="switchTab('reserva')" data-tab="reserva" class="mobile-nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-500">
+            <i data-lucide="shield-check" class="w-5 h-5"></i><span>Reserva</span>
+        </button>
+        <button onclick="switchTab('sonhos')" data-tab="sonhos" class="mobile-nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-500">
+            <i data-lucide="target" class="w-5 h-5"></i><span>Sonhos</span>
+        </button>
+    </nav>
+
+    <!-- MODAL: PLANEJAMENTO FINANCEIRO EDITÁVEL -->
+    <div id="modal-planejamento" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-800">Configurar Distribuição da Renda</h3>
+                <button onclick="closeModal('modal-planejamento')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-500">Ajuste os percentuais. A soma total deve fechar em exatamente 100%.</p>
+            <form onsubmit="salvarPlanejamento(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Economia e Investimentos (%)</label>
+                    <input type="number" step="0.1" id="cfg-eco" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Entretenimento (%)</label>
+                    <input type="number" step="0.1" id="cfg-ent" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Doações - Lei de AMRA (%)</label>
+                    <input type="number" step="0.1" id="cfg-doa" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Demais Despesas e Objetivos (%)</label>
+                    <input type="number" step="0.1" id="cfg-dem" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                </div>
+                <button type="submit" class="w-full bg-sage-500 hover:bg-sage-600 text-white font-semibold py-2.5 rounded-xl text-sm">Salvar Percentuais</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIGURAÇÃO SUPABASE -->
+    <div id="modal-db" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-800">Conexão Supabase</h3>
+                <button onclick="closeModal('modal-db')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-500">Insira a URL e a Anon Key do seu projeto Supabase (em Project Settings > API). As chaves ficam salvas no seu navegador.</p>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Project URL</label>
+                    <input type="url" id="sb-url" placeholder="https://xyz.supabase.co" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Anon Public Key</label>
+                    <input type="password" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                </div>
+                <button onclick="conectarSupabase()" class="w-full bg-forest text-white font-semibold py-2.5 rounded-xl text-sm">Conectar e Sincronizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RÁPIDO: + NOVA MOVIMENTAÇÃO -->
+    <div id="modal-quick-choice" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 text-center">
+            <h3 class="font-bold text-slate-800">Qual movimentação deseja registrar?</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="irParaFormulario('entradas')" class="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 flex flex-col items-center gap-2 text-forest font-semibold text-sm">
+                    <i data-lucide="arrow-up-circle" class="w-6 h-6"></i> Entrada
+                </button>
+                <button onclick="irParaFormulario('saidas')" class="p-4 rounded-2xl border border-red-200 bg-red-50/50 hover:bg-red-50 flex flex-col items-center gap-2 text-crimson font-semibold text-sm">
+                    <i data-lucide="arrow-down-circle" class="w-6 h-6"></i> Saída
+                </button>
+            </div>
+            <button onclick="closeModal('modal-quick-choice')" class="text-xs text-slate-400 hover:text-slate-600">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- ==================== LÓGICA DA APLICAÇÃO ==================== -->
+    <script>
+        // Estado Global Real (Zero dados fictícios)
+        let supabaseClient = null;
+        let transacoes = [];
+        let categorias = [];
+        let config = {
+            perc_economia: 10,
+            perc_entretenimento: 10,
+            perc_doacoes: 1,
+            perc_demais: 79,
+            saldo_investido_manual: 0,
+            saldo_reserva_manual: 0
+        };
+        let chartPeriod = 'semanal';
+        let evolutionChartInstance = null;
+        let categoryChartInstance = null;
+        let isSubmitting = false;
+
+        const categoriasPadrao = [
+            { nome: 'Salário', tipo: 'entrada' }, { nome: 'Bolsa/estágio', tipo: 'entrada' },
+            { nome: 'Plantões', tipo: 'entrada' }, { nome: 'Trabalhos extras', tipo: 'entrada' },
+            { nome: 'Rendimentos', tipo: 'entrada' }, { nome: 'Presentes', tipo: 'entrada' },
+            { nome: 'Outros', tipo: 'entrada' },
+            { nome: 'Mercado', tipo: 'saida' }, { nome: 'Entretenimento', tipo: 'saida' },
+            { nome: 'Saúde física e esportes', tipo: 'saida' }, { nome: 'Pets', tipo: 'saida' },
+            { nome: 'Faculdade', tipo: 'saida' }, { nome: 'Assinaturas e internet', tipo: 'saida' },
+            { nome: 'Roupas e acessórios', tipo: 'saida' }, { nome: 'Barbeiro', tipo: 'saida' },
+            { nome: 'Moradia', tipo: 'saida' }, { nome: 'Transporte', tipo: 'saida' },
+            { nome: 'Saúde', tipo: 'saida' }, { nome: 'Outros', tipo: 'saida' }
+        ];
+
+        // Formatação Monetária Brasileira
+        const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(val) || 0);
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            // Definir mês atual e datas de hoje nos formulários
+            const hoje = new Date();
+            const mesAtual = hoje.toISOString().slice(0, 7);
+            const dataHoje = hoje.toISOString().slice(0, 10);
+            document.getElementById('month-filter').value = mesAtual;
+            document.getElementById('ent-data').value = dataHoje;
+            document.getElementById('sai-data').value = dataHoje;
+
+            initSupabase();
+        });
+
+        function initSupabase() {
+            const url = localStorage.getItem('mp_sb_url');
+            const key = localStorage.getItem('mp_sb_key');
+
+            if (url && key) {
+                document.getElementById('sb-url').value = url;
+                document.getElementById('sb-key').value = key;
+                supabaseClient = window.supabase.createClient(url, key);
+                document.getElementById('supabase-alert').classList.add('hidden');
+                document.getElementById('db-status-text').innerText = 'Supabase Conectado';
+            } else {
+                document.getElementById('supabase-alert').classList.remove('hidden');
+            }
+            loadAllData();
+        }
+
+        function conectarSupabase() {
+            const url = document.getElementById('sb-url').value.trim();
+            const key = document.getElementById('sb-key').value.trim();
+            if (!url || !key) return alert('Preencha a URL e a Anon Key do Supabase.');
+            
+            localStorage.setItem('mp_sb_url', url);
+            localStorage.setItem('mp_sb_key', key);
+            closeModal('modal-db');
+            initSupabase();
+        }
+
+        // Carregar Dados (Do Supabase se conectado, ou espelho local caso ainda não configurado)
+        async function loadAllData() {
+            if (supabaseClient) {
+                try {
+                    const [resTrans, resCat, resCfg] = await Promise.all([
+                        supabaseClient.from('transacoes').select('*').order('data', { ascending: false }),
+                        supabaseClient.from('categorias').select('*').order('nome', { ascending: true }),
+                        supabaseClient.from('configuracoes').select('*').eq('id', 1).single()
+                    ]);
+
+                    if (!resTrans.error) transacoes = resTrans.data || [];
+                    if (!resCat.error && resCat.data.length > 0) categorias = resCat.data;
+                    else categorias = categoriasPadrao;
+                    if (!resCfg.error && resCfg.data) config = resCfg.data;
+                } catch (err) {
+                    console.error('Erro ao buscar do Supabase:', err);
+                }
+            } else {
+                transacoes = JSON.parse(localStorage.getItem('mp_local_transacoes') || '[]');
+                categorias = JSON.parse(localStorage.getItem('mp_local_categorias') || JSON.stringify(categoriasPadrao));
+                config = JSON.parse(localStorage.getItem('mp_local_config') || JSON.stringify(config));
+            }
+
+            popularSelectsCategorias();
+            atualizarInterfaceCompleta();
+        }
+
+        function popularSelectsCategorias() {
+            const selEnt = document.getElementById('ent-categoria');
+            const selSai = document.getElementById('sai-categoria');
+            
+            selEnt.innerHTML = categorias.filter(c => c.tipo === 'entrada')
+                .map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+            
+            selSai.innerHTML = categorias.filter(c => c.tipo === 'saida')
+                .map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+        }
+
+        async function novaCategoriaPrompt(tipo) {
+            const nome = prompt(`Digite o nome da nova categoria de ${tipo === 'entrada' ? 'Entrada' : 'Saída'}:`);
+            if (!nome || !nome.trim()) return;
+            const nomeLimpo = nome.trim();
+
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('categorias').insert([{ nome: nomeLimpo, tipo }]);
+                if (error) return alert('Erro ao criar categoria: ' + error.message);
+            } else {
+                categorias.push({ nome: nomeLimpo, tipo });
+                localStorage.setItem('mp_local_categorias', JSON.stringify(categorias));
+            }
+            await loadAllData();
+        }
+
+        // Salvar ou Editar Movimentação (Prevenindo duplicidade)
+        async function salvarTransacao(e, tipo) {
+            e.preventDefault();
+            if (isSubmitting) return;
+            isSubmitting = true;
+
+            const isEntrada = tipo === 'entrada';
+            const idEdicao = document.getElementById(isEntrada ? 'ent-id' : 'sai-id').value;
+            
+            const payload = {
+                tipo,
+                valor: parseFloat(document.getElementById(isEntrada ? 'ent-valor' : 'sai-valor').value),
+                descricao: document.getElementById(isEntrada ? 'ent-descricao' : 'sai-descricao').value.trim(),
+                categoria: document.getElementById(isEntrada ? 'ent-categoria' : 'sai-categoria').value,
+                data: document.getElementById(isEntrada ? 'ent-data' : 'sai-data').value,
+                recorrencia: isEntrada ? document.getElementById('ent-recorrencia').value : null,
+                natureza: !isEntrada ? document.getElementById('sai-natureza').value : null,
+                essencialidade: !isEntrada ? document.getElementById('sai-essencialidade').value : null,
+                forma_pagamento: !isEntrada ? document.getElementById('sai-pagamento').value : null,
+            };
+
+            try {
+                if (supabaseClient) {
+                    if (idEdicao) {
+                        await supabaseClient.from('transacoes').update(payload).eq('id', idEdicao);
+                    } else {
+                        await supabaseClient.from('transacoes').insert([payload]);
+                    }
+                } else {
+                    if (idEdicao) {
+                        const idx = transacoes.findIndex(t => t.id === idEdicao);
+                        if (idx > -1) transacoes[idx] = { ...transacoes[idx], ...payload };
+                    } else {
+                        transacoes.unshift({ id: crypto.randomUUID(), ...payload });
+                    }
+                    localStorage.setItem('mp_local_transacoes', JSON.stringify(transacoes));
+                }
+
+                // Resetar formulário
+                document.getElementById(isEntrada ? 'form-entrada' : 'form-saida').reset();
+                document.getElementById(isEntrada ? 'ent-id' : 'sai-id').value = '';
+                document.getElementById(isEntrada ? 'ent-data' : 'sai-data').value = new Date().toISOString().slice(0, 10);
+                document.getElementById(isEntrada ? 'btn-submit-entrada' : 'btn-submit-saida').innerText = isEntrada ? 'Salvar Entrada' : 'Salvar Saída';
+                document.getElementById('ent-preview-box').classList.add('hidden');
+
+                await loadAllData();
+            } finally {
+                isSubmitting = false;
+            }
+        }
+
+        async function excluirTransacao(id) {
+            if (!confirm('Deseja realmente excluir este lançamento?')) return;
+            if (supabaseClient) {
+                await supabaseClient.from('transacoes').delete().eq('id', id);
+            } else {
+                transacoes = transacoes.filter(t => t.id !== id);
+                localStorage.setItem('mp_local_transacoes', JSON.stringify(transacoes));
+            }
+            await loadAllData();
+        }
+
+        function editarTransacao(id) {
+            const item = transacoes.find(t => t.id === id);
+            if (!item) return;
+
+            if (item.tipo === 'entrada') {
+                switchTab('entradas');
+                document.getElementById('ent-id').value = item.id;
+                document.getElementById('ent-valor').value = item.valor;
+                document.getElementById('ent-descricao').value = item.descricao;
+                document.getElementById('ent-categoria').value = item.categoria;
+                document.getElementById('ent-data').value = item.data;
+                document.getElementById('ent-recorrencia').value = item.recorrencia || 'Unica';
+                document.getElementById('btn-submit-entrada').innerText = 'Atualizar Entrada';
+                calcularPreviaDistribuicao(item.valor);
+            } else {
+                switchTab('saidas');
+                document.getElementById('sai-id').value = item.id;
+                document.getElementById('sai-valor').value = item.valor;
+                document.getElementById('sai-descricao').value = item.descricao;
+                document.getElementById('sai-categoria').value = item.categoria;
+                document.getElementById('sai-natureza').value = item.natureza || 'Variavel';
+                document.getElementById('sai-essencialidade').value = item.essencialidade || 'Essencial';
+                document.getElementById('sai-pagamento').value = item.forma_pagamento || 'Pix';
+                document.getElementById('sai-data').value = item.data;
+                document.getElementById('btn-submit-saida').innerText = 'Atualizar Saída';
+            }
+        }
+
+        // Cálculo em tempo real ao digitar nova Entrada
+        function calcularPreviaDistribuicao(valorDigitado) {
+            const box = document.getElementById('ent-preview-box');
+            const v = parseFloat(valorDigitado);
+            if (!v || v <= 0) {
+                box.classList.add('hidden');
+                return;
+            }
+            box.classList.remove('hidden');
+            document.querySelector('.p-eco-lbl').innerText = config.perc_economia;
+            document.querySelector('.p-ent-lbl').innerText = config.perc_entretenimento;
+            document.querySelector('.p-doa-lbl').innerText = config.perc_doacoes;
+            document.querySelector('.p-dem-lbl').innerText = config.perc_demais;
+
+            document.getElementById('prev-eco').innerText = formatBRL(v * (config.perc_economia / 100));
+            document.getElementById('prev-ent').innerText = formatBRL(v * (config.perc_entretenimento / 100));
+            document.getElementById('prev-doa').innerText = formatBRL(v * (config.perc_doacoes / 100));
+            document.getElementById('prev-dem').innerText = formatBRL(v * (config.perc_demais / 100));
+        }
+
+        // Atualizar todos os Indicadores, Tabelas e Gráficos
+        function atualizarInterfaceCompleta() {
+            const mesSelecionado = document.getElementById('month-filter').value; // YYYY-MM
+            
+            // Saldo Global Acumulado
+            const totalEntradasGlobal = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
+            const totalSaidasGlobal = transacoes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
+            const saldoDisponivel = totalEntradasGlobal - totalSaidasGlobal;
+
+            // Movimentações do Mês Selecionado
+            const transMes = transacoes.filter(t => t.data && t.data.startsWith(mesSelecionado));
+            const entradasMes = transMes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + Number(t.valor), 0);
+            const saidasMes = transMes.filter(t => t.tipo === 'saida').reduce((acc, t) => acc + Number(t.valor), 0);
+            const economizadoMes = entradasMes - saidasMes;
+
+            // Atualizar Cards do Resumo Financeiro
+            const elSaldo = document.getElementById('ind-saldo');
+            elSaldo.innerText = formatBRL(saldoDisponivel);
+            elSaldo.className = `text-3xl font-bold mt-1 ${saldoDisponivel >= 0 ? 'text-forest' : 'text-crimson'}`;
+
+            document.getElementById('ind-entradas-mes').innerText = formatBRL(entradasMes);
+            document.getElementById('ind-saidas-mes').innerText = formatBRL(saidasMes);
+            
+            const elEco = document.getElementById('ind-economizado');
+            elEco.innerText = formatBRL(economizadoMes);
+            elEco.className = `text-base font-bold ${economizadoMes >= 0 ? 'text-forest' : 'text-crimson'}`;
+
+            document.getElementById('ind-investido').innerText = formatBRL(config.saldo_investido_manual || 0);
+            document.getElementById('ind-reserva').innerText = formatBRL(config.saldo_reserva_manual || 0);
+            document.getElementById('input-saldo-investido').value = config.saldo_investido_manual || '';
+            document.getElementById('input-saldo-reserva').value = config.saldo_reserva_manual || '';
+
+            // Atualizar Card de Planejamento Financeiro (10/10/1/79)
+            document.getElementById('plan-income-ref').innerText = formatBRL(entradasMes);
+            document.getElementById('lbl-perc-eco').innerText = `${config.perc_economia}%`;
+            document.getElementById('lbl-perc-ent').innerText = `${config.perc_entretenimento}%`;
+            document.getElementById('lbl-perc-doa').innerText = `${config.perc_doacoes}%`;
+            document.getElementById('lbl-perc-dem').innerText = `${config.perc_demais}%`;
+
+            document.getElementById('val-perc-eco').innerText = formatBRL(entradasMes * (config.perc_economia / 100));
+            document.getElementById('val-perc-ent').innerText = formatBRL(entradasMes * (config.perc_entretenimento / 100));
+            document.getElementById('val-perc-doa').innerText = formatBRL(entradasMes * (config.perc_doacoes / 100));
+            document.getElementById('val-perc-dem').innerText = formatBRL(entradasMes * (config.perc_demais / 100));
+
+            const gastoEntretenimento = transMes.filter(t => t.tipo === 'saida' && t.categoria === 'Entretenimento').reduce((a, b) => a + Number(b.valor), 0);
+            document.getElementById('gasto-ent-status').innerText = `Gasto no mês: ${formatBRL(gastoEntretenimento)}`;
+            document.getElementById('gasto-dem-status').innerText = `Saídas totais: ${formatBRL(saidasMes)}`;
+
+            // Preencher inputs do Modal de Planejamento
+            document.getElementById('cfg-eco').value = config.perc_economia;
+            document.getElementById('cfg-ent').value = config.perc_entretenimento;
+            document.getElementById('cfg-doa').value = config.perc_doacoes;
+            document.getElementById('cfg-dem').value = config.perc_demais;
+
+            renderizarTabelas(transMes);
+            renderizarGraficos(transMes);
+            lucide.createIcons();
+        }
+
+        function renderizarTabelas(transMes) {
+            document.getElementById('total-registros-count').innerText = `${transMes.length} registros`;
+            const formatDataBR = (d) => d.split('-').reverse().join('/');
+
+            // 1. Tabela do Dashboard
+            const dashTbody = document.getElementById('dashboard-transactions-list');
+            if (transMes.length === 0) {
+                dashTbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Nenhuma movimentação cadastrada neste mês.</td></tr>`;
+            } else {
+                dashTbody.innerHTML = transMes.map(t => `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3 px-2 text-xs text-slate-500 whitespace-nowrap">${formatDataBR(t.data)}</td>
+                        <td class="py-3 px-2 font-medium text-slate-800">${t.descricao}</td>
+                        <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${t.categoria}</span></td>
+                        <td class="py-3 px-2 text-xs text-slate-400">${t.tipo === 'entrada' ? (t.recorrencia || 'Única') : `${t.natureza} • ${t.forma_pagamento}`}</td>
+                        <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${t.tipo === 'entrada' ? 'text-forest' : 'text-crimson'}">
+                            ${t.tipo === 'entrada' ? '+' : '-'} ${formatBRL(t.valor)}
+                        </td>
+                        <td class="py-3 px-2 text-right whitespace-nowrap">
+                            <button onclick="editarTransacao('${t.id}')" class="p-1.5 text-slate-400 hover:text-slate-700"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="excluirTransacao('${t.id}')" class="p-1.5 text-slate-400 hover:text-crimson"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // 2. Tabela de Entradas
+            const entMes = transMes.filter(t => t.tipo === 'entrada');
+            const entTbody = document.getElementById('lista-entradas-tbody');
+            entTbody.innerHTML = entMes.length === 0
+                ? `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Nenhuma receita registrada neste mês.</td></tr>`
+                : entMes.map(t => `
+                    <tr>
+                        <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(t.data)}</td>
+                        <td class="py-3 px-2 font-medium text-slate-800">${t.descricao}</td>
+                        <td class="py-3 px-2 text-xs text-slate-600">${t.categoria}</td>
+                        <td class="py-3 px-2 text-xs text-slate-400">${t.recorrencia}</td>
+                        <td class="py-3 px-2 text-right font-bold text-forest">+ ${formatBRL(t.valor)}</td>
+                        <td class="py-3 px-2 text-right">
+                            <button onclick="editarTransacao('${t.id}')" class="p-1 text-slate-400 hover:text-slate-700"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="excluirTransacao('${t.id}')" class="p-1 text-slate-400 hover:text-crimson"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            // 3. Tabela de Saídas
+            const saiMes = transMes.filter(t => t.tipo === 'saida');
+            const saiTbody = document.getElementById('lista-saidas-tbody');
+            saiTbody.innerHTML = saiMes.length === 0
+                ? `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Nenhuma despesa registrada neste mês.</td></tr>`
+                : saiMes.map(t => `
+                    <tr>
+                        <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(t.data)}</td>
+                        <td class="py-3 px-2 font-medium text-slate-800">${t.descricao}</td>
+                        <td class="py-3 px-2 text-xs text-slate-600">${t.categoria}</td>
+                        <td class="py-3 px-2 text-xs text-slate-400">${t.natureza} / ${t.essencialidade} (${t.forma_pagamento})</td>
+                        <td class="py-3 px-2 text-right font-bold text-crimson">- ${formatBRL(t.valor)}</td>
+                        <td class="py-3 px-2 text-right">
+                            <button onclick="editarTransacao('${t.id}')" class="p-1 text-slate-400 hover:text-slate-700"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                            <button onclick="excluirTransacao('${t.id}')" class="p-1 text-slate-400 hover:text-crimson"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        // Gráficos Dinâmicos (Chart.js) baseados exclusivamente nos dados reais
+        function setChartPeriod(periodo) {
+            chartPeriod = periodo;
+            document.getElementById('btn-chart-semanal').className = periodo === 'semanal'
+                ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition'
+                : 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition';
+            document.getElementById('btn-chart-mensal').className = periodo === 'mensal'
+                ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition'
+                : 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition';
+            atualizarInterfaceCompleta();
+        }
+
+        function renderizarGraficos(transMes) {
+            const ctxEvo = document.getElementById('evolutionChart').getContext('2d');
+            if (evolutionChartInstance) evolutionChartInstance.destroy();
+
+            let labels = [];
+            let dataEntradas = [];
+            let dataSaidas = [];
+
+            if (chartPeriod === 'semanal') {
+                labels = ['Sem 1 (1-7)', 'Sem 2 (8-14)', 'Sem 3 (15-21)', 'Sem 4 (22+)'];
+                dataEntradas = [0, 0, 0, 0];
+                dataSaidas = [0, 0, 0, 0];
+
+                transMes.forEach(t => {
+                    const dia = parseInt(t.data.split('-')[2], 10);
+                    const idx = dia <= 7 ? 0 : dia <= 14 ? 1 : dia <= 21 ? 2 : 3;
+                    if (t.tipo === 'entrada') dataEntradas[idx] += Number(t.valor);
+                    else dataSaidas[idx] += Number(t.valor);
+                });
+            } else {
+                // Evolução Mensal (Últimos 6 meses até o mês selecionado)
+                const [anoRef, mesRef] = document.getElementById('month-filter').value.split('-').map(Number);
+                for (let i = 5; i >= 0; i--) {
+                    const d = new Date(anoRef, mesRef - 1 - i, 1);
+                    const ym = d.toISOString().slice(0, 7);
+                    const nomeMes = d.toLocaleDateString('pt-BR', { month: 'short' });
+                    labels.push(nomeMes);
+
+                    const ent = transacoes.filter(t => t.tipo === 'entrada' && t.data.startsWith(ym)).reduce((a, b) => a + Number(b.valor), 0);
+                    const sai = transacoes.filter(t => t.tipo === 'saida' && t.data.startsWith(ym)).reduce((a, b) => a + Number(b.valor), 0);
+                    dataEntradas.push(ent);
+                    dataSaidas.push(sai);
+                }
+            }
+
+            evolutionChartInstance = new Chart(ctxEvo, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Entradas', data: dataEntradas, backgroundColor: '#1B4332', borderRadius: 6 },
+                        { label: 'Saídas', data: dataSaidas, backgroundColor: '#C94A4A', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            // Gráfico de Despesas por Categoria
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            const saidas = transMes.filter(t => t.tipo === 'saida');
+            const msgVazio = document.getElementById('no-expense-msg');
+
+            if (saidas.length === 0) {
+                msgVazio.classList.remove('hidden');
+                return;
+            }
+            msgVazio.classList.add('hidden');
+
+            const mapaCat = {};
+            saidas.forEach(s => { mapaCat[s.categoria] = (mapaCat[s.categoria] || 0) + Number(s.valor); });
+
+            categoryChartInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(mapaCat),
+                    datasets: [{
+                        data: Object.values(mapaCat),
+                        backgroundColor: ['#1B4332', '#7C9A82', '#C94A4A', '#52796F', '#84A98C', '#354F52', '#CAD2C5', '#E07A5F'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 } } } }
+                }
+            });
+        }
+
+        // Salvar Edição de Percentuais (10/10/1/79)
+        async function salvarPlanejamento(e) {
+            e.preventDefault();
+            const eco = parseFloat(document.getElementById('cfg-eco').value) || 0;
+            const ent = parseFloat(document.getElementById('cfg-ent').value) || 0;
+            const doa = parseFloat(document.getElementById('cfg-doa').value) || 0;
+            const dem = parseFloat(document.getElementById('cfg-dem').value) || 0;
+
+            if (Math.round((eco + ent + doa + dem) * 10) / 10 !== 100) {
+                return alert(`A soma dos percentuais deve ser 100%. Soma atual: ${(eco + ent + doa + dem).toFixed(1)}%`);
+            }
+
+            config.perc_economia = eco;
+            config.perc_entretenimento = ent;
+            config.perc_doacoes = doa;
+            config.perc_demais = dem;
+
+            if (supabaseClient) {
+                await supabaseClient.from('configuracoes').upsert({ id: 1, ...config });
+            } else {
+                localStorage.setItem('mp_local_config', JSON.stringify(config));
+            }
+            closeModal('modal-planejamento');
+            atualizarInterfaceCompleta();
+        }
+
+        async function atualizarAtivoManual(tipo) {
+            if (tipo === 'investido') {
+                config.saldo_investido_manual = parseFloat(document.getElementById('input-saldo-investido').value) || 0;
+            } else {
+                config.saldo_reserva_manual = parseFloat(document.getElementById('input-saldo-reserva').value) || 0;
+            }
+
+            if (supabaseClient) {
+                await supabaseClient.from('configuracoes').upsert({ id: 1, ...config });
+            } else {
+                localStorage.setItem('mp_local_config', JSON.stringify(config));
+            }
+            atualizarInterfaceCompleta();
+            switchTab('dashboard');
+        }
+
+        // Navegação entre abas e modais
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            const titulos = {
+                dashboard: 'Dashboard', entradas: 'Entradas', saidas: 'Saídas',
+                investimentos: 'Investimentos', reserva: 'Reserva de Emergência', sonhos: 'Sonhos e Metas'
+            };
+            document.getElementById('page-title').innerText = titulos[tabId];
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('nav-active', btn.dataset.tab === tabId);
+            });
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                btn.classList.toggle('mobile-nav-active', btn.dataset.tab === tabId);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openNovaMovimentacao() { openModal('modal-quick-choice'); }
+        function irParaFormulario(aba) {
+            closeModal('modal-quick-choice');
+            switchTab(aba);
+        }
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>

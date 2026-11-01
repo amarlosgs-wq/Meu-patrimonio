@@ -1,130 +1,686 @@
-<!-- ... existing code ... -->
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js (UMD Build + Fallback CDN) -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1B4332">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Meu Patrimônio — Gestão Financeira & Comportamental</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['"Plus Jakarta Sans"', ' system-ui', '-apple-system', 'sans-serif'],
+                        },
+                        colors: {
+                            bgLight: '#F4F6F5',
+                            sage: {
+                                50: '#F2F6F3',
+                                100: '#E1ECE4',
+                                200: '#C5DBC9',
+                                500: '#7C9A82',
+                                600: '#5F7D65',
+                            },
+                            forest: {
+                                DEFAULT: '#1B4332',
+                                dark: '#112A20',
+                                light: '#2D6A4F'
+                            },
+                            crimson: '#C94A4A',
+                        }
+                    }
+                }
+            };
+        }
+    </script>
+
+    <!-- Lucide Icons (Com Fallback CDN) -->
+    <script src="https://unpkg.com/lucide@latest" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js';"></script>
+    <!-- Chart.js UMD (Com Fallback CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase JS (Com Fallback CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2';"></script>
 
     <style>
-<!-- ... existing code ... -->
-        const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(val) || 0);
-        const formatDataBR = (d) => d ? String(d).slice(0, 10).split('-').reverse().join('/') : '';
-
-        function safeCreateIcons() {
-            if (typeof window.lucide !== 'undefined' && typeof window.lucide.createIcons === 'function') {
-                window.lucide.createIcons();
-            }
+        /* Fallbacks nativos para garantir renderização instantânea mesmo no 4G lento */
+        * { box-sizing: border-box; }
+        body {
+            background-color: #F4F6F5;
+            color: #1E293B;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        function isChartAvailable() {
-            return typeof window.Chart !== 'undefined';
+        .card-shadow { box-shadow: 0 8px 30px -4px rgba(27, 67, 50, 0.05); }
+        .hero-gradient { background: linear-gradient(135deg, #1B4332 0%, #112A20 100%); }
+        .optimistic-gradient { background: linear-gradient(135deg, #112A20 0%, #1B4332 55%, #2D6A4F 100%); }
+        .nav-active { background-color: #E1ECE4; color: #1B4332; font-weight: 700; }
+        .mobile-nav-active { color: #1B4332; font-weight: 700; }
+        .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.2s ease; }
+        .money-val { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(201, 74, 74, 0.4); }
+            50% { border-color: rgba(201, 74, 74, 1); }
         }
+        .alert-pulse { animation: pulse-border 2s infinite; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
 
-        function safeGetStorage(key, fallback = null) {
-<!-- ... existing code ... -->
-        function togglePrivacy() {
-            privacyMode = !privacyMode;
-            document.querySelectorAll('.money-val').forEach(el => el.classList.toggle('privacy-blur', privacyMode));
-            const icon = document.getElementById('privacy-icon');
-            if (icon) icon.setAttribute('data-lucide', privacyMode ? 'eye-off' : 'eye');
-            safeCreateIcons();
-        }
+    <!-- CONTAINER DE NOTIFICAÇÕES FLUTUANTES (TOASTS) -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 md:px-0"></div>
 
-        function togglePatrimonioPrivacy() {
-            patrimonioPrivacyMode = !patrimonioPrivacyMode;
-            const el = document.getElementById('ind-patrimonio-global');
-            const icon = document.getElementById('patrimonio-privacy-icon');
-            if (el) el.classList.toggle('privacy-blur', patrimonioPrivacyMode);
-            if (icon) icon.setAttribute('data-lucide', patrimonioPrivacyMode ? 'eye-off' : 'eye');
-            safeCreateIcons();
-        }
+    <!-- MENU LATERAL (DESKTOP) -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200/70 p-5 fixed h-full z-20">
+        <div class="flex items-center gap-3 mb-7 px-1">
+            <div class="w-10 h-10 rounded-2xl hero-gradient flex items-center justify-center text-white font-extrabold text-xl shadow-md shrink-0">
+                M
+            </div>
+            <div class="min-w-0">
+                <h1 class="font-extrabold text-slate-800 text-base leading-tight truncate">Meu Patrimônio</h1>
+                <span class="text-[11px] font-medium text-sage-600 block truncate">Planejamento & Futuro Médico</span>
+            </div>
+        </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            safeCreateIcons();
-            const hoje = new Date();
-            const mesAtual = hoje.toISOString().slice(0, 7);
-<!-- ... existing code ... -->
-        function initSupabase() {
-            const url = safeGetStorage('mp_sb_url');
-            const key = safeGetStorage('mp_sb_key');
+        <nav class="flex-1 space-y-1" id="desktop-nav">
+            <button onclick="switchTab('dashboard')" data-tab="dashboard" class="nav-btn nav-active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Dashboard</span>
+            </button>
+            <button onclick="switchTab('entradas')" data-tab="entradas" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="arrow-up-circle" class="w-4 h-4 text-forest shrink-0"></i>
+                <span class="truncate">Entradas</span>
+            </button>
+            <button onclick="switchTab('saidas')" data-tab="saidas" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="arrow-down-circle" class="w-4 h-4 text-crimson shrink-0"></i>
+                <span class="truncate">Saídas</span>
+            </button>
+            <button onclick="switchTab('investimentos')" data-tab="investimentos" class="nav-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-left text-slate-600 hover:bg-sage-50 transition">
+                <span class="flex items-center gap-3 truncate">
+                    <i data-lucide="trending-up" class="w-4 h-4 shrink-0"></i>
+                    <span class="truncate">Investimentos</span>
+                </span>
+                <span class="text-[10px] font-bold bg-sage-100 text-forest px-1.5 py-0.5 rounded-md">13% a.a.</span>
+            </button>
+            <button onclick="switchTab('reserva')" data-tab="reserva" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="shield-check" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Reserva de Emergência</span>
+            </button>
+            <button onclick="switchTab('sonhos')" data-tab="sonhos" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-slate-600 hover:bg-sage-50 transition">
+                <i data-lucide="target" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Sonhos & Metas</span>
+            </button>
+            <div class="pt-3 pb-1">
+                <span class="px-3.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Estratégia 2026 → 40+ Anos</span>
+            </div>
+            <button onclick="switchTab('carreira')" data-tab="carreira" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-forest bg-sage-50/70 hover:bg-sage-100 transition font-semibold">
+                <i data-lucide="stethoscope" class="w-4 h-4 text-forest shrink-0"></i>
+                <span class="truncate">Virada Médica & 40+</span>
+            </button>
+        </nav>
 
-            if (url && key && typeof window.supabase !== 'undefined') {
-                document.getElementById('sb-url').value = url;
-                document.getElementById('sb-key').value = key;
-                supabaseClient = window.supabase.createClient(url, key);
-                document.getElementById('supabase-alert').classList.add('hidden');
-                document.getElementById('db-status-text').innerText = 'Supabase Conectado';
-            } else {
-                document.getElementById('supabase-alert').classList.remove('hidden');
-            }
-            loadAllData();
-        }
-<!-- ... existing code ... -->
-            popularSelectsCategorias();
-            atualizarInterfaceCompleta();
-            try {
-                rodarSimulacaoCarreira();
-            } catch (err) {
-                console.error('Erro ao rodar simulação de carreira:', err);
-            }
-        }
+        <div class="pt-4 border-t border-slate-100 space-y-1">
+            <button onclick="openModal('modal-planejamento')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Regra 10/10/2/78 + 50/50</span>
+            </button>
+            <button onclick="openModal('modal-backup')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="download" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Backup / Exportar Dados</span>
+            </button>
+            <button onclick="openModal('modal-db')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
+                <span id="db-status-text" class="truncate">Configurar Supabase</span>
+            </button>
+        </div>
+    </aside>
 
-        function popularSelectsCategorias() {
-<!-- ... existing code ... -->
-            try { renderizarModuloSonhos(); } catch (e) { console.error('Erro sonhos:', e); }
-            try { renderizarSimuladorRentabilidadePassiva(); } catch (e) { console.error('Erro simulador rentabilidade:', e); }
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 md:ml-64 p-4 md:p-7 max-w-6xl mx-auto w-full min-w-0">
+        
+        <!-- HEADER SUPERIOR -->
+        <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-[11px] font-bold text-sage-600 uppercase tracking-wider">Fase Atual: Formação & Hábito</span>
+                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-sage-100 text-forest" id="header-burn-badge">10/10/2/78 + Extra 50/50</span>
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-800 mt-0.5 truncate" id="page-title">Dashboard</h2>
+            </div>
 
-            if (privacyMode) {
-                document.querySelectorAll('.money-val').forEach(el => el.classList.add('privacy-blur'));
-            }
-            safeCreateIcons();
-        }
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="togglePrivacy()" title="Ocultar/Mostrar Valores" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
+                    <i data-lucide="eye" id="privacy-icon" class="w-4 h-4"></i>
+                </button>
 
-        function atualizarAporteF2() {
-<!-- ... existing code ... -->
-            // Renderizar gráfico comparativo de evolução 0 a max(10, anosAteAlvo) anos
-            const ctxYield = document.getElementById('yieldProjectionChart');
-            if (!ctxYield || !isChartAvailable()) return;
-            if (yieldProjectionChartInstance) yieldProjectionChartInstance.destroy();
+                <input type="month" id="month-filter" onchange="loadAllData()" class="min-w-[145px] bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs md:text-sm font-semibold text-slate-700 focus:outline-none focus:border-sage-500 shadow-2xs">
+                
+                <button onclick="openModal('modal-db')" title="Banco de Dados Supabase" class="md:hidden p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600">
+                    <i data-lucide="database" class="w-4 h-4"></i>
+                </button>
 
-            const anosGrafico = [0, 1, 2, 3, 4, 5, 7, 10];
-<!-- ... existing code ... -->
-            const ctxCareer = document.getElementById('careerChart');
-            if (!ctxCareer || !isChartAvailable()) {
-                renderizarSimuladorRentabilidadePassiva();
-                return;
-            }
-            if (careerChartInstance) careerChartInstance.destroy();
+                <button onclick="openNovaMovimentacao()" class="hero-gradient hover:opacity-95 text-white font-semibold px-4 py-2.5 rounded-xl text-xs md:text-sm flex items-center gap-2 shadow-sm transition whitespace-nowrap">
+                    <i data-lucide="plus" class="w-4 h-4 shrink-0"></i>
+                    <span class="hidden sm:inline">Nova movimentação</span>
+                </button>
+            </div>
+        </header>
 
-            const datasets = [{
-<!-- ... existing code ... -->
-            const ctxPort = document.getElementById('portfolioChart').getContext('2d');
-            if (portfolioChartInstance) portfolioChartInstance.destroy();
-            const msgEmpty = document.getElementById('no-inv-msg');
-            if (investimentos.length === 0) return msgEmpty.classList.remove('hidden');
-            msgEmpty.classList.add('hidden');
-            if (!isChartAvailable()) return;
+        <!-- AVISO SUPABASE -->
+        <div id="supabase-alert" class="hidden mb-6 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                <p class="text-xs">Modo Local Ativo: Conecte seu <strong>Supabase</strong> para sincronizar seus dados na nuvem entre dispositivos.</p>
+            </div>
+            <button onclick="openModal('modal-db')" class="text-xs font-bold bg-amber-200/70 hover:bg-amber-200 px-3 py-1.5 rounded-lg shrink-0">Conectar</button>
+        </div>
 
-            const porClasse = {};
-            investimentos.forEach(i => { porClasse[i.classe] = (porClasse[i.classe] || 0) + Number(i.saldo_atual ?? i.valor_aplicado ?? 0); });
-<!-- ... existing code ... -->
-        function filtrarTabelaDashboard() {
-            const mesSelecionado = document.getElementById('month-filter').value;
-            const transMes = transacoes.filter(t => t.data && t.data.startsWith(mesSelecionado));
-            renderizarTabelas(transMes);
-            if (privacyMode) {
-                document.querySelectorAll('.money-val').forEach(el => el.classList.add('privacy-blur'));
-            }
-            safeCreateIcons();
-        }
+        <!-- ==================== ABA 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            
+            <!-- RADAR DE INTELIGÊNCIA COMPORTAMENTAL E ALERTAS -->
+            <div id="behavioral-alerts-container" class="space-y-3"></div>
 
-        function renderizarTabelas(transMes) {
-<!-- ... existing code ... -->
-        function renderizarGraficos(transMes) {
-            if (!isChartAvailable()) return;
-            const ctxEvo = document.getElementById('evolutionChart').getContext('2d');
-            if (evolutionChartInstance) evolutionChartInstance.destroy();
+            <!-- HERO CARD: SALDO LIVRE EM DESTAQUE + PATRIMÔNIO OCULTO POR PADRÃO -->
+            <div class="hero-gradient rounded-3xl p-6 md:p-7 text-white shadow-lg">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-6 border-b border-white/10">
+                    <div>
+                        <div class="flex items-center gap-2 text-sage-200 text-xs font-medium mb-1">
+                            <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i>
+                            <span>Saldo Disponível em Conta (Giro Livre)</span>
+                        </div>
+                        <p class="text-3xl md:text-4xl font-extrabold tracking-tight money-val text-emerald-300" id="ind-saldo">R$ 0,00</p>
+                        <p class="text-[11px] text-sage-200 mt-1 font-medium" id="ind-cota-diaria">
+                            Cota diária segura: calculando...
+                        </p>
+                    </div>
 
-            let labels = [];
-<!-- ... existing code ... -->
+                    <!-- Bloco do Patrimônio Total com Olhinho Próprio (Oculto por padrão) -->
+                    <div class="bg-white/10 backdrop-blur-xs border border-white/15 px-4 py-3 rounded-2xl flex items-center justify-between gap-4 shrink-0">
+                        <div>
+                            <span class="text-[10px] text-sage-200 uppercase tracking-wider block">Patrimônio Líquido Acumulado</span>
+                            <span class="text-lg font-extrabold text-white privacy-blur money-val block" id="ind-patrimonio-global">R$ 0,00</span>
+                            <span class="text-[10px] text-emerald-300 block mt-0.5" id="ind-renda-passiva-dash">Renda passiva (13% a.a.): R$ 0,00/mês</span>
+                        </div>
+                        <button onclick="togglePatrimonioPrivacy()" title="Revelar/Ocultar Patrimônio Total" class="p-2 bg-white/10 hover:bg-white/20 rounded-xl text-sage-100 transition">
+                            <i data-lucide="eye-off" id="patrimonio-privacy-icon" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 Sub-Cards de Apoio -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-6">
+                    <!-- Entradas -->
+                    <div onclick="switchTab('entradas')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
+                        <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
+                            <span class="font-medium truncate">Entradas (Mês)</span>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-300 shrink-0"></i>
+                        </div>
+                        <strong class="text-xl font-extrabold text-emerald-300 money-val block truncate" id="ind-entradas-mes">R$ 0,00</strong>
+                        <span class="text-[11px] text-sage-200/80 block mt-1 truncate" id="ind-detalhe-extra">Extra (50/50): R$ 0,00</span>
+                    </div>
+
+                    <!-- Saídas -->
+                    <div onclick="switchTab('saidas')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
+                        <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
+                            <span class="font-medium truncate">Saídas (Mês)</span>
+                            <i data-lucide="arrow-down-right" class="w-4 h-4 text-red-300 shrink-0"></i>
+                        </div>
+                        <strong class="text-xl font-extrabold text-red-300 money-val block truncate" id="ind-saidas-mes">R$ 0,00</strong>
+                        <span class="text-[11px] text-sage-200/80 block mt-1 truncate" id="ind-taxa-poupanca">Resultado: R$ 0,00</span>
+                    </div>
+
+                    <!-- Investimentos -->
+                    <div onclick="switchTab('investimentos')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
+                        <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
+                            <span class="font-medium truncate">Investimentos</span>
+                            <i data-lucide="trending-up" class="w-4 h-4 text-sage-200 shrink-0"></i>
+                        </div>
+                        <strong class="text-xl font-extrabold text-white money-val block truncate" id="ind-investido">R$ 0,00</strong>
+                        <span class="text-[11px] text-emerald-300 font-medium block mt-1 truncate" id="ind-investido-sub">Ver carteira & 13% a.a. →</span>
+                    </div>
+
+                    <!-- Reserva de Emergência -->
+                    <div onclick="switchTab('reserva')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
+                        <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
+                            <span class="font-medium truncate">Reserva Emerg.</span>
+                            <i data-lucide="shield-check" class="w-4 h-4 text-sage-200 shrink-0"></i>
+                        </div>
+                        <strong class="text-xl font-extrabold text-white money-val block truncate" id="ind-reserva">R$ 0,00</strong>
+                        <span class="text-[11px] text-emerald-300 font-medium block mt-1 truncate" id="ind-reserva-sub">Ver valores depositados →</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORÇAMENTO INTELIGENTE DO MÊS -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h3 class="font-bold text-slate-800 text-base">Orçamento Inteligente do Mês</h3>
+                            <span class="px-2.5 py-0.5 text-[10px] font-bold bg-sage-100 text-forest rounded-md" id="ritmo-tempo-label">Base 10/10/2/78 + Extra 50/50</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Renda Regular: <strong class="text-slate-600 money-val" id="plan-regular-ref">R$ 0,00</strong> • 
+                            Renda Extra (50/50): <strong class="text-forest money-val" id="plan-extra-ref">R$ 0,00</strong>
+                        </p>
+                    </div>
+                    <button onclick="openModal('modal-planejamento')" class="text-xs bg-sage-50 hover:bg-sage-100 text-forest font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shrink-0">
+                        <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Configurar Regras
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Bloco 1: PAGUE-SE PRIMEIRO -->
+                    <div class="p-4 rounded-2xl bg-sage-50/60 border border-sage-200 flex flex-col justify-between min-w-0">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1.5">
+                                <span class="text-xs font-bold text-forest truncate">1º Pague-se (Invest.)</span>
+                                <span class="font-bold text-forest bg-sage-100 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-eco">10% + 50%</span>
+                            </div>
+                            <p class="text-xl font-extrabold text-forest money-val truncate" id="val-perc-eco">R$ 0,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="detalhe-eco-composicao">Guardado: R$ 0,00</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-sage-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-eco" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span id="status-pague-se-card" class="font-semibold text-amber-700 truncate">Pendente</span>
+                                <button onclick="abrirModalPagueSe()" class="text-forest font-bold hover:underline shrink-0">Quitar →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 2: Lazer & Sonhos -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between min-w-0">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1.5">
+                                <span class="text-xs font-semibold text-slate-700 truncate">Lazer & Sonhos</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-ent">10% + 50%</span>
+                            </div>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-ent">R$ 0,00</p>
+                            <p class="text-[11px] text-slate-400 mt-1 truncate" id="gasto-ent-status">Usado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-ent" class="h-full bg-sage-500 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block truncate" id="ritmo-ent-msg">Dentro do limite</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 3: Doações - Lei AMRA -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between min-w-0">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1.5">
+                                <span class="text-xs font-semibold text-slate-700 truncate">Doações (AMRA)</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-doa">2% Base</span>
+                            </div>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-doa">R$ 0,00</p>
+                            <p class="text-[11px] text-slate-400 mt-1 truncate" id="gasto-doa-status">Doado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-doa" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block truncate">Lei da proporcionalidade</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 4: Custo Geral / Fixo -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between min-w-0">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1.5">
+                                <span class="text-xs font-semibold text-slate-700 truncate">Custo Geral / Fixo</span>
+                                <span class="font-bold text-slate-700 bg-slate-200/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-dem">78% Base</span>
+                            </div>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-dem">R$ 0,00</p>
+                            <p class="text-[11px] text-slate-400 mt-1 truncate" id="gasto-dem-status">Gasto: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-dem" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block truncate" id="ritmo-dem-msg">Ritmo saudável</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS DO DASHBOARD -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm">Fluxo de Caixa & Velocidade</h3>
+                        <div class="inline-flex rounded-xl bg-slate-100 p-1">
+                            <button onclick="setChartPeriod('semanal')" id="btn-chart-semanal" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs transition">Semanal</button>
+                            <button onclick="setChartPeriod('mensal')" id="btn-chart-mensal" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition">Semestral</button>
+                        </div>
+                    </div>
+                    <div class="h-60 relative">
+                        <canvas id="evolutionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm">Auditoria de Despesas</h3>
+                        <span class="text-xs font-semibold text-slate-500" id="rigidez-badge">Essenciais: 0% • Lazer: 0%</span>
+                    </div>
+                    <div class="h-60 relative flex items-center justify-center">
+                        <canvas id="categoryChart"></canvas>
+                        <p id="no-expense-msg" class="hidden text-xs text-slate-400 absolute">Nenhuma saída registrada neste mês.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOVIMENTAÇÕES DO MÊS COM BUSCA E FILTRO -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Lançamentos do Mês</h3>
+                        <span class="text-xs text-slate-400" id="total-registros-count">0 registros</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input type="text" id="dash-search" oninput="filtrarTabelaDashboard()" placeholder="Buscar descrição ou categoria..." class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-sage-500">
+                        <select id="dash-type-filter" onchange="filtrarTabelaDashboard()" class="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-600">
+                            <option value="todos">Todos</option>
+                            <option value="entrada">Só Entradas</option>
+                            <option value="saida">Só Saídas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400">
+                                <th class="py-3 px-2">Data</th>
+                                <th class="py-3 px-2">Descrição</th>
+                                <th class="py-3 px-2">Categoria</th>
+                                <th class="py-3 px-2">Diagnóstico / Perfil</th>
+                                <th class="py-3 px-2 text-right">Valor</th>
+                                <th class="py-3 px-2 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-transactions-list" class="divide-y divide-slate-100 text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABA 2: ENTRADAS ==================== -->
+        <section id="tab-entradas" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 h-fit">
+                    <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+                        <i data-lucide="arrow-up-circle" class="w-5 h-5 text-forest"></i> Cadastrar Receita
+                    </h3>
+                    <form id="form-entrada" onsubmit="salvarTransacao(event, 'entrada')" class="space-y-4">
+                        <input type="hidden" id="ent-id">
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Valor da Entrada (R$)</label>
+                            <input type="number" step="0.01" min="0.01" id="ent-valor" required oninput="calcularPreviaDistribuicao()" placeholder="0,00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-base font-bold text-forest focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-medium text-slate-600">Categoria</label>
+                                <button type="button" onclick="abrirModalNovaCategoria('entrada')" class="text-[11px] text-sage-600 font-semibold hover:underline">+ Nova categoria</button>
+                            </div>
+                            <select id="ent-categoria" required onchange="verificarCategoriaExtra()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-sage-50/70 border border-sage-200/80 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-forest block">Renda Extra (Regra 50/50)</span>
+                                <span class="text-[10px] text-slate-500">50% Investimentos • 50% Lazer/Sonhos</span>
+                            </div>
+                            <input type="checkbox" id="ent-is-extra" onchange="calcularPreviaDistribuicao()" class="w-5 h-5 accent-forest rounded cursor-pointer">
+                        </div>
+
+                        <div id="ent-preview-box" class="hidden bg-slate-800 text-white rounded-2xl p-3.5 text-xs space-y-2">
+                            <div class="flex items-center gap-1.5 text-emerald-300 font-bold text-[11px] uppercase tracking-wider">
+                                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                <span id="prev-titulo-regra">Regra "Pague-se Primeiro":</span>
+                            </div>
+                            <div id="prev-linhas-container" class="space-y-1 text-slate-200"></div>
+                            <p class="text-[10px] text-amber-300 pt-1 border-t border-white/10">
+                                Regra de Ouro: Transfira o valor de Investimento assim que esta receita cair na conta.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
+                            <input type="text" id="ent-descricao" required placeholder="Ex: Bolsa, Plantão Extra, Monitoria..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Data</label>
+                                <input type="date" id="ent-data" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Modalidade</label>
+                                <select id="ent-recorrencia" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                                    <option value="Mensal">Renda Base (Mensal)</option>
+                                    <option value="Extra_50_50">Extra (50/50)</option>
+                                    <option value="Unica">Única (Base)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-entrada" class="w-full hero-gradient hover:opacity-95 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
+                            Salvar Entrada
+                        </button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Entradas do Mês</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400">
+                                    <th class="py-3 px-2">Data</th>
+                                    <th class="py-3 px-2">Descrição</th>
+                                    <th class="py-3 px-2">Categoria</th>
+                                    <th class="py-3 px-2">Regra / Pague-se 1º</th>
+                                    <th class="py-3 px-2 text-right">Valor</th>
+                                    <th class="py-3 px-2 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-entradas-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABA 3: SAÍDAS ==================== -->
+        <section id="tab-saidas" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 h-fit">
+                    <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+                        <i data-lucide="arrow-down-circle" class="w-5 h-5 text-crimson"></i> Registrar Despesa
+                    </h3>
+                    <form id="form-saida" onsubmit="salvarTransacao(event, 'saida')" class="space-y-4">
+                        <input type="hidden" id="sai-id">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Valor (R$)</label>
+                            <input type="number" step="0.01" min="0.01" id="sai-valor" required oninput="avaliarImpactoSaidaTempoReal()" placeholder="0,00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-base font-bold text-crimson focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
+                            <input type="text" id="sai-descricao" required placeholder="Ex: Mercado, Corrida/Esporte, Imprevisto..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-medium text-slate-600">Categoria</label>
+                                <button type="button" onclick="abrirModalNovaCategoria('saida')" class="text-[11px] text-sage-600 font-semibold hover:underline">+ Nova categoria</button>
+                            </div>
+                            <select id="sai-categoria" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Natureza</label>
+                                <select id="sai-natureza" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
+                                    <option value="Variavel">Variável</option>
+                                    <option value="Fixa">Fixa</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Classificação</label>
+                                <select id="sai-essencialidade" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
+                                    <option value="Essencial">Essencial (78%)</option>
+                                    <option value="Nao Essencial">Não Essencial / Impulso (10%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="sai-impact-warning" class="hidden rounded-2xl p-3.5 text-xs space-y-1 border"></div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Pagamento</label>
+                                <select id="sai-pagamento" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                                    <option value="Pix">Pix</option>
+                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                    <option value="Cartão de Débito">Cartão de Débito</option>
+                                    <option value="Boleto">Boleto</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Data</label>
+                                <input type="date" id="sai-data" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-saida" class="w-full bg-crimson hover:bg-red-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
+                            Salvar Saída
+                        </button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Despesas do Mês</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-100 text-[11px] uppercase text-slate-400">
+                                    <th class="py-3 px-2">Data</th>
+                                    <th class="py-3 px-2">Descrição</th>
+                                    <th class="py-3 px-2">Categoria</th>
+                                    <th class="py-3 px-2">Perfil / Pgto</th>
+                                    <th class="py-3 px-2 text-right">Valor</th>
+                                    <th class="py-3 px-2 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-saidas-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABA 4: INVESTIMENTOS & CENÁRIO OTIMISTA 13% ==================== -->
+        <section id="tab-investimentos" class="tab-content hidden space-y-6">
+            <!-- 4 KPI CARDS DE VALORES JÁ DEPOSITADOS E RENDIMENTO -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-3xl p-5 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+                        <span>Patrimônio na Carteira (Atual)</span>
+                        <i data-lucide="trending-up" class="w-4 h-4 text-forest"></i>
+                    </div>
+                    <p class="text-2xl font-extrabold text-forest mt-1.5 money-val" id="inv-total-atual">R$ 0,00</p>
+                    <span class="text-[11px] text-slate-400 block mt-1" id="inv-qtd-ativos">0 ativos cadastrados</span>
+                </div>
+
+                <div class="bg-white rounded-3xl p-5 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+                        <span>Total Já Depositado (Custo)</span>
+                        <i data-lucide="piggy-bank" class="w-4 h-4 text-sage-600"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 mt-1.5 money-val" id="inv-total-aplicado">R$ 0,00</p>
+                    <span class="text-[11px] text-slate-400 block mt-1">Soma dos aportes na carteira</span>
+                </div>
+
+                <div class="bg-white rounded-3xl p-5 card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between text-xs font-medium text-slate-400">
+                        <span>Rendimento Acumulado</span>
+                        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-forest mt-1.5 money-val" id="inv-rendimento">R$ 0,00 (0%)</p>
+                    <span class="text-[11px] text-slate-400 block mt-1">Lucro sobre o valor depositado</span>
+                </div>
+
+                <div class="bg-sage-50/80 rounded-3xl p-5 card-shadow border border-sage-200">
+                    <div class="flex items-center justify-between text-xs font-bold text-forest">
+                        <span>Renda Passiva Hoje (13% a.a.)</span>
+                        <span class="px-2 py-0.5 text-[10px] rounded-full bg-forest text-white">~1,02% a.m.</span>
+                    </div>
+                    <p class="text-2xl font-extrabold text-forest mt-1.5 money-val" id="inv-renda-passiva-hoje">R$ 0,00/mês</p>
+                    <span class="text-[11px] text-sage-600 block mt-1" id="inv-base-total-rendendo">Carteira + Reserva rendendo</span>
+                </div>
+            </div>
+
+            <!-- PAINEL INTERATIVO: PREVISÃO DE CENÁRIO OTIMISTA (13% a.a.) E RENDA PASSIVA EM 2, 5, 10 ANOS + DESACELERAÇÃO AOS 40+ -->
+            <div class="bg-white rounded-3xl p-6 md:p-7 card-shadow border border-sage-200 space-y-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-forest">Planejamento de Liberdade & Desaceleração (40+ Anos)</span>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sage-100 text-sage-600">Taxa Equivalente: 1,024% a.m.</span>
+                        </div>
+                        <h3 class="text-lg md:text-xl font-extrabold text-slate-800 mt-1.5">
+                            Simulador de Rentabilidade Otimista (13% a.a.) & Renda Passiva em 2, 5 e 10 Anos
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Veja quanto seus valores já depositados + aportes mensais vão gerar de renda mensal sem trabalhar para você reduzir o ritmo de plantões após os 40 anos.
+                        </p>
+                    </div>
+
+                    <!-- Seletor de Modo de Simulação -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <label class="text-xs font-semibold text-slate-600">Base Inicial:</label>
+                        <select id="proj-base-mode" onchange="renderizarSimuladorRentabilidadePassiva()" class="bg-sage-50 border border-sage-200 rounded-xl px-3 py-2 text-xs font-bold text-forest">
+                            <option value="total">Carteira + Reserva Emerg. (Total Depositado)</option>
+                            <option value="carteira">Apenas Carteira de Investimentos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Controles Rápidos do Simulador 13% -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-500 block">Capital Já Depositado (R$)</label>
+                        <input type="text" id="proj-capital-atual-display" disabled class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-extrabold text-forest mt-1 money-val">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-600 block">Aporte Mensal Médio (R$)</label>
+                        <input type="number" id="proj-aporte-mensal" value="500" step="50" oninput="salvarConfigProjecao(); renderizarSimuladorRentabilidadePassiva()" class="w-full bg-white border border-sage-300 rounded-xl px-3 py-2 text-xs font-bold text-forest mt-1">
+                        <div class="flex gap-1 mt-1">
+                            <button type="button" onclick="setAporteProjecao(150)" class="text-[10px] px-1.5 py-0.5 bg-sage-100 text-forest rounded font-semibold">R$150 (Atual)</button>
+                            <button type="button" onclick="setAporteProjecao(3000)" class="text-[10px] px-1.5 py-0.5 bg-sage-100 text-forest rounded font-semibold">R$3k (Médico)</button>
+                            <button type="button" onclick="setAporteProjecao(5000)" class="text-[10px] px-1.5 py-0.5 bg-sage-100 text-forest rounded font-semibold">R$5k</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-semibold text-slate-600 block">Sua Idade Atual</label>
+                        <input type="number" id="proj-idade-atual" value="31"

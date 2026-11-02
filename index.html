@@ -702,7 +702,7 @@
                         <div class="grid grid-cols-2 gap-2.5">
                             <div>
                                 <label class="text-[10px] font-bold text-slate-600">Sua Idade Atual</label>
-                                <input type="number" id="proj-idade-atual" value="25" min="18" max="65" oninput="salvarConfigProjecao(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-sage-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 mt-0.5">
+                                <input type="number" id="proj-idade-atual" value="32" min="18" max="65" oninput="salvarConfigProjecao(); renderizarProjecaoRentabilidade(); rodarSimulacaoCarreira()" class="w-full bg-white border border-sage-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 mt-0.5">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-600">Idade p/ Desacelerar</label>
@@ -710,7 +710,7 @@
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-600">Renda Passiva Alvo (R$)</label>
-                                <input type="number" id="proj-renda-alvo-40" value="10000" step="500" min="1000" oninput="salvarConfigProjecao(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-sage-200 rounded-xl px-3 py-1.5 text-xs font-bold text-forest mt-0.5">
+                                <input type="number" id="proj-renda-alvo-40" value="5000" step="500" min="1000" oninput="salvarConfigProjecao(); renderizarProjecaoRentabilidade(); rodarSimulacaoCarreira()" class="w-full bg-white border border-sage-200 rounded-xl px-3 py-1.5 text-xs font-bold text-forest mt-0.5">
                             </div>
                             <div>
                                 <label class="text-[10px] font-bold text-slate-600">Valor 1 Plantão 12h (R$)</label>
@@ -1002,7 +1002,7 @@
                     </h4>
 
                     <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                        <p class="text-xs font-bold text-slate-700">1. Fase Acadêmica (Até Dez/2028)</p>
+                        <p class="text-xs font-bold text-slate-700">1. Fase Acadêmica (32 aos 34a — Formatura Dez/28)</p>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="text-[10px] text-slate-500">Renda Atual (R$)</label>
@@ -1031,7 +1031,7 @@
                     </div>
 
                     <div class="p-3 rounded-2xl bg-sage-50/70 border border-sage-200 space-y-2">
-                        <p class="text-xs font-bold text-forest">3. Pós-7º Mês (Jul/2029+ Com Aluguel e Carro)</p>
+                        <p class="text-xs font-bold text-forest">3. Generalista (Jul/2029 a Nov/2031 — 34 aos 37a)</p>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="text-[10px] text-slate-600">Renda Médica (R$)</label>
@@ -1048,6 +1048,26 @@
                             </div>
                         </div>
                         <p class="text-[10px] text-slate-500">Orçamento p/ Moradia + Carro + Lazer: <strong id="sim-custo-vida-f2" class="text-slate-700">R$ 7.000,00</strong>/mês.</p>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 space-y-2">
+                        <p class="text-xs font-bold text-forest">4. Pós-Residência (Dez/2031+ — Aos 37+ anos)</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-600">Nova Renda Média (R$)</label>
+                                <input type="number" id="sim-renda-f4" value="15000" oninput="atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-600">% Aporte Pós-2031</label>
+                                <select id="sim-perc-f4" onchange="atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2 py-1.5 text-xs font-bold text-forest">
+                                    <option value="25">25% (R$ 3.750/mês)</option>
+                                    <option value="30" selected>30% (R$ 4.500/mês)</option>
+                                    <option value="40">40% (R$ 6.000/mês)</option>
+                                    <option value="50">50% (R$ 7.500/mês)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500">Aporte mensal a partir de Dez/2031: <strong id="sim-aporte-f4-txt" class="text-forest">R$ 4.500,00</strong>/mês.</p>
                     </div>
 
                     <div>
@@ -1076,7 +1096,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="marcos-patrimonio-grid"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="marcos-patrimonio-grid"></div>
 
                     <!-- Resumo de Renda Passiva 2, 5 e 10 anos integrado ao Simulador 2029 -->
                     <div class="bg-white rounded-3xl p-6 card-shadow border border-sage-200">
@@ -1276,9 +1296,9 @@
             aporteMode: 'plano2029',
             aporteFixo: 1500,
             taxaOtimista: 13,
-            idadeAtual: 25,
+            idadeAtual: 32,
             idadeAlvo: 40,
-            rendaAlvo40: 10000,
+            rendaAlvo40: 5000,
             valorPlantao: 1200
         };
 
@@ -1436,16 +1456,19 @@
             const salvo = safeGetStorage('mp_proj_config');
             if (salvo) {
                 try {
-                    projConfig = { ...projConfig, ...JSON.parse(salvo) };
+                    const parsed = JSON.parse(salvo);
+                    if (parsed.idadeAtual === 25) parsed.idadeAtual = 32;
+                    if (parsed.rendaAlvo40 === 10000) parsed.rendaAlvo40 = 5000;
+                    projConfig = { ...projConfig, ...parsed };
                 } catch (e) {}
             }
             document.getElementById('proj-base-mode').value = projConfig.baseMode || 'total';
             document.getElementById('proj-aporte-mode').value = projConfig.aporteMode || 'plano2029';
             document.getElementById('proj-aporte-fixo-val').value = projConfig.aporteFixo || 1500;
             document.getElementById('proj-taxa-otimista').value = projConfig.taxaOtimista || 13;
-            document.getElementById('proj-idade-atual').value = projConfig.idadeAtual || 25;
+            document.getElementById('proj-idade-atual').value = projConfig.idadeAtual || 32;
             document.getElementById('proj-idade-alvo').value = projConfig.idadeAlvo || 40;
-            document.getElementById('proj-renda-alvo-40').value = projConfig.rendaAlvo40 || 10000;
+            document.getElementById('proj-renda-alvo-40').value = projConfig.rendaAlvo40 || 5000;
             document.getElementById('proj-valor-plantao').value = projConfig.valorPlantao || 1200;
             toggleModoAporteProjecao();
         }
@@ -1455,9 +1478,9 @@
             projConfig.aporteMode = document.getElementById('proj-aporte-mode').value;
             projConfig.aporteFixo = toNum(document.getElementById('proj-aporte-fixo-val').value) || 1500;
             projConfig.taxaOtimista = toNum(document.getElementById('proj-taxa-otimista').value) || 13;
-            projConfig.idadeAtual = toNum(document.getElementById('proj-idade-atual').value) || 25;
+            projConfig.idadeAtual = toNum(document.getElementById('proj-idade-atual').value) || 32;
             projConfig.idadeAlvo = toNum(document.getElementById('proj-idade-alvo').value) || 40;
-            projConfig.rendaAlvo40 = toNum(document.getElementById('proj-renda-alvo-40').value) || 10000;
+            projConfig.rendaAlvo40 = toNum(document.getElementById('proj-renda-alvo-40').value) || 5000;
             projConfig.valorPlantao = toNum(document.getElementById('proj-valor-plantao').value) || 1200;
             safeSetStorage('mp_proj_config', JSON.stringify(projConfig));
         }
@@ -2393,21 +2416,39 @@
             const percF2 = toNum(document.getElementById('sim-perc-f2')?.value) || 30;
             const aportePosSetimoMes = rendaF2 * (percF2 / 100);
 
-            const hoje = new Date();
+            // Fase 4: Pós-Residência (a partir de Dezembro de 2031 -> ganho médio R$ 15.000)
+            const rendaF4 = toNum(document.getElementById('sim-renda-f4')?.value) || 15000;
+            const percF4 = toNum(document.getElementById('sim-perc-f4')?.value) || 30;
+            const aportePosDez2031 = rendaF4 * (percF4 / 100);
+
+            const idadeBase = toNum(document.getElementById('proj-idade-atual')?.value) || 32;
+            const dataInicio = new Date(2026, 10, 1); // Nov/2026 (32 anos)
             let saldo = capitalInicial;
             let totalAportado = capitalInicial;
-            const historico = [{ mes: 0, saldo, totalAportado, jurosAcumulados: 0, rendaPassivaMensal: saldo * taxaMensal }];
+            const historico = [{
+                mes: 0,
+                ano: 2026,
+                mesCalendario: 11,
+                idade: idadeBase,
+                dataFmt: 'Nov/2026',
+                saldo,
+                totalAportado,
+                jurosAcumulados: 0,
+                rendaPassivaMensal: saldo * taxaMensal
+            }];
 
             for (let m = 1; m <= mesesMax; m++) {
-                const d = new Date(hoje.getFullYear(), hoje.getMonth() + m, 1);
+                const d = new Date(dataInicio.getFullYear(), dataInicio.getMonth() + m, 1);
                 const ano = d.getFullYear();
                 const mes = d.getMonth() + 1;
+                const idadeNoMes = idadeBase + Math.floor(m / 12);
 
                 let aporteMes = aporteFixoMensal;
                 if (usarPlano2029) {
                     if (ano < 2029) aporteMes = aporteF1;
                     else if (ano === 2029 && mes <= 6) aporteMes = aporteJanelaOuro;
-                    else aporteMes = aportePosSetimoMes;
+                    else if (ano < 2031 || (ano === 2031 && mes < 12)) aporteMes = aportePosSetimoMes;
+                    else aporteMes = aportePosDez2031; // Dezembro de 2031 em diante (R$ 15k base)
                 }
 
                 saldo = saldo * (1 + taxaMensal) + aporteMes;
@@ -2423,6 +2464,9 @@
                 historico.push({
                     mes: m,
                     ano,
+                    mesCalendario: mes,
+                    idade: idadeNoMes,
+                    dataFmt: d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }),
                     saldo,
                     totalAportado,
                     jurosAcumulados,
@@ -2442,25 +2486,25 @@
             const taxaOtimista = toNum(document.getElementById('proj-taxa-otimista')?.value) || 13;
             const taxaConservadora = 8;
 
-            const idadeAtual = toNum(document.getElementById('proj-idade-atual')?.value) || 25;
+            const idadeAtual = toNum(document.getElementById('proj-idade-atual')?.value) || 32;
             const idadeAlvo = Math.max(idadeAtual + 1, toNum(document.getElementById('proj-idade-alvo')?.value) || 40);
-            const rendaAlvo40 = toNum(document.getElementById('proj-renda-alvo-40')?.value) || 10000;
+            const rendaAlvo40 = toNum(document.getElementById('proj-renda-alvo-40')?.value) || 5000;
             const valorPlantao = Math.max(100, toNum(document.getElementById('proj-valor-plantao')?.value) || 1200);
 
             const capitalInicial = baseMode === 'total' ? (totalInvestidoCarteira + totalReserva) : totalInvestidoCarteira;
             const usarPlano2029 = aporteMode === 'plano2029';
 
-            const mesesAte40 = Math.max(120, (idadeAlvo - idadeAtual) * 12);
-            const simOtimista = calcularEvolucaoMesAMes(capitalInicial, mesesAte40, taxaOtimista, usarPlano2029, aporteFixo);
-            const simConservadora = calcularEvolucaoMesAMes(capitalInicial, mesesAte40, taxaConservadora, usarPlano2029, aporteFixo);
+            const mesesSimulacao = Math.max(240, (idadeAlvo - idadeAtual + 10) * 12);
+            const simOtimista = calcularEvolucaoMesAMes(capitalInicial, mesesSimulacao, taxaOtimista, usarPlano2029, aporteFixo);
+            const simConservadora = calcularEvolucaoMesAMes(capitalInicial, mesesSimulacao, taxaConservadora, usarPlano2029, aporteFixo);
 
             // Taxa de retirada segura real (0.75% a.m. ~ 9.4% a.a., descontando ~3.6% de inflação para preservar o poder de compra perpetuamente)
             const taxaRetiradaSeguraMensal = Math.max(0.005, simOtimista.taxaMensal - 0.003);
 
             const horizontes = [
-                { anos: 2, meses: 24, titulo: 'Em 2 Anos', subtitulo: 'Curto Prazo • Hábito & Base' },
-                { anos: 5, meses: 60, titulo: 'Em 5 Anos', subtitulo: 'Médio Prazo • Tração Médica' },
-                { anos: 10, meses: 120, titulo: 'Em 10 Anos', subtitulo: 'Longo Prazo • Consolidação' }
+                { anos: 2, meses: 24, titulo: 'Em 2 Anos (Nov/2028)', subtitulo: 'Formatura Médica • Aos ' + (idadeAtual + 2) + ' anos' },
+                { anos: 5, meses: 60, titulo: 'Em 5 Anos (Nov/2031)', subtitulo: 'Início Renda R$ 15k • Aos ' + (idadeAtual + 5) + ' anos' },
+                { anos: 10, meses: 120, titulo: 'Em 10 Anos (Nov/2036)', subtitulo: 'Liberdade Passiva > R$ 5k • Aos ' + (idadeAtual + 10) + ' anos' }
             ];
 
             const cardsHTML = horizontes.map(h => {
@@ -2533,34 +2577,51 @@
                 }).join('');
             }
 
-            // Diagnóstico aos 40+ Anos
-            const mesesAlvo40 = (idadeAlvo - idadeAtual) * 12;
+            // Diagnóstico de Liberdade Financeira (Quando atinge Renda Passiva Alvo e situação aos 40+ Anos)
+            const mesesAlvo40 = Math.max(1, (idadeAlvo - idadeAtual) * 12);
             const pt40 = simOtimista.historico[mesesAlvo40] || simOtimista.historico[simOtimista.historico.length - 1];
-            const patrimonioNecessario40 = simOtimista.taxaMensal > 0 ? (rendaAlvo40 / simOtimista.taxaMensal) : 0;
-            const percMeta40 = patrimonioNecessario40 > 0 ? Math.min(100, Math.round((pt40.saldo / patrimonioNecessario40) * 100)) : 0;
+            const patrimonioNecessarioAlvo = simOtimista.taxaMensal > 0 ? (rendaAlvo40 / simOtimista.taxaMensal) : 0;
+            const percMeta40 = patrimonioNecessarioAlvo > 0 ? Math.min(100, Math.round((pt40.saldo / patrimonioNecessarioAlvo) * 100)) : 0;
             const plantoesMenos40 = (pt40.rendaPassivaMensal / valorPlantao).toFixed(1);
+
+            // Descobrir exatamente o mês/ano e idade em que atinge a Renda Passiva Alvo (ex: R$ 5.000/mês)
+            const marcoLiberdadeOti = simOtimista.historico.find(h => h.rendaPassivaMensal >= rendaAlvo40);
+            const marcoLiberdadeCons = simConservadora.historico.find(h => h.rendaPassivaMensal >= rendaAlvo40);
 
             const box40 = document.getElementById('proj-resumo-40-box');
             if (box40) {
                 box40.innerHTML = `
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-slate-500">Aos <strong>${idadeAlvo} anos</strong> (daqui a ${idadeAlvo - idadeAtual} anos):</span>
+                    <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1">
+                        <span class="text-[10px] uppercase font-extrabold text-forest block">🎯 Quando atinge ${formatBRL(rendaAlvo40)}/mês de Renda Passiva:</span>
+                        <p class="text-xs font-extrabold text-forest">
+                            ${marcoLiberdadeOti
+                                ? `Aos <strong>${marcoLiberdadeOti.idade} anos</strong> (${marcoLiberdadeOti.dataFmt}) no cenário ${taxaOtimista}% a.a.`
+                                : `Após os ${idadeAtual + 20} anos`}
+                        </p>
+                        <p class="text-[10px] text-slate-500">
+                            No cenário conservador (8% a.a.): <strong>${marcoLiberdadeCons ? `Aos ${marcoLiberdadeCons.idade} anos (${marcoLiberdadeCons.dataFmt})` : `Após ${idadeAtual + 20} anos`}</strong>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-xs pt-1">
+                        <span class="text-slate-500">Fotografia aos <strong>${idadeAlvo} anos</strong> (${2026 + (idadeAlvo - idadeAtual)}):</span>
                         <span class="font-bold text-forest">${percMeta40}% da meta</span>
                     </div>
-                    <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Patrimônio Projetado aos ${idadeAlvo} Anos</span>
-                        <strong class="text-lg font-extrabold text-forest money-val">${formatBRL(pt40.saldo)}</strong>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Patrimônio (${idadeAlvo}a)</span>
+                            <strong class="text-sm font-extrabold text-forest money-val">${formatBRL(pt40.saldo)}</strong>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Renda Passiva (${idadeAlvo}a)</span>
+                            <strong class="text-sm font-extrabold text-emerald-700 money-val">${formatBRL(pt40.rendaPassivaMensal)}/mês</strong>
+                        </div>
                     </div>
-                    <div class="pt-1 border-t border-slate-100">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Renda Passiva Mensal aos ${idadeAlvo} Anos (${taxaOtimista}% a.a.)</span>
-                        <strong class="text-base font-extrabold text-emerald-700 money-val">${formatBRL(pt40.rendaPassivaMensal)}/mês</strong>
-                        <span class="text-[11px] text-slate-500 block mt-0.5">Permite cortar <strong>~${plantoesMenos40} plantões/mês</strong></span>
-                    </div>
-                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mt-1">
+                    <span class="text-[11px] text-slate-500 block">Aos ${idadeAlvo} anos, substitui <strong>~${plantoesMenos40} plantões/mês</strong></span>
+                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div class="h-full hero-gradient rounded-full transition-all" style="width: ${percMeta40}%"></div>
                     </div>
                     <p class="text-[10px] text-slate-400">
-                        Patrimônio necessário p/ gerar ${formatBRL(rendaAlvo40)}/mês a ${taxaOtimista}% a.a.: <strong class="text-slate-600 money-val">${formatBRL(patrimonioNecessario40)}</strong>
+                        Capital necessário p/ ${formatBRL(rendaAlvo40)}/mês (a ${taxaOtimista}% a.a.): <strong class="text-slate-600 money-val">${formatBRL(patrimonioNecessarioAlvo)}</strong>
                     </p>
                 `;
             }
@@ -2642,6 +2703,12 @@
             const percF2 = toNum(document.getElementById('sim-perc-f2').value) || 30;
             const sobra = rendaF2 * (1 - percF2 / 100);
             document.getElementById('sim-custo-vida-f2').innerText = formatBRL(sobra);
+
+            const rendaF4 = toNum(document.getElementById('sim-renda-f4')?.value) || 15000;
+            const percF4 = toNum(document.getElementById('sim-perc-f4')?.value) || 30;
+            const aporteF4 = rendaF4 * (percF4 / 100);
+            const elF4 = document.getElementById('sim-aporte-f4-txt');
+            if (elF4) elF4.innerText = formatBRL(aporteF4);
         }
 
         function rodarSimulacaoCarreira() {
@@ -2651,6 +2718,9 @@
             let saldoAcumulado = capitalBase;
             let saldoOtimista13 = capitalBase;
 
+            const idadeBase = toNum(document.getElementById('proj-idade-atual')?.value) || 32;
+            const rendaPassivaMeta = toNum(document.getElementById('proj-renda-alvo-40')?.value) || 5000;
+
             const aporteF1 = toNum(document.getElementById('sim-aporte-f1').value) || 150;
             const aporteJanelaOuro = toNum(document.getElementById('sim-aporte-janela').value) || 7000;
             const custoCarroMudanca = toNum(document.getElementById('sim-custo-carro').value) || 32000;
@@ -2659,35 +2729,45 @@
             const percF2 = toNum(document.getElementById('sim-perc-f2').value) || 30;
             const aportePosSetimoMes = rendaF2 * (percF2 / 100);
 
+            const rendaF4 = toNum(document.getElementById('sim-renda-f4')?.value) || 15000;
+            const percF4 = toNum(document.getElementById('sim-perc-f4')?.value) || 30;
+            const aportePosDez2031 = rendaF4 * (percF4 / 100);
+
             const taxaAnual = toNum(document.getElementById('sim-taxa-anual').value) || 13;
             const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
             const taxaComparacao = taxaAnual === 13 ? 8 : 13;
             const taxaMensalComp = Math.pow(1 + taxaComparacao / 100, 1 / 12) - 1;
+
+            const alvoPatrimonioRendaPassiva = taxaMensal > 0 ? Math.round(rendaPassivaMeta / taxaMensal) : 488432;
 
             const dataInicio = new Date(2026, 10, 1);
             const labels = [];
             const valores = [];
             const valoresComp = [];
             const marcos = [
-                { alvo: 45000, titulo: 'Pico Janela Ouro (Jun/29)', dataAtingida: null },
-                { alvo: 100000, titulo: 'Primeiros R$ 100k Líquidos', dataAtingida: null },
-                { alvo: 500000, titulo: 'Meio Milhão (R$ 500k)', dataAtingida: null },
-                { alvo: 1000000, titulo: 'Primeiro Milhão (R$ 1M)', dataAtingida: null }
+                { alvo: 45000, titulo: 'Pico Janela Ouro (Jun/29)', dataAtingida: null, idadeAtingida: null, sub: 'Alvo: R$ 45.000,00' },
+                { alvo: 100000, titulo: 'Primeiros R$ 100k Líquidos', dataAtingida: null, idadeAtingida: null, sub: 'Alvo: R$ 100.000,00' },
+                { alvo: alvoPatrimonioRendaPassiva, titulo: `Renda Passiva ${formatCompactBRL(rendaPassivaMeta)}/mês`, dataAtingida: null, idadeAtingida: null, sub: `Capital: ${formatBRL(alvoPatrimonioRendaPassiva)}` },
+                { alvo: 500000, titulo: 'Meio Milhão (R$ 500k)', dataAtingida: null, idadeAtingida: null, sub: 'Alvo: R$ 500.000,00' },
+                { alvo: 1000000, titulo: 'Primeiro Milhão (R$ 1M)', dataAtingida: null, idadeAtingida: null, sub: 'Alvo: R$ 1.000.000,00' }
             ];
 
             let caixaJunho2029 = 0;
             let sobraJulho2029 = 0;
-            let patrimonioDez2033 = 0;
+            let patrimonio10Anos = 0;
 
-            for (let m = 0; m <= 122; m++) {
+            // Simular 192 meses (16 anos: dos 32 aos 48 anos) para cobrir todos os marcos até R$ 1M+
+            for (let m = 0; m <= 192; m++) {
                 const d = new Date(dataInicio.getFullYear(), dataInicio.getMonth() + m, 1);
                 const ano = d.getFullYear();
                 const mes = d.getMonth() + 1;
+                const idadeNoMes = idadeBase + Math.floor(m / 12);
 
                 let aporteDoMes = 0;
                 if (ano < 2029) aporteDoMes = aporteF1;
                 else if (ano === 2029 && mes <= 6) aporteDoMes = aporteJanelaOuro;
-                else aporteDoMes = aportePosSetimoMes;
+                else if (ano < 2031 || (ano === 2031 && mes < 12)) aporteDoMes = aportePosSetimoMes;
+                else aporteDoMes = aportePosDez2031;
 
                 if (m > 0) {
                     saldoAcumulado = saldoAcumulado * (1 + taxaMensal) + aporteDoMes;
@@ -2703,28 +2783,34 @@
                 marcos.forEach(marco => {
                     if (!marco.dataAtingida && saldoAcumulado >= marco.alvo) {
                         marco.dataAtingida = d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                        marco.idadeAtingida = idadeNoMes;
                     }
                 });
 
-                if (ano === 2033 && mes === 12) patrimonioDez2033 = saldoAcumulado;
+                if (ano === 2036 && mes === 11) patrimonio10Anos = saldoAcumulado;
 
-                if (m === 0 || (ano === 2029 && (mes === 6 || mes === 7)) || mes === 12) {
+                if (m === 0 || (ano === 2029 && (mes === 6 || mes === 7)) || (mes === 12 && ano <= 2041)) {
                     const prefixo = mes === 6 ? 'Jun/' : (mes === 7 ? 'Jul(Carro)/' : (mes === 12 ? 'Dez/' : 'Nov/'));
-                    labels.push(`${prefixo}${String(ano).slice(2)}`);
+                    labels.push(`${prefixo}${String(ano).slice(2)} (${idadeNoMes}a)`);
                     valores.push(Math.round(saldoAcumulado));
                     valoresComp.push(Math.round(saldoOtimista13));
                 }
             }
 
             document.getElementById('sim-caixa-jun2029').innerText = formatBRL(caixaJunho2029);
-            document.getElementById('sim-sobra-pos-carro').innerText = `Reserva intacta pós-carro (Jul/29): ${formatBRL(sobraJulho2029)}`;
-            document.getElementById('sim-patrimonio-5anos').innerText = `Patrimônio Dez/2033 (${taxaAnual}%): ${formatBRL(patrimonioDez2033)}`;
+            document.getElementById('sim-sobra-pos-carro').innerText = `Reserva intacta pós-carro (Jul/29 • ${idadeBase + 2}a): ${formatBRL(sobraJulho2029)}`;
+            document.getElementById('sim-patrimonio-5anos').innerText = `10 Anos (Nov/36 • ${idadeBase + 10}a): ${formatBRL(patrimonio10Anos)}`;
 
             document.getElementById('marcos-patrimonio-grid').innerHTML = marcos.map(m => `
-                <div class="bg-white rounded-2xl p-4 card-shadow border border-slate-100">
-                    <span class="text-[10px] font-bold uppercase text-sage-600 block">${m.titulo}</span>
-                    <strong class="text-base font-extrabold text-forest mt-1 block">${m.dataAtingida || 'Após 2036'}</strong>
-                    <span class="text-[10px] text-slate-400">Alvo: ${formatBRL(m.alvo)}</span>
+                <div class="bg-white rounded-2xl p-4 card-shadow border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase text-sage-600 block">${m.titulo}</span>
+                        <strong class="text-base font-extrabold text-forest mt-1 block">${m.dataAtingida ? `${m.dataAtingida}` : 'Após 48 anos'}</strong>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-forest">${m.idadeAtingida ? `Aos ${m.idadeAtingida} anos` : '48+ anos'}</span>
+                        <span class="text-[10px] text-slate-400 truncate ml-1">${m.sub}</span>
+                    </div>
                 </div>
             `).join('');
 

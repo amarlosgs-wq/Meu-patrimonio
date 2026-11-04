@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -64,6 +65,13 @@
             50% { border-color: rgba(201, 74, 74, 1); }
         }
         .alert-pulse { animation: pulse-border 2s infinite; }
+        @keyframes mercury-glow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.4)); }
+            50% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.85)); }
+        }
+        .thermometer-bulb { animation: mercury-glow 2.5s infinite ease-in-out; }
+        .thermo-pointer { transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        .thermo-mercury { transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
@@ -172,6 +180,9 @@
         <!-- ==================== ABA 1: DASHBOARD ==================== -->
         <section id="tab-dashboard" class="tab-content space-y-6">
             
+            <!-- TERMÔMETRO ARTÍSTICO DE RITMO DE GASTOS & DIAGNÓSTICO COM PÍLULA DE ACONSELHAMENTO -->
+            <div id="spending-thermometer-card" class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-slate-200/90 transition-all duration-300"></div>
+
             <!-- RADAR DE INTELIGÊNCIA COMPORTAMENTAL E ALERTAS -->
             <div id="behavioral-alerts-container" class="space-y-3"></div>
 
@@ -1752,33 +1763,63 @@
 
             document.getElementById('ritmo-tempo-label').innerText = `Dia ${diaCorreto}/${diasNoMes} (${percTempoDecorrido}% do mês)`;
 
-            const orcamentoGastoMaximo = metaEntTotal + metaDemTotal;
+            const orcamentoPadraoRef = (1500 * ((config.perc_entretenimento + config.perc_demais) / 100));
+            const orcamentoGastoMaximo = (metaEntTotal + metaDemTotal) > 0 ? (metaEntTotal + metaDemTotal) : orcamentoPadraoRef;
+            const usandoOrcamentoRef = (metaEntTotal + metaDemTotal) <= 0;
             const percOrcamentoConsumido = orcamentoGastoMaximo > 0 ? Math.round((saidasMesTotal / orcamentoGastoMaximo) * 100) : 0;
             const headerBadge = document.getElementById('header-burn-badge');
 
-            if (orcamentoGastoMaximo > 0 && percOrcamentoConsumido > (percTempoDecorrido + 18)) {
-                const gastoDiarioMedio = saidasMesTotal / Math.max(1, diaCorreto);
-                const diasAteZerar = gastoDiarioMedio > 0 ? Math.max(0, Math.floor((orcamentoGastoMaximo - saidasMesTotal) / gastoDiarioMedio)) : 0;
-                const diaEstouro = Math.min(diasNoMes, diaCorreto + diasAteZerar);
+            const deltaRitmo = percOrcamentoConsumido - percTempoDecorrido;
+            const gastoDiarioMedio = saidasMesTotal / Math.max(1, diaCorreto);
+            const diasRestantesMes = Math.max(1, diasNoMes - diaCorreto);
+            const saldoOrcamentoRestante = Math.max(0, orcamentoGastoMaximo - saidasMesTotal);
+            const cotaDiariaOrcamento = saldoOrcamentoRestante / diasRestantesMes;
+            const gastoEsperadoHoje = orcamentoGastoMaximo * (percTempoDecorrido / 100);
+            const economiaPotencialHoje = Math.max(0, gastoEsperadoHoje - saidasMesTotal);
+            const projecaoFimMes = gastoDiarioMedio * diasNoMes;
+            const economiaProjetadaFimMes = Math.max(0, orcamentoGastoMaximo - projecaoFimMes);
+            const valorSugeridoAporteExtra = Math.max(50, Math.round(economiaPotencialHoje > 25 ? economiaPotencialHoje : (economiaProjetadaFimMes * 0.4)));
 
-                headerBadge.innerText = `⚠️ Ritmo Acelerado (${percOrcamentoConsumido}% gasto)`;
-                headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-crimson';
-
-                alertasHTML.push(`
-                    <div class="bg-red-50 border-l-4 border-crimson rounded-2xl p-4 flex items-start gap-3 shadow-2xs alert-pulse">
-                        <i data-lucide="gauge" class="w-5 h-5 text-crimson shrink-0 mt-0.5"></i>
-                        <div>
-                            <h4 class="text-xs font-extrabold text-red-950 uppercase tracking-wide">Alerta de Velocidade Acelerada (Burn Rate Alto)</h4>
-                            <p class="text-xs text-red-800 mt-0.5">
-                                Estamos no <strong>dia ${diaCorreto} (${percTempoDecorrido}% do tempo)</strong>, mas você já consumiu <strong>${percOrcamentoConsumido}% do orçamento de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}). Nesse ritmo, seu limite acabará no <strong>dia ${diaEstouro}</strong>.
-                            </p>
-                        </div>
-                    </div>
-                `);
+            let estadoTermometro = 'verde';
+            if (percOrcamentoConsumido > 100 || deltaRitmo > 15) {
+                estadoTermometro = 'vermelho';
+            } else if (deltaRitmo >= -3) {
+                estadoTermometro = 'laranja';
             } else {
-                headerBadge.innerText = `10/10/2/78 + Extra 50/50`;
-                headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-sage-100 text-forest';
+                estadoTermometro = 'verde';
             }
+
+            if (estadoTermometro === 'vermelho') {
+                headerBadge.innerText = `🔴 Termômetro Vermelho (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-crimson';
+            } else if (estadoTermometro === 'laranja') {
+                headerBadge.innerText = `🟠 Sinal Laranja: Atenção (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800';
+            } else {
+                headerBadge.innerText = `🟢 Sinal Verde: Ritmo Lentificado (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-forest';
+            }
+
+            renderizarTermometroGastos({
+                estado: estadoTermometro,
+                diaCorreto,
+                diasNoMes,
+                diasRestantesMes,
+                percTempoDecorrido,
+                percOrcamentoConsumido,
+                deltaRitmo,
+                saidasMesTotal,
+                orcamentoGastoMaximo,
+                usandoOrcamentoRef,
+                gastoDiarioMedio,
+                cotaDiariaOrcamento,
+                gastoEsperadoHoje,
+                economiaPotencialHoje,
+                economiaProjetadaFimMes,
+                valorSugeridoAporteExtra,
+                gastoLazer,
+                metaEntTotal
+            });
 
             if (metaEntTotal > 0 && gastoLazer > metaEntTotal) {
                 const excesso = gastoLazer - metaEntTotal;
@@ -1812,6 +1853,259 @@
             }
 
             container.innerHTML = alertasHTML.join('');
+        }
+
+        function renderizarTermometroGastos(dados) {
+            const card = document.getElementById('spending-thermometer-card');
+            if (!card) return;
+
+            const {
+                estado, diaCorreto, diasNoMes, diasRestantesMes,
+                percTempoDecorrido, percOrcamentoConsumido, deltaRitmo,
+                saidasMesTotal, orcamentoGastoMaximo, usandoOrcamentoRef,
+                gastoDiarioMedio, cotaDiariaOrcamento, gastoEsperadoHoje,
+                economiaPotencialHoje, economiaProjetadaFimMes, valorSugeridoAporteExtra
+            } = dados;
+
+            // Posição visual do mercúrio no termômetro artístico (0% a 100%)
+            // 50% no tubo representa ritmo perfeitamente pareado (delta = 0). Abaixo de 42% = Verde, 42% a 68% = Laranja, > 68% = Vermelho
+            const posPont = Math.max(6, Math.min(96, Math.round(50 + (deltaRitmo * 1.35))));
+            const posTempo = Math.max(4, Math.min(96, percTempoDecorrido));
+            const posGasto = Math.max(4, Math.min(100, percOrcamentoConsumido));
+
+            const diasAteZerar = gastoDiarioMedio > 0 ? Math.max(0, Math.floor((orcamentoGastoMaximo - saidasMesTotal) / gastoDiarioMedio)) : diasRestantesMes;
+            const diaEstouro = Math.min(diasNoMes, diaCorreto + diasAteZerar);
+            const excessoAcimaDoEsperado = Math.max(0, saidasMesTotal - gastoEsperadoHoje);
+
+            let tema = {};
+            if (estado === 'vermelho') {
+                tema = {
+                    cardBorder: 'border-red-300 bg-gradient-to-br from-white via-red-50/40 to-red-50/70 alert-pulse',
+                    sinalBadgeBg: 'bg-crimson text-white shadow-sm',
+                    sinalTexto: 'SINAL VERMELHO • RITMO MUITO ACELERADO',
+                    titulo: 'Temperatura Crítica: Gastos Acima da Velocidade do Mês',
+                    corPrimaria: '#C94A4A',
+                    corSecundaria: '#FCA5A5',
+                    corTextoDestaque: 'text-crimson',
+                    corBarraGasto: 'bg-gradient-to-r from-amber-500 via-red-500 to-crimson',
+                    grauTemp: `${Math.min(42, (38.5 + Math.max(0, deltaRitmo) * 0.08)).toFixed(1)}°C`,
+                    rotuloTemp: 'Febre Orçamentária',
+                    motivoDiagnostico: `O termômetro está <strong class="text-crimson">vermelho</strong> porque você já consumiu <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. base' : ''}) tendo decorrido apenas <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}). Seu ritmo está <strong>+${ Math.max(1, deltaRitmo) } pontos percentuais acima</strong> do calendário (${formatBRL(excessoAcimaDoEsperado)} acima do teto proporcional de hoje) e, nessa velocidade (${formatBRL(gastoDiarioMedio)}/dia), seu orçamento se esgotará no <strong>dia ${diaEstouro}</strong>.`,
+                    pilulaBg: 'bg-red-950 text-white border-red-800',
+                    pilulaTag: '💊 Pílula de Aconselhamento • Freio de Emergência',
+                    pilulaTitulo: 'Congele gastos não essenciais por 72h e recalibre seu teto diário',
+                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Ative um <strong>bloqueio de 72 horas</strong> para compras por impulso, delivery ou lazer; (2) Reduza seu ritmo pelos próximos ${diasRestantesMes} dias para no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (3) Audite abaixo suas últimas saídas variáveis para cortar excessos imediatamente.`,
+                    btnAcaoTexto: 'Auditar Saídas do Mês',
+                    btnAcaoClass: 'bg-crimson hover:bg-red-700 text-white',
+                    btnAcaoFn: `acaoPilulaTermometro('auditar_saidas')`,
+                    btnSecTexto: 'Revisar Teto 10/10/2/78',
+                    btnSecFn: `openModal('modal-planejamento')`
+                };
+            } else if (estado === 'laranja') {
+                tema = {
+                    cardBorder: 'border-amber-300 bg-gradient-to-br from-white via-amber-50/30 to-amber-50/60',
+                    sinalBadgeBg: 'bg-amber-500 text-white shadow-sm',
+                    sinalTexto: 'SINAL LARANJA • ESTADO DE ATENÇÃO',
+                    titulo: 'Temperatura Morna: Ritmo no Limite da Previsão',
+                    corPrimaria: '#D97706',
+                    corSecundaria: '#FCD34D',
+                    corTextoDestaque: 'text-amber-600',
+                    corBarraGasto: 'bg-gradient-to-r from-emerald-500 via-amber-400 to-amber-600',
+                    grauTemp: `${(37.1 + Math.max(0, deltaRitmo + 3) * 0.07).toFixed(1)}°C`,
+                    rotuloTemp: 'Zona de Vigilância',
+                    motivoDiagnostico: `O sinal está <strong class="text-amber-600">laranja (atenção)</strong> porque você já utilizou <strong>${percOrcamentoConsumido}% da sua previsão mensal</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. base' : ''}) com <strong>${percTempoDecorrido}% do mês decorrido</strong> (Dia ${diaCorreto} de ${diasNoMes}). Como a margem entre o gasto e o tempo está estreita (${deltaRitmo >= 0 ? '+' + deltaRitmo : deltaRitmo}% de diferença), qualquer despesa extra não planejada empurrará seu orçamento para o vermelho.`,
+                    pilulaBg: 'bg-amber-950 text-white border-amber-800',
+                    pilulaTag: '💊 Pílula de Aconselhamento • Manobra de Estabilização',
+                    pilulaTitulo: 'Trave o teto diário e desacople pequenos gastos variáveis',
+                    pilulaTexto: `Para fazer o termômetro voltar ao sinal verde e abrir folga para investir: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo da cota segura de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) Adie compras não urgentes da cota de 10% (Lazer) para a próxima semana; (3) Se ainda não quitou seu "Pague-se Primeiro", blinde-o agora antes que o giro livre seja consumido.`,
+                    btnAcaoTexto: 'Quitar Pague-se 1º',
+                    btnAcaoClass: 'bg-amber-500 hover:bg-amber-600 text-white',
+                    btnAcaoFn: `abrirModalPagueSe()`,
+                    btnSecTexto: 'Ver Saídas Variáveis',
+                    btnSecFn: `acaoPilulaTermometro('auditar_saidas')`
+                };
+            } else {
+                tema = {
+                    cardBorder: 'border-emerald-300 bg-gradient-to-br from-white via-emerald-50/30 to-sage-50/70',
+                    sinalBadgeBg: 'bg-forest text-white shadow-sm',
+                    sinalTexto: 'SINAL VERDE • RITMO LENTIFICADO & ECONÔMICO',
+                    titulo: 'Temperatura Ideal: Ritmo Desacelerado com Folga de Caixa',
+                    corPrimaria: '#1B4332',
+                    corSecundaria: '#6EE7B7',
+                    corTextoDestaque: 'text-forest',
+                    corBarraGasto: 'bg-gradient-to-r from-emerald-600 to-forest',
+                    grauTemp: '36.2°C',
+                    rotuloTemp: 'Saúde Financeira Ótima',
+                    motivoDiagnostico: `O sinal está <strong class="text-forest">verde</strong> porque o seu ritmo de gastos está <strong>lentificado e controlado</strong>: já se passaram <strong>${percTempoDecorrido}% do decorrer do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}), mas você consumiu apenas <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. base' : ''}). Essa desaceleração gerou uma <strong>folga acumulada de ${formatBRL(economiaPotencialHoje)}</strong> abaixo do teto esperado para hoje!`,
+                    pilulaBg: ' hero-gradient text-white border-emerald-800',
+                    pilulaTag: '💊 Pílula de Aconselhamento • Multiplicação de Patrimônio',
+                    pilulaTitulo: `Converta sua economia em um aporte extra de ${formatBRL(valorSugeridoAporteExtra)} agora`,
+                    pilulaTexto: `Como seu ritmo está lentificado, não deixe essa sobra parada na conta corrente (onde ela corre risco de ser gasta por impulso): (1) Aproveite a janela verde para fazer um <strong>aporte extra de ${formatBRL(valorSugeridoAporteExtra)}</strong> na sua Carteira (a 13% a.a.) ou Reserva; (2) Mantendo esse ritmo até o dia ${diasNoMes}, você fechará o mês economizando <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras rumo à sua meta de renda passiva!`,
+                    btnAcaoTexto: `Aportar Economia (${formatBRL(valorSugeridoAporteExtra)})`,
+                    btnAcaoClass: 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold',
+                    btnAcaoFn: `acaoPilulaTermometro('aportar_economia', ${valorSugeridoAporteExtra})`,
+                    btnSecTexto: 'Simular Juros (13% a.a.)',
+                    btnSecFn: `switchTab('investimentos')`
+                };
+            }
+
+            card.className = `rounded-3xl p-5 md:p-6 card-shadow border-2 transition-all duration-300 ${tema.cardBorder}`;
+
+            card.innerHTML = `
+                <!-- Cabeçalho do Termômetro -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200/70">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 ${tema.sinalBadgeBg}">
+                            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                            ${tema.sinalTexto}
+                        </span>
+                        <span class="text-xs font-bold text-slate-500 bg-white/80 border border-slate-200 px-2.5 py-1 rounded-full">
+                            Dia ${diaCorreto}/${diasNoMes} • ${percTempoDecorrido}% do mês vs ${percOrcamentoConsumido}% orçado
+                        </span>
+                    </div>
+
+                    <!-- Semáforo de 3 Luzes + Temperatura -->
+                    <div class="flex items-center gap-3 bg-slate-900 text-white px-3.5 py-1.5 rounded-2xl shadow-inner">
+                        <div class="flex items-center gap-1.5" title="Semáforo de Ritmo: Verde (Lentificado), Laranja (Atenção), Vermelho (Acelerado)">
+                            <span class="w-3 h-3 rounded-full transition-all ${estado === 'verde' ? 'bg-emerald-400 ring-4 ring-emerald-400/30 scale-110' : 'bg-emerald-950 opacity-40'}"></span>
+                            <span class="w-3 h-3 rounded-full transition-all ${estado === 'laranja' ? 'bg-amber-400 ring-4 ring-amber-400/30 scale-110' : 'bg-amber-950 opacity-40'}"></span>
+                            <span class="w-3 h-3 rounded-full transition-all ${estado === 'vermelho' ? 'bg-red-500 ring-4 ring-red-500/30 scale-110' : 'bg-red-950 opacity-40'}"></span>
+                        </div>
+                        <div class="border-l border-white/15 pl-2.5 text-right">
+                            <span class="text-xs font-extrabold tracking-tight block leading-none">${tema.grauTemp}</span>
+                            <span class="text-[9px] text-slate-300 uppercase tracking-wider block">${tema.rotuloTemp}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Corpo Principal: Ilustração Artística do Termômetro + Diagnóstico + Pílula -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-5 items-center">
+                    
+                    <!-- Coluna 1: Termômetro Artístico Visual (5 Colunas no Desktop) -->
+                    <div class="lg:col-span-5 bg-white/90 rounded-2xl p-4 border border-slate-200/80 shadow-2xs space-y-4">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-500">
+                            <span class="text-forest flex items-center gap-1">🟢 Lentificado (Investir)</span>
+                            <span class="text-amber-600">🟠 Atenção</span>
+                            <span class="text-crimson flex items-center gap-1">🔴 Acelerado</span>
+                        </div>
+
+                        <!-- Arte do Termômetro de Vidro e Mercúrio -->
+                        <div class="relative flex items-center py-3 select-none">
+                            <!-- Bulbo Esquerdo do Termômetro (SVG Artístico) -->
+                            <div class="relative z-10 -mr-2 shrink-0 thermometer-bulb">
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-md border-4 border-slate-800" style="background: radial-gradient(circle at 30% 30%, ${tema.corSecundaria}, ${tema.corPrimaria});">
+                                    <i data-lucide="thermometer" class="w-5 h-5 text-white"></i>
+                                </div>
+                            </div>
+
+                            <!-- Tubo Graduado do Termômetro -->
+                            <div class="relative flex-1 h-7 bg-slate-900 rounded-r-full border-4 border-l-0 border-slate-800 p-1 flex items-center shadow-inner overflow-visible">
+                                <!-- Trilha tricolor de fundo sutil -->
+                                <div class="absolute inset-1 rounded-r-full opacity-35" style="background: linear-gradient(90deg, #10B981 0%, #10B981 40%, #F59E0B 45%, #F59E0B 68%, #EF4444 72%, #DC2626 100%);"></div>
+
+                                <!-- Coluna de Mercúrio Dinâmica -->
+                                <div class="thermo-mercury relative h-full rounded-r-full shadow-xs" style="width: ${posPont}%; background: linear-gradient(90deg, #1B4332 0%, ${tema.corPrimaria} 100%);"></div>
+
+                                <!-- Marcações de Escala do Termômetro -->
+                                <div class="absolute inset-0 flex justify-between px-3 items-center pointer-events-none">
+                                    <span class="w-0.5 h-2 bg-white/40"></span>
+                                    <span class="w-0.5 h-3 bg-white/50"></span>
+                                    <span class="w-0.5 h-2 bg-white/40"></span>
+                                    <span class="w-0.5 h-3.5 bg-white/80" title="Equilíbrio Gasto = Tempo"></span>
+                                    <span class="w-0.5 h-2 bg-white/40"></span>
+                                    <span class="w-0.5 h-3 bg-white/50"></span>
+                                    <span class="w-0.5 h-2 bg-white/40"></span>
+                                </div>
+
+                                <!-- Ponteiro Indicador Flutuante -->
+                                <div class="thermo-pointer absolute -top-7 -translate-x-1/2 flex flex-col items-center z-20" style="left: ${posPont}%;">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold text-white shadow-sm whitespace-nowrap" style="background-color: ${tema.corPrimaria};">
+                                        ${deltaRitmo > 0 ? '+' + deltaRitmo + '% rápido' : (deltaRitmo < 0 ? Math.abs(deltaRitmo) + '% econômico' : 'No ritmo')}
+                                    </span>
+                                    <div class="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent" style="border-top-color: ${tema.corPrimaria};"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comparativo Duplo de Barras: Gasto Realizado vs Tempo do Mês -->
+                        <div class="space-y-2.5 pt-1 border-t border-slate-100">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="font-bold text-slate-700">🔥 Gasto Realizado da Previsão</span>
+                                    <strong class="${tema.corTextoDestaque} money-val">${percOrcamentoConsumido}% (${formatBRL(saidasMesTotal)} / ${formatBRL(orcamentoGastoMaximo)})</strong>
+                                </div>
+                                <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+                                    <div class="h-full rounded-full transition-all duration-500 ${tema.corBarraGasto}" style="width: ${posGasto}%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="font-semibold text-slate-500">⏳ Tempo Decorrido no Mês</span>
+                                    <strong class="text-slate-600">${percTempoDecorrido}% (Dia ${diaCorreto} de ${diasNoMes})</strong>
+                                </div>
+                                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-slate-400 rounded-full transition-all duration-500" style="width: ${posTempo}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna 2: Diagnóstico Detalhado + Pílula de Aconselhamento (7 Colunas no Desktop) -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div>
+                            <h3 class="text-base md:text-lg font-extrabold text-slate-800 leading-snug">${tema.titulo}</h3>
+                            <p class="text-xs md:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                                ${tema.motivoDiagnostico}
+                            </p>
+                        </div>
+
+                        <!-- PÍLULA DE ACONSELHAMENTO ACIONÁVEL -->
+                        <div class="rounded-2xl p-4 border shadow-sm ${tema.pilulaBg} space-y-2.5">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/15 text-white">
+                                    ${tema.pilulaTag}
+                                </span>
+                                <span class="text-[11px] font-semibold text-white/80 money-val">
+                                    Teto diário seguro: ${formatBRL(cotaDiariaOrcamento)}/dia
+                                </span>
+                            </div>
+                            <h4 class="text-xs md:text-sm font-extrabold text-white">${tema.pilulaTitulo}</h4>
+                            <p class="text-xs text-white/90 leading-relaxed">
+                                ${tema.pilulaTexto}
+                            </p>
+                            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                                <button type="button" onclick="${tema.btnAcaoFn}" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 ${tema.btnAcaoClass}">
+                                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                                    <span>${tema.btnAcaoTexto}</span>
+                                </button>
+                                <button type="button" onclick="${tema.btnSecFn}" class="px-3 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition">
+                                    ${tema.btnSecTexto} →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function acaoPilulaTermometro(acao, valorSugerido = 150) {
+            if (acao === 'aportar_economia') {
+                document.getElementById('pague-se-valor-input').value = Number(valorSugerido || 150).toFixed(2);
+                document.getElementById('pague-se-destino-select').value = 'investimento';
+                document.getElementById('pague-se-local-input').value = 'Aporte Extra (Economia do Termômetro Verde)';
+                openModal('modal-pague-se');
+            } else if (acao === 'auditar_saidas') {
+                const filtroSelect = document.getElementById('dash-type-filter');
+                if (filtroSelect) {
+                    filtroSelect.value = 'saida';
+                    filtrarLancamentosDashboard();
+                }
+                const tabelaEl = document.getElementById('dashboard-transactions-list');
+                if (tabelaEl) tabelaEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast('Exibindo apenas as saídas do mês para auditoria de gastos.', 'alerta');
+            }
         }
 
         function abrirModalPagueSe() {
@@ -3338,3 +3632,4 @@
     </script>
 </body>
 </html>
+```

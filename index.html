@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -128,7 +127,7 @@
         <div class="pt-4 border-t border-slate-100 space-y-1">
             <button onclick="openModal('modal-planejamento')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
                 <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
-                <span class="truncate">Regra 10/10/2/78 + 50/50</span>
+                <span class="truncate">8 Blocos (10/40/15/10/10/5/2/8)</span>
             </button>
             <button onclick="openModal('modal-db')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
                 <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
@@ -258,33 +257,59 @@
                 </div>
             </div>
 
-            <!-- ORÇAMENTO INTELIGENTE DO MÊS -->
-            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+            <!-- ORÇAMENTO INTELIGENTE DO MÊS (MODELO DE 8 CATEGORIAS: FIXOS & VARIADOS) -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <h3 class="font-bold text-slate-800 text-base">Orçamento Inteligente do Mês</h3>
-                            <span class="px-2.5 py-0.5 text-[10px] font-bold bg-sage-100 text-forest rounded-md" id="ritmo-tempo-label">Base 10/10/2/78 + Extra 50/50</span>
+                            <h3 class="font-bold text-slate-800 text-base">Orçamento Inteligente do Mês (8 Blocos: Fixos & Variados)</h3>
+                            <span class="px-2.5 py-0.5 text-[10px] font-bold bg-sage-100 text-forest rounded-md" id="ritmo-tempo-label">10/40/15/10/10/5/2/8 + Extra 50/50</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1">
-                            Renda Regular: <strong class="text-slate-600 money-val" id="plan-regular-ref">R$ 0,00</strong> • 
-                            Renda Extra (50/50): <strong class="text-forest money-val" id="plan-extra-ref">R$ 0,00</strong>
+                            Renda Base Referência: <strong class="text-slate-600 money-val" id="plan-regular-ref">R$ 1.500,00</strong> • 
+                            Renda Extra (50/50): <strong class="text-forest money-val" id="plan-extra-ref">R$ 0,00</strong> •
+                            <span class="text-emerald-700 font-semibold">Nota: priorize os R$ 150 de Investimentos na Reserva de Emergência (3 a 6 meses de Custos Fixos)</span>
                         </p>
                     </div>
-                    <button onclick="openModal('modal-planejamento')" class="text-xs bg-sage-50 hover:bg-sage-100 text-forest font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shrink-0">
-                        <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Configurar Regras
-                    </button>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button type="button" onclick="toggleGuiaBlocos()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                            <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> O que colocar em cada bloco?
+                        </button>
+                        <button onclick="openModal('modal-planejamento')" class="text-xs bg-sage-50 hover:bg-sage-100 text-forest font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+                            <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Configurar Regras
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Guia Rápido Colapsável dos 8 Blocos -->
+                <div id="guia-oito-blocos" class="hidden rounded-2xl bg-slate-50 border border-slate-200/80 p-4 text-xs space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <span class="font-extrabold text-slate-700 uppercase tracking-wider text-[11px]">Guia Prático: O que colocar em cada um dos 8 blocos (Base R$ 1.500,00)</span>
+                        <span class="text-[11px] font-semibold text-forest">10% Inv. • 40% Fixos • 25% Conforto/Prazeres • 15% Metas/Conhec. • 10% Lei de Anha/Outros</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-[11px]">
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-forest block">1. Investimentos (10% • R$ 150) [Fixo]</strong>Tesouro Selic, CDB, reserva de emergência e renda fixa.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">2. Custos fixos (40% • R$ 600) [Fixo]</strong>Alimentação básica, transporte, contas, mensalidades e despesas essenciais.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">3. Conforto (15% • R$ 225) [Variado]</strong>Academia, roupas, cuidados pessoais, streaming, delivery e Uber.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">4. Metas (10% • R$ 150) [Fixo/Planejado]</strong>Viagens, computador, carro, projetos pessoais e compras planejadas.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">5. Prazeres (10% • R$ 150) [Variado]</strong>Cinema, restaurantes, passeios, jogos e entretenimento.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">6. Conhecimento (5% • R$ 75) [Variado]</strong>Livros, cursos, congressos, idiomas e materiais de estudo.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">7. Lei de Anha (2% • R$ 30) [Fixo]</strong>Reserva específica conforme a finalidade atribuída a essa categoria.</div>
+                        <div class="p-2.5 rounded-xl bg-white border border-slate-200/70"><strong class="text-slate-800 block">8. Outros gastos (8% • R$ 120) [Variado]</strong>Pet, medicamentos, imprevistos e despesas extraordinárias.</div>
+                    </div>
+                </div>
+
+                <!-- Grid Principal com os 4 Blocos Pilares (Mantendo IDs originais para compatibilidade total) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Bloco 1: PAGUE-SE PRIMEIRO -->
-                    <div class="p-4 rounded-2xl bg-sage-50/60 border border-sage-200 flex flex-col justify-between min-w-0">
+                    <!-- Bloco 1: INVESTIMENTOS (10% = R$ 150) -->
+                    <div class="p-4 rounded-2xl bg-sage-50/60 border border-sage-200 flex flex-col justify-between min-w-0" id="card-bloco-investimentos">
                         <div>
-                            <div class="flex items-center justify-between gap-1 mb-1.5">
-                                <span class="text-xs font-bold text-forest truncate">1º Pague-se (Invest.)</span>
-                                <span class="font-bold text-forest bg-sage-100 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-eco">10% + 50%</span>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-forest truncate">1. Investimentos (Pague-se 1º)</span>
+                                <span class="font-bold text-forest bg-sage-100 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-eco">10% + 50% Extra</span>
                             </div>
-                            <p class="text-xl font-extrabold text-forest money-val truncate" id="val-perc-eco">R$ 0,00</p>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Fixo • Selic, CDB, Reserva de Emergência</span>
+                            <p class="text-xl font-extrabold text-forest money-val truncate" id="val-perc-eco">R$ 150,00</p>
                             <p class="text-[11px] text-slate-500 mt-1 truncate" id="detalhe-eco-composicao">Guardado: R$ 0,00</p>
                         </div>
                         <div class="mt-3 pt-2 border-t border-sage-200/60">
@@ -298,57 +323,136 @@
                         </div>
                     </div>
 
-                    <!-- Bloco 2: Lazer & Sonhos -->
-                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between min-w-0">
+                    <!-- Bloco 2: CUSTOS FIXOS (40% = R$ 600) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-custos-fixos">
                         <div>
-                            <div class="flex items-center justify-between gap-1 mb-1.5">
-                                <span class="text-xs font-semibold text-slate-700 truncate">Lazer & Sonhos</span>
-                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-ent">10% + 50%</span>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">2. Custos fixos (Essenciais)</span>
+                                <span class="font-bold text-slate-700 bg-slate-200/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-dem">40% Base</span>
                             </div>
-                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-ent">R$ 0,00</p>
-                            <p class="text-[11px] text-slate-400 mt-1 truncate" id="gasto-ent-status">Usado: R$ 0,00 (0%)</p>
-                        </div>
-                        <div class="mt-3 pt-2 border-t border-slate-200/60">
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
-                                <div id="bar-ent" class="h-full bg-sage-500 rounded-full transition-all" style="width: 0%"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 block truncate" id="ritmo-ent-msg">Dentro do limite</span>
-                        </div>
-                    </div>
-
-                    <!-- Bloco 3: Doações - Lei AMRA -->
-                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between min-w-0">
-                        <div>
-                            <div class="flex items-center justify-between gap-1 mb-1.5">
-                                <span class="text-xs font-semibold text-slate-700 truncate">Doações (AMRA)</span>
-                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-doa">2% Base</span>
-                            </div>
-                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-doa">R$ 0,00</p>
-                            <p class="text-[11px] text-slate-400 mt-1 truncate" id="gasto-doa-status">Doado: R$ 0,00 (0%)</p>
-                        </div>
-                        <div class="mt-3 pt-2 border-t border-slate-200/60">
-                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
-                                <div id="bar-doa" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 block truncate">Lei da proporcionalidade</span>
-                        </div>
-                    </div>
-
-                    <!-- Bloco 4: Custo Geral / Fixo -->
-                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between min-w-0">
-                        <div>
-                            <div class="flex items-center justify-between gap-1 mb-1.5">
-                                <span class="text-xs font-semibold text-slate-700 truncate">Custo Geral / Fixo</span>
-                                <span class="font-bold text-slate-700 bg-slate-200/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-dem">78% Base</span>
-                            </div>
-                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-dem">R$ 0,00</p>
-                            <p class="text-[11px] text-slate-400 mt-1 truncate" id="gasto-dem-status">Gasto: R$ 0,00 (0%)</p>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Bloco Fixo • Alimentação, contas, transporte</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-dem">R$ 600,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-dem-status">Gasto: R$ 0,00 (0%)</p>
                         </div>
                         <div class="mt-3 pt-2 border-t border-slate-200/60">
                             <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
                                 <div id="bar-dem" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
                             </div>
-                            <span class="text-[10px] text-slate-400 block truncate" id="ritmo-dem-msg">Ritmo saudável</span>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-dem-msg">Previsão fixa: R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 3: CONFORTO (15% = R$ 225) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-conforto">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">3. Conforto</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-conforto">15% Base</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Variado • Academia, roupas, streaming, Uber</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-conforto">R$ 225,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-conforto-status">Usado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-conforto" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-conforto-msg">Dentro do limite</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 4: METAS (10% = R$ 150) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-metas">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">4. Metas (Projetos)</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-metas">10% Base</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Planejado • Viagens, carro, computador</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-metas">R$ 150,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-metas-status">Alocado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-metas" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-metas-msg">No ritmo das metas</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 5: PRAZERES (10% = R$ 150) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-prazeres">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">5. Prazeres (Lazer)</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-ent">10% + 50% Extra</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Variado • Cinema, restaurantes, passeios</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-ent">R$ 150,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-ent-status">Usado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-ent" class="h-full bg-sage-500 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-ent-msg">Dentro do limite</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 6: CONHECIMENTO (5% = R$ 75) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-conhecimento">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">6. Conhecimento</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-conhecimento">5% Base</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Variado • Livros, cursos, congressos, idiomas</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-conhecimento">R$ 75,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-conhecimento-status">Investido: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-conhecimento" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-conhecimento-msg">Dentro do limite</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 7: LEI DE ANHA (2% = R$ 30) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-anha">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">7. Lei de Anha</span>
+                                <span class="font-bold text-sage-600 bg-sage-100/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-doa">2% Base</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Fixo • Reserva específica / proporcionalidade</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-doa">R$ 30,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-doa-status">Destinado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-doa" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-doa-msg">Lei da proporcionalidade</span>
+                        </div>
+                    </div>
+
+                    <!-- Bloco 8: OUTROS GASTOS (8% = R$ 120) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col justify-between min-w-0" id="card-bloco-outros">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-xs font-bold text-slate-800 truncate">8. Outros gastos</span>
+                                <span class="font-bold text-slate-700 bg-slate-200/70 px-2 py-0.5 rounded-md text-[10px] whitespace-nowrap shrink-0" id="lbl-perc-outros">8% Base</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mb-1 truncate">Variado • Pet, medicamentos, imprevistos</span>
+                            <p class="text-xl font-extrabold text-slate-800 money-val truncate" id="val-perc-outros">R$ 120,00</p>
+                            <p class="text-[11px] text-slate-500 mt-1 truncate" id="gasto-outros-status">Usado: R$ 0,00 (0%)</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-slate-200/60">
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
+                                <div id="bar-outros" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span class="text-[10px] text-slate-500 block truncate" id="ritmo-outros-msg">Margem de flexibilidade</span>
                         </div>
                     </div>
                 </div>
@@ -531,7 +635,7 @@
                                 <label class="text-xs font-medium text-slate-600">Categoria</label>
                                 <button type="button" onclick="novaCategoriaPrompt('saida')" class="text-[11px] text-sage-600 font-semibold hover:underline">+ Nova categoria</button>
                             </div>
-                            <select id="sai-categoria" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
+                            <select id="sai-categoria" required onchange="autoSelecionarBlocoPorCategoria(); avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -543,10 +647,15 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Classificação</label>
-                                <select id="sai-essencialidade" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
-                                    <option value="Essencial">Essencial (78%)</option>
-                                    <option value="Nao Essencial">Não Essencial / Impulso (10%)</option>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Bloco do Orçamento</label>
+                                <select id="sai-essencialidade" required onchange="sincronizarNaturezaPorBloco(); avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700">
+                                    <option value="Custos fixos">Custos fixos (40% • Fixo/Essencial)</option>
+                                    <option value="Conforto">Conforto (15% • Variado)</option>
+                                    <option value="Metas">Metas (10% • Planejado)</option>
+                                    <option value="Prazeres">Prazeres (10% • Variado)</option>
+                                    <option value="Conhecimento">Conhecimento (5% • Variado)</option>
+                                    <option value="Lei de Anha">Lei de Anha (2% • Fixo)</option>
+                                    <option value="Outros gastos">Outros gastos (8% • Variado)</option>
                                 </select>
                             </div>
                         </div>
@@ -1184,32 +1293,53 @@
         </div>
     </div>
 
-    <!-- MODAL: CONFIGURAÇÃO DA REGRA 10/10/2/78 -->
+    <!-- MODAL: CONFIGURAÇÃO DOS 8 BLOCOS DA RENDA BASE -->
     <div id="modal-planejamento" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
-                <h3 class="font-bold text-slate-800">Regra da Renda Base (10/10/2/78)</h3>
+                <h3 class="font-bold text-slate-800">Distribuição Financeira em 8 Blocos</h3>
                 <button onclick="closeModal('modal-planejamento')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <p class="text-xs text-slate-500">Ajuste os percentuais da sua renda regular. A soma deve fechar em 100%.</p>
+            <p class="text-xs text-slate-500">Ajuste os percentuais dos 8 blocos da sua renda base (R$ 1.500,00 padrão). A soma deve fechar em 100%.</p>
             <form onsubmit="salvarPlanejamento(event)" class="space-y-3">
-                <div>
-                    <label class="text-xs font-medium text-slate-600">1º Pague-se: Economia e Investimentos (%)</label>
-                    <input type="number" step="0.1" id="cfg-eco" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-semibold text-forest">1. Investimentos — Fixo (%)</label>
+                        <input type="number" step="0.1" id="cfg-eco" required class="w-full bg-sage-50 border border-sage-200 rounded-xl px-3 py-2 text-sm font-bold text-forest mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-700">2. Custos fixos — Essencial (%)</label>
+                        <input type="number" step="0.1" id="cfg-dem" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-slate-600">3. Conforto — Variado (%)</label>
+                        <input type="number" step="0.1" id="cfg-conforto" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-slate-600">4. Metas — Planejado (%)</label>
+                        <input type="number" step="0.1" id="cfg-metas" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-slate-600">5. Prazeres — Variado (%)</label>
+                        <input type="number" step="0.1" id="cfg-ent" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-slate-600">6. Conhecimento — Variado (%)</label>
+                        <input type="number" step="0.1" id="cfg-conhecimento" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-slate-600">7. Lei de Anha — Fixo (%)</label>
+                        <input type="number" step="0.1" id="cfg-doa" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-slate-600">8. Outros gastos — Variado (%)</label>
+                        <input type="number" step="0.1" id="cfg-outros" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                    </div>
                 </div>
-                <div>
-                    <label class="text-xs font-medium text-slate-600">Entretenimento / Lazer (%)</label>
-                    <input type="number" step="0.1" id="cfg-ent" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
+                <div class="p-3 rounded-xl bg-sage-50/80 border border-sage-200 text-[11px] text-slate-600">
+                    💡 <strong>Dica Estratégica:</strong> Construa sua Reserva de Emergência dentro dos <strong>10% de Investimentos (R$ 150/mês)</strong> priorizando liquidez diária até acumular de 3 a 6 meses dos seus Custos Fixos (R$ 1.800 a R$ 3.600).
                 </div>
-                <div>
-                    <label class="text-xs font-medium text-slate-600">Doações - Lei de AMRA (%)</label>
-                    <input type="number" step="0.1" id="cfg-doa" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
-                </div>
-                <div>
-                    <label class="text-xs font-medium text-slate-600">Demais Despesas e Custos Essenciais (%)</label>
-                    <input type="number" step="0.1" id="cfg-dem" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm mt-1">
-                </div>
-                <button type="submit" class="w-full hero-gradient text-white font-semibold py-2.5 rounded-xl text-sm">Salvar Regra Base</button>
+                <button type="submit" class="w-full hero-gradient text-white font-semibold py-2.5 rounded-xl text-sm">Salvar Distribuição dos 8 Blocos</button>
             </form>
         </div>
     </div>
@@ -1294,10 +1424,14 @@
         let dialogResolver = null;
 
         let config = {
-            perc_economia: 10,
-            perc_entretenimento: 10,
-            perc_doacoes: 2,
-            perc_demais: 78,
+            perc_economia: 10,       // 1. Investimentos (10% = R$ 150) [Fixo]
+            perc_demais: 40,         // 2. Custos fixos (40% = R$ 600) [Fixo]
+            perc_conforto: 15,       // 3. Conforto (15% = R$ 225) [Variado]
+            perc_metas: 10,          // 4. Metas (10% = R$ 150) [Planejado/Fixo]
+            perc_entretenimento: 10, // 5. Prazeres (10% = R$ 150) [Variado]
+            perc_conhecimento: 5,    // 6. Conhecimento (5% = R$ 75) [Variado]
+            perc_doacoes: 2,         // 7. Lei de Anha (2% = R$ 30) [Fixo]
+            perc_outros: 8,          // 8. Outros gastos (8% = R$ 120) [Variado]
             meses_meta_reserva: 6,
             custo_fixo_estimado: 0
         };
@@ -1344,14 +1478,78 @@
             { nome: 'Plantões', tipo: 'entrada' }, { nome: 'Trabalhos extras', tipo: 'entrada' },
             { nome: 'Rendimentos', tipo: 'entrada' }, { nome: 'Presentes', tipo: 'entrada' },
             { nome: 'Outros', tipo: 'entrada' },
+            // 8 Categorias Oficiais da Nova Distribuição Financeira + subcategorias usuais
+            { nome: 'Custos fixos (Alimentação, contas, transporte)', tipo: 'saida' },
+            { nome: 'Conforto (Academia, roupas, streaming, Uber)', tipo: 'saida' },
+            { nome: 'Metas (Viagens, carro, projetos, compras)', tipo: 'saida' },
+            { nome: 'Prazeres (Cinema, restaurantes, passeios, jogos)', tipo: 'saida' },
+            { nome: 'Conhecimento (Livros, cursos, congressos, idiomas)', tipo: 'saida' },
+            { nome: 'Lei de Anha (Reserva específica / Doações)', tipo: 'saida' },
+            { nome: 'Outros gastos (Pet, medicamentos, imprevistos)', tipo: 'saida' },
             { nome: 'Mercado', tipo: 'saida' }, { nome: 'Entretenimento', tipo: 'saida' },
             { nome: 'Saúde física e esportes', tipo: 'saida' }, { nome: 'Pets', tipo: 'saida' },
             { nome: 'Faculdade', tipo: 'saida' }, { nome: 'Assinaturas e internet', tipo: 'saida' },
             { nome: 'Roupas e acessórios', tipo: 'saida' }, { nome: 'Barbeiro', tipo: 'saida' },
             { nome: 'Moradia', tipo: 'saida' }, { nome: 'Transporte', tipo: 'saida' },
-            { nome: 'Saúde', tipo: 'saida' }, { nome: 'Doações (AMRA)', tipo: 'saida' },
-            { nome: 'Imprevistos / Emergência', tipo: 'saida' }, { nome: 'Outros', tipo: 'saida' }
+            { nome: 'Saúde', tipo: 'saida' }, { nome: 'Imprevistos / Emergência', tipo: 'saida' }
         ];
+
+        function normalizarConfigOitoBlocos(cfg) {
+            const c = { ...cfg };
+            if (toNum(c.perc_demais) === 78 || toNum(c.perc_demais) === 79 || c.perc_conforto === undefined) {
+                c.perc_economia = 10;
+                c.perc_demais = 40;
+                c.perc_conforto = 15;
+                c.perc_metas = 10;
+                c.perc_entretenimento = 10;
+                c.perc_conhecimento = 5;
+                c.perc_doacoes = 2;
+                c.perc_outros = 8;
+            }
+            return c;
+        }
+
+        function identificarBlocoSaida(s) {
+            const ess = String(s.essencialidade || '').trim();
+            const blocValidos = ['Custos fixos', 'Conforto', 'Metas', 'Prazeres', 'Conhecimento', 'Lei de Anha', 'Outros gastos'];
+            if (blocValidos.includes(ess)) return ess;
+
+            const cat = String(s.categoria || '').toLowerCase();
+            const desc = String(s.descricao || '').toLowerCase();
+            const texto = `${cat} ${desc}`;
+
+            if (texto.includes('anha') || texto.includes('amra') || texto.includes('doaç') || texto.includes('doac')) return 'Lei de Anha';
+            if (texto.includes('conhecimento') || texto.includes('livro') || texto.includes('curso') || texto.includes('congresso') || texto.includes('idioma') || texto.includes('estudo')) return 'Conhecimento';
+            if (texto.includes('meta') || texto.includes('viagem') || texto.includes('computador') || texto.includes('carro') || texto.includes('projeto')) return 'Metas';
+            if (texto.includes('conforto') || texto.includes('academia') || texto.includes('esporte') || texto.includes('roupa') || texto.includes('barbeiro') || texto.includes('cuidado') || texto.includes('streaming') || texto.includes('delivery') || texto.includes('uber')) return 'Conforto';
+            if (texto.includes('prazer') || texto.includes('entretenimento') || texto.includes('cinema') || texto.includes('restaurante') || texto.includes('passeio') || texto.includes('jogo') || texto.includes('lazer') || ess === 'Nao Essencial') return 'Prazeres';
+            if (texto.includes('outros') || texto.includes('pet') || texto.includes('medicamento') || texto.includes('farmácia') || texto.includes('farmacia') || texto.includes('imprevisto') || texto.includes('emerg')) return 'Outros gastos';
+            return 'Custos fixos';
+        }
+
+        function toggleGuiaBlocos() {
+            const el = document.getElementById('guia-oito-blocos');
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function autoSelecionarBlocoPorCategoria() {
+            const cat = document.getElementById('sai-categoria')?.value || '';
+            const bloco = identificarBlocoSaida({ categoria: cat, essencialidade: '' });
+            const selectBloco = document.getElementById('sai-essencialidade');
+            if (selectBloco) selectBloco.value = bloco;
+            sincronizarNaturezaPorBloco();
+        }
+
+        function sincronizarNaturezaPorBloco() {
+            const bloco = document.getElementById('sai-essencialidade')?.value || 'Custos fixos';
+            const selectNat = document.getElementById('sai-natureza');
+            if (!selectNat) return;
+            if (['Custos fixos', 'Lei de Anha', 'Metas'].includes(bloco)) {
+                selectNat.value = 'Fixa';
+            } else {
+                selectNat.value = 'Variavel';
+            }
+        }
 
         const categoriasExtrasAuto = ['Plantões', 'Trabalhos extras', 'Presentes', 'Rendimentos'];
 
@@ -1547,12 +1745,7 @@
                     else categorias = categoriasPadrao;
 
                     if (!resCfg.error && resCfg.data) {
-                        config = { ...config, ...resCfg.data };
-                        if (toNum(config.perc_doacoes) === 1 && toNum(config.perc_demais) === 79) {
-                            config.perc_doacoes = 2;
-                            config.perc_demais = 78;
-                            supabaseClient.from('configuracoes').update({ perc_doacoes: 2, perc_demais: 78 }).eq('id', 1);
-                        }
+                        config = normalizarConfigOitoBlocos({ ...config, ...resCfg.data });
                     }
                     if (!resInv.error) investimentos = resInv.data || [];
                     if (!resRes.error) reservaMovs = resRes.data || [];
@@ -1564,7 +1757,7 @@
                 try {
                     transacoes = JSON.parse(safeGetStorage('mp_local_transacoes', '[]'));
                     categorias = JSON.parse(safeGetStorage('mp_local_categorias', JSON.stringify(categoriasPadrao)));
-                    config = JSON.parse(safeGetStorage('mp_local_config', JSON.stringify(config)));
+                    config = normalizarConfigOitoBlocos(JSON.parse(safeGetStorage('mp_local_config', JSON.stringify(config))));
                     investimentos = JSON.parse(safeGetStorage('mp_local_investimentos', '[]'));
                     reservaMovs = JSON.parse(safeGetStorage('mp_local_reserva', '[]'));
                     sonhos = JSON.parse(safeGetStorage('mp_local_sonhos', '[]'));
@@ -1580,9 +1773,21 @@
 
         function popularSelectsCategorias() {
             const listaEnt = categorias.filter(c => c.tipo === 'entrada');
-            const listaSai = categorias.filter(c => c.tipo === 'saida');
-            if (!listaSai.some(c => c.nome.includes('Doações'))) listaSai.push({ nome: 'Doações (AMRA)', tipo: 'saida' });
-            if (!listaSai.some(c => c.nome.includes('Imprevistos'))) listaSai.push({ nome: 'Imprevistos / Emergência', tipo: 'saida' });
+            const listaSai = [...categorias.filter(c => c.tipo === 'saida')];
+            const oficiaisSaida = [
+                'Custos fixos (Alimentação, contas, transporte)',
+                'Conforto (Academia, roupas, streaming, Uber)',
+                'Metas (Viagens, carro, projetos, compras)',
+                'Prazeres (Cinema, restaurantes, passeios, jogos)',
+                'Conhecimento (Livros, cursos, congressos, idiomas)',
+                'Lei de Anha (Reserva específica / Doações)',
+                'Outros gastos (Pet, medicamentos, imprevistos)'
+            ];
+            oficiaisSaida.reverse().forEach(nomeOficial => {
+                if (!listaSai.some(c => c.nome === nomeOficial)) {
+                    listaSai.unshift({ nome: nomeOficial, tipo: 'saida' });
+                }
+            });
 
             document.getElementById('ent-categoria').innerHTML = listaEnt.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
             document.getElementById('sai-categoria').innerHTML = listaSai.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
@@ -1640,16 +1845,20 @@
             if (isExtra) {
                 titulo.innerText = 'Regra Renda Extra (50/50) — Pague-se Primeiro:';
                 container.innerHTML = `
-                    <div class="flex justify-between"><span>1º Pague-se (50% Investimentos):</span> <strong class="text-emerald-300">${formatBRL(v * 0.5)}</strong></div>
-                    <div class="flex justify-between"><span>50% Lazer / Sonhos Livres:</span> <strong class="text-emerald-300">${formatBRL(v * 0.5)}</strong></div>
+                    <div class="flex justify-between"><span>1º Pague-se (50% Investimentos / Reserva):</span> <strong class="text-emerald-300">${formatBRL(v * 0.5)}</strong></div>
+                    <div class="flex justify-between"><span>50% Prazeres / Metas Livres:</span> <strong class="text-emerald-300">${formatBRL(v * 0.5)}</strong></div>
                 `;
             } else {
-                titulo.innerText = `Regra Base (${config.perc_economia}/${config.perc_entretenimento}/${config.perc_doacoes}/${config.perc_demais}) — Pague-se Primeiro:`;
+                titulo.innerText = `Distribuição nos 8 Blocos (${config.perc_economia}/${config.perc_demais}/${config.perc_conforto}/${config.perc_metas}/${config.perc_entretenimento}/${config.perc_conhecimento}/${config.perc_doacoes}/${config.perc_outros}):`;
                 container.innerHTML = `
-                    <div class="flex justify-between"><span>1º Pague-se (${config.perc_economia}% Investimentos):</span> <strong class="text-emerald-300">${formatBRL(v * (config.perc_economia / 100))}</strong></div>
-                    <div class="flex justify-between"><span>Doações Lei AMRA (${config.perc_doacoes}%):</span> <strong>${formatBRL(v * (config.perc_doacoes / 100))}</strong></div>
-                    <div class="flex justify-between"><span>Entretenimento (${config.perc_entretenimento}%):</span> <strong>${formatBRL(v * (config.perc_entretenimento / 100))}</strong></div>
-                    <div class="flex justify-between"><span>Custo Essencial (${config.perc_demais}%):</span> <strong>${formatBRL(v * (config.perc_demais / 100))}</strong></div>
+                    <div class="flex justify-between"><span>1. Investimentos (${config.perc_economia}% • Reserva/Selic):</span> <strong class="text-emerald-300">${formatBRL(v * (config.perc_economia / 100))}</strong></div>
+                    <div class="flex justify-between"><span>2. Custos fixos (${config.perc_demais}% • Essenciais):</span> <strong>${formatBRL(v * (config.perc_demais / 100))}</strong></div>
+                    <div class="flex justify-between"><span>3. Conforto (${config.perc_conforto}% • Variado):</span> <strong>${formatBRL(v * (config.perc_conforto / 100))}</strong></div>
+                    <div class="flex justify-between"><span>4. Metas (${config.perc_metas}% • Projetos):</span> <strong>${formatBRL(v * (config.perc_metas / 100))}</strong></div>
+                    <div class="flex justify-between"><span>5. Prazeres (${config.perc_entretenimento}% • Lazer):</span> <strong>${formatBRL(v * (config.perc_entretenimento / 100))}</strong></div>
+                    <div class="flex justify-between"><span>6. Conhecimento (${config.perc_conhecimento}% • Estudos):</span> <strong>${formatBRL(v * (config.perc_conhecimento / 100))}</strong></div>
+                    <div class="flex justify-between"><span>7. Lei de Anha (${config.perc_doacoes}% • Fixo):</span> <strong>${formatBRL(v * (config.perc_doacoes / 100))}</strong></div>
+                    <div class="flex justify-between"><span>8. Outros gastos (${config.perc_outros}% • Pets/Imprev.):</span> <strong>${formatBRL(v * (config.perc_outros / 100))}</strong></div>
                 `;
             }
         }
@@ -1659,8 +1868,7 @@
             const valorNovo = toNum(document.getElementById('sai-valor').value);
             if (valorNovo <= 0) return box.classList.add('hidden');
 
-            const cat = document.getElementById('sai-categoria').value || '';
-            const essencialidade = document.getElementById('sai-essencialidade').value;
+            const blocoEscolhido = document.getElementById('sai-essencialidade').value || 'Custos fixos';
             const mesSelecionado = document.getElementById('month-filter').value;
             const transMes = transacoes.filter(t => t.data && t.data.startsWith(mesSelecionado));
 
@@ -1668,47 +1876,60 @@
             const rendaRegular = entradasMes.filter(t => !isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0) || 1500;
             const rendaExtra = entradasMes.filter(t => isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
 
-            const tetoLazer = (rendaRegular * (config.perc_entretenimento / 100)) + (rendaExtra * 0.5);
-            const tetoEssencial = rendaRegular * (config.perc_demais / 100);
+            const mapaTetos = {
+                'Custos fixos': rendaRegular * (toNum(config.perc_demais) / 100),
+                'Conforto': rendaRegular * (toNum(config.perc_conforto) / 100),
+                'Metas': rendaRegular * (toNum(config.perc_metas) / 100),
+                'Prazeres': (rendaRegular * (toNum(config.perc_entretenimento) / 100)) + (rendaExtra * 0.5),
+                'Conhecimento': rendaRegular * (toNum(config.perc_conhecimento) / 100),
+                'Lei de Anha': rendaRegular * (toNum(config.perc_doacoes) / 100),
+                'Outros gastos': rendaRegular * (toNum(config.perc_outros) / 100)
+            };
 
+            const tetoBloco = mapaTetos[blocoEscolhido] || 150;
             const saidasMes = transMes.filter(t => t.tipo === 'saida');
-            const gastoLazerAtual = saidasMes.filter(s => s.categoria === 'Entretenimento' || s.essencialidade === 'Nao Essencial').reduce((a, b) => a + toNum(b.valor), 0);
-            const gastoEssencialAtual = saidasMes.filter(s => s.essencialidade === 'Essencial' && !(s.categoria || '').toLowerCase().includes('doa')).reduce((a, b) => a + toNum(b.valor), 0);
+            const gastoBlocoAtual = saidasMes
+                .filter(s => identificarBlocoSaida(s) === blocoEscolhido)
+                .reduce((a, b) => a + toNum(b.valor), 0);
+
+            const projecaoBloco = gastoBlocoAtual + valorNovo;
+            const percProj = tetoBloco > 0 ? Math.round((projecaoBloco / tetoBloco) * 100) : 100;
 
             box.classList.remove('hidden');
 
-            if (cat.includes('Imprevistos')) {
+            if (percProj > 100) {
+                box.className = 'rounded-2xl p-3.5 text-xs space-y-1 border bg-red-50 border-red-300 text-red-900 alert-pulse';
+                box.innerHTML = `
+                    <p class="font-bold">🔴 Termômetro Vermelho no Bloco "${blocoEscolhido}"!</p>
+                    <p>Com este gasto, o bloco <strong>${blocoEscolhido}</strong> chegará a <strong>${formatBRL(projecaoBloco)} (${percProj}% do teto de ${formatBRL(tetoBloco)})</strong>, estourando em ${formatBRL(projecaoBloco - tetoBloco)}.</p>
+                `;
+            } else if (percProj >= 80) {
                 box.className = 'rounded-2xl p-3.5 text-xs space-y-1 border bg-amber-50 border-amber-300 text-amber-900';
                 box.innerHTML = `
-                    <p class="font-bold">⚠️ Alerta de Gasto Imprevisto Detectado</p>
-                    <p>Este valor representa <strong>${Math.round((valorNovo / rendaRegular) * 100)}%</strong> da sua renda base mensal. Avalie cobrir com a Reserva de Emergência se for uma urgência real.</p>
+                    <p class="font-bold">🟡 Sinal Amarelo em "${blocoEscolhido}" (${percProj}% do teto)</p>
+                    <p>Após este lançamento, você terá consumido <strong>${formatBRL(projecaoBloco)} de ${formatBRL(tetoBloco)}</strong>. Restarão apenas ${formatBRL(Math.max(0, tetoBloco - projecaoBloco))} neste bloco.</p>
                 `;
-            } else if (essencialidade === 'Nao Essencial' || cat === 'Entretenimento') {
-                const projecaoLazer = gastoLazerAtual + valorNovo;
-                const percProj = tetoLazer > 0 ? Math.round((projecaoLazer / tetoLazer) * 100) : 100;
-                if (projecaoLazer > tetoLazer) {
-                    box.className = 'rounded-2xl p-3.5 text-xs space-y-1 border bg-red-50 border-red-300 text-red-900 alert-pulse';
-                    box.innerHTML = `
-                        <p class="font-bold">🛑 Fuga do Plano: Estouro do Teto de Lazer/Impulso!</p>
-                        <p>Com esta compra, seus gastos não essenciais chegarão a <strong>${formatBRL(projecaoLazer)} (${percProj}% do teto de ${formatBRL(tetoLazer)})</strong>.</p>
-                    `;
-                } else {
-                    box.className = 'rounded-2xl p-3.5 text-xs space-y-1 border bg-sage-50 border-sage-200 text-forest';
-                    box.innerHTML = `<p class="font-semibold">Consciência de Lazer: Após este gasto, você terá usado <strong>${percProj}%</strong> da sua cota livre (${formatBRL(projecaoLazer)} de ${formatBRL(tetoLazer)}).</p>`;
-                }
             } else {
-                const projecaoEssencial = gastoEssencialAtual + valorNovo;
-                const percEss = tetoEssencial > 0 ? Math.round((projecaoEssencial / tetoEssencial) * 100) : 0;
-                box.className = `rounded-2xl p-3.5 text-xs space-y-1 border ${percEss > 100 ? 'bg-red-50 border-red-300 text-red-900' : 'bg-slate-50 border-slate-200 text-slate-600'}`;
-                box.innerHTML = `<p>Impacto no Custo Essencial (78%): levará seus gastos essenciais a <strong>${percEss}%</strong> do teto (${formatBRL(projecaoEssencial)} de ${formatBRL(tetoEssencial)}).</p>`;
+                box.className = 'rounded-2xl p-3.5 text-xs space-y-1 border bg-sage-50 border-sage-200 text-forest';
+                box.innerHTML = `
+                    <p class="font-semibold">🟢 Sinal Verde em "${blocoEscolhido}": ficará em <strong>${percProj}%</strong> da meta (${formatBRL(projecaoBloco)} de ${formatBRL(tetoBloco)}).</p>
+                `;
             }
         }
 
         function renderizarAlertasComportamentais(params) {
             const {
-                mesSelecionado, entradasMesTotal,
-                saidasMesLista, saidasMesTotal, metaEcoTotal, gastoLazer, metaEntTotal,
-                metaDemTotal
+                mesSelecionado, rendaRegularMes, usandoRendaPadrao1500, entradasMesTotal,
+                saidasMesLista, saidasMesTotal, metaEcoTotal,
+                gastoCustosFixos, metaDemTotal,
+                gastoConforto, metaConfortoTotal,
+                gastoMetas, metaMetasTotal,
+                gastoLazer, metaEntTotal,
+                gastoConhecimento, metaConhecimentoTotal,
+                gastoDoacoes, metaDoaTotal,
+                gastoOutros, metaOutrosTotal,
+                gastosNaturezaFixaMes,
+                totalReserva
             } = params;
 
             const container = document.getElementById('behavioral-alerts-container');
@@ -1736,22 +1957,23 @@
                         <div class="flex items-start gap-3 max-w-3xl">
                             <i data-lucide="flame" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
                             <div>
-                                <h4 class="text-xs font-extrabold text-amber-950 uppercase tracking-wide">Regra #1 Pendente: Pague-se Primeiro!</h4>
+                                <h4 class="text-xs font-extrabold text-amber-950 uppercase tracking-wide">Bloco #1 Pendente: Investimentos (${formatBRL(metaEcoTotal)})!</h4>
                                 <p class="text-xs text-amber-800 mt-0.5">
-                                    Entraram <strong>${formatBRL(entradasMesTotal)}</strong> neste mês, mas você separou <strong>${formatBRL(aportesReservaNoMes)}</strong> da sua meta de <strong>${formatBRL(metaEcoTotal)}</strong>. Nunca pague despesas antes de separar o seu patrimônio.
+                                    Entraram <strong>${formatBRL(entradasMesTotal)}</strong> neste mês, mas você separou <strong>${formatBRL(aportesReservaNoMes)}</strong> da sua meta de <strong>${formatBRL(metaEcoTotal)}</strong>. Priorize alocar na sua Reserva de Emergência (liquidez diária) até completar de 3 a 6 meses de Custos Fixos.
                                 </p>
                             </div>
                         </div>
                         <button onclick="abrirModalPagueSe()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shrink-0 transition">
-                            Pagar-me Agora (${formatBRL(faltaPagarSe)})
+                            Investir Agora (${formatBRL(faltaPagarSe)})
                         </button>
                     </div>
                 `);
-            } else if (entradasMesTotal > 0 && faltaPagarSe <= 1) {
-                statusCardPagueSe.innerText = `100% Quitado!`;
+            } else if (aportesReservaNoMes >= metaEcoTotal && metaEcoTotal > 0) {
+                statusCardPagueSe.innerText = `🟢 100% Quitado!`;
                 statusCardPagueSe.className = 'font-bold text-forest truncate';
             } else {
-                statusCardPagueSe.innerText = `Aguardando entradas`;
+                statusCardPagueSe.innerText = `Meta: ${formatBRL(metaEcoTotal)}`;
+                statusCardPagueSe.className = 'font-semibold text-amber-700 truncate';
             }
 
             const hoje = new Date();
@@ -1763,11 +1985,50 @@
 
             document.getElementById('ritmo-tempo-label').innerText = `Dia ${diaCorreto}/${diasNoMes} (${percTempoDecorrido}% do mês)`;
 
-            const orcamentoPadraoRef = (1500 * ((config.perc_entretenimento + config.perc_demais) / 100));
-            const orcamentoGastoMaximo = (metaEntTotal + metaDemTotal) > 0 ? (metaEntTotal + metaDemTotal) : orcamentoPadraoRef;
-            const usandoOrcamentoRef = (metaEntTotal + metaDemTotal) <= 0;
+            // Orçamento de gastos compreende os 7 blocos de despesa (90% da renda base = R$ 1.350 em R$ 1.500 + 50% de renda extra)
+            const orcamentoGastoMaximo = metaDemTotal + metaConfortoTotal + metaMetasTotal + metaEntTotal + metaConhecimentoTotal + metaDoaTotal + metaOutrosTotal;
+            const usandoOrcamentoRef = usandoRendaPadrao1500;
             const percOrcamentoConsumido = orcamentoGastoMaximo > 0 ? Math.round((saidasMesTotal / orcamentoGastoMaximo) * 100) : 0;
             const headerBadge = document.getElementById('header-burn-badge');
+
+            // Avaliação de Saúde Individual das 8 Categorias (Verde, Amarelo e Vermelho)
+            const classificarSaudeBloco = (usado, meta, tipoBloco, isInvestimento = false) => {
+                const perc = meta > 0 ? Math.round((usado / meta) * 100) : 0;
+                if (isInvestimento) {
+                    if (perc >= 100) return { status: 'verde', corEmoji: '🟢', label: 'Saudável (Quitado)', perc };
+                    if (perc > 0 || diaCorreto <= 10) return { status: 'amarelo', corEmoji: '🟡', label: 'Atenção (Pendente)', perc };
+                    return { status: 'vermelho', corEmoji: '🔴', label: 'Crítico (Não aportado)', perc };
+                }
+                if (tipoBloco === 'Variado') {
+                    // Blocos variáveis seguem o ritmo do mês OU limite de 85%
+                    if (perc > 100 || (perc > (percTempoDecorrido + 20) && perc >= 60)) {
+                        return { status: 'vermelho', corEmoji: '🔴', label: perc > 100 ? 'Estourado' : 'Ritmo Acelerado', perc };
+                    }
+                    if (perc >= 80 || perc > (percTempoDecorrido + 8)) {
+                        return { status: 'amarelo', corEmoji: '🟡', label: 'Atenção', perc };
+                    }
+                    return { status: 'verde', corEmoji: '🟢', label: 'Saudável', perc };
+                } else {
+                    // Blocos fixos/planejados (Custos fixos, Metas, Lei de Anha) podem ser pagos no início do mês sem disparar falso alarme de ritmo
+                    if (perc > 100) return { status: 'vermelho', corEmoji: '🔴', label: 'Acima do Teto', perc };
+                    if (perc >= 90) return { status: 'amarelo', corEmoji: '🟡', label: 'No Limite', perc };
+                    return { status: 'verde', corEmoji: '🟢', label: 'Saudável', perc };
+                }
+            };
+
+            const diagnosticoOitoBlocos = [
+                { id: 'investimentos', nome: 'Investimentos', natureza: 'Fixo', percMeta: config.perc_economia, usado: aportesReservaNoMes, meta: metaEcoTotal, ...classificarSaudeBloco(aportesReservaNoMes, metaEcoTotal, 'Fixo', true) },
+                { id: 'custos_fixos', nome: 'Custos fixos', natureza: 'Fixo', percMeta: config.perc_demais, usado: gastoCustosFixos, meta: metaDemTotal, ...classificarSaudeBloco(gastoCustosFixos, metaDemTotal, 'Fixo') },
+                { id: 'conforto', nome: 'Conforto', natureza: 'Variado', percMeta: config.perc_conforto, usado: gastoConforto, meta: metaConfortoTotal, ...classificarSaudeBloco(gastoConforto, metaConfortoTotal, 'Variado') },
+                { id: 'metas', nome: 'Metas', natureza: 'Planejado', percMeta: config.perc_metas, usado: gastoMetas, meta: metaMetasTotal, ...classificarSaudeBloco(gastoMetas, metaMetasTotal, 'Fixo') },
+                { id: 'prazeres', nome: 'Prazeres', natureza: 'Variado', percMeta: config.perc_entretenimento, usado: gastoLazer, meta: metaEntTotal, ...classificarSaudeBloco(gastoLazer, metaEntTotal, 'Variado') },
+                { id: 'conhecimento', nome: 'Conhecimento', natureza: 'Variado', percMeta: config.perc_conhecimento, usado: gastoConhecimento, meta: metaConhecimentoTotal, ...classificarSaudeBloco(gastoConhecimento, metaConhecimentoTotal, 'Variado') },
+                { id: 'lei_anha', nome: 'Lei de Anha', natureza: 'Fixo', percMeta: config.perc_doacoes, usado: gastoDoacoes, meta: metaDoaTotal, ...classificarSaudeBloco(gastoDoacoes, metaDoaTotal, 'Fixo') },
+                { id: 'outros', nome: 'Outros gastos', natureza: 'Variado', percMeta: config.perc_outros, usado: gastoOutros, meta: metaOutrosTotal, ...classificarSaudeBloco(gastoOutros, metaOutrosTotal, 'Variado') }
+            ];
+
+            const blocosVermelhos = diagnosticoOitoBlocos.filter(b => b.status === 'vermelho' && b.id !== 'investimentos');
+            const blocosAmarelos = diagnosticoOitoBlocos.filter(b => b.status === 'amarelo');
 
             const deltaRitmo = percOrcamentoConsumido - percTempoDecorrido;
             const gastoDiarioMedio = saidasMesTotal / Math.max(1, diaCorreto);
@@ -1781,9 +2042,9 @@
             const valorSugeridoAporteExtra = Math.max(50, Math.round(economiaPotencialHoje > 25 ? economiaPotencialHoje : (economiaProjetadaFimMes * 0.4)));
 
             let estadoTermometro = 'verde';
-            if (percOrcamentoConsumido > 100 || deltaRitmo > 15) {
+            if (percOrcamentoConsumido > 100 || deltaRitmo > 15 || blocosVermelhos.length >= 2) {
                 estadoTermometro = 'vermelho';
-            } else if (deltaRitmo >= -3) {
+            } else if (deltaRitmo >= -3 || blocosVermelhos.length === 1 || blocosAmarelos.length >= 2) {
                 estadoTermometro = 'laranja';
             } else {
                 estadoTermometro = 'verde';
@@ -1796,7 +2057,7 @@
                 headerBadge.innerText = `🟠 Sinal Laranja: Atenção (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
                 headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800';
             } else {
-                headerBadge.innerText = `🟢 Sinal Verde: Ritmo Lentificado (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.innerText = `🟢 Sinal Verde: 8 Blocos Saudáveis (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
                 headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-forest';
             }
 
@@ -1817,19 +2078,21 @@
                 economiaPotencialHoje,
                 economiaProjetadaFimMes,
                 valorSugeridoAporteExtra,
-                gastoLazer,
-                metaEntTotal
+                diagnosticoOitoBlocos,
+                gastosNaturezaFixaMes,
+                metaDemTotal,
+                totalReserva
             });
 
-            if (metaEntTotal > 0 && gastoLazer > metaEntTotal) {
-                const excesso = gastoLazer - metaEntTotal;
+            if (blocosVermelhos.length > 0) {
+                const nomesEstourados = blocosVermelhos.map(b => `<strong>${b.nome}</strong> (${formatBRL(b.usado)} de ${formatBRL(b.meta)} • ${b.perc}%)`).join(', ');
                 alertasHTML.push(`
                     <div class="bg-red-50 border-l-4 border-crimson rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
-                        <i data-lucide="shopping-bag" class="w-5 h-5 text-crimson shrink-0 mt-0.5"></i>
+                        <i data-lucide="alert-octagon" class="w-5 h-5 text-crimson shrink-0 mt-0.5"></i>
                         <div>
-                            <h4 class="text-xs font-extrabold text-red-950 uppercase tracking-wide">Fuga do Plano: Compras Não Essenciais Acima do Teto</h4>
+                            <h4 class="text-xs font-extrabold text-red-950 uppercase tracking-wide">Alerta de Categoria no Vermelho: ${blocosVermelhos.length} bloco(s) acima do ritmo/limite</h4>
                             <p class="text-xs text-red-800 mt-0.5">
-                                Seus gastos de lazer/não essenciais somam <strong>${formatBRL(gastoLazer)}</strong>, ultrapassando o teto em <strong>${formatBRL(excesso)}</strong>.
+                                Atenção aos blocos em vermelho neste mês: ${nomesEstourados}. Evite novos lançamentos nessas categorias ou realoque folga de blocos variáveis verdes.
                             </p>
                         </div>
                     </div>
@@ -1864,11 +2127,11 @@
                 percTempoDecorrido, percOrcamentoConsumido, deltaRitmo,
                 saidasMesTotal, orcamentoGastoMaximo, usandoOrcamentoRef,
                 gastoDiarioMedio, cotaDiariaOrcamento, gastoEsperadoHoje,
-                economiaPotencialHoje, economiaProjetadaFimMes, valorSugeridoAporteExtra
+                economiaPotencialHoje, economiaProjetadaFimMes, valorSugeridoAporteExtra,
+                diagnosticoOitoBlocos = [], gastosNaturezaFixaMes = 0, metaDemTotal = 600, totalReserva = 0
             } = dados;
 
             // Posição visual do mercúrio no termômetro artístico (0% a 100%)
-            // 50% no tubo representa ritmo perfeitamente pareado (delta = 0). Abaixo de 42% = Verde, 42% a 68% = Laranja, > 68% = Vermelho
             const posPont = Math.max(6, Math.min(96, Math.round(50 + (deltaRitmo * 1.35))));
             const posTempo = Math.max(4, Math.min(96, percTempoDecorrido));
             const posGasto = Math.max(4, Math.min(100, percOrcamentoConsumido));
@@ -1877,28 +2140,45 @@
             const diaEstouro = Math.min(diasNoMes, diaCorreto + diasAteZerar);
             const excessoAcimaDoEsperado = Math.max(0, saidasMesTotal - gastoEsperadoHoje);
 
+            // Contagem de saúde das 8 categorias
+            const qtdVerdes = diagnosticoOitoBlocos.filter(b => b.status === 'verde').length;
+            const qtdAmarelos = diagnosticoOitoBlocos.filter(b => b.status === 'amarelo').length;
+            const qtdVermelhos = diagnosticoOitoBlocos.filter(b => b.status === 'vermelho').length;
+            const nomesEmAlerta = diagnosticoOitoBlocos
+                .filter(b => b.status === 'vermelho' || b.status === 'amarelo')
+                .map(b => `${b.corEmoji} <strong>${b.nome}</strong> (${b.perc}%)`)
+                .join(', ');
+
+            // Meta de Reserva de Emergência baseada nos Custos Fixos (3 a 6 meses de R$ 600 = R$ 1.800 a R$ 3.600)
+            const custoFixoRefReserva = metaDemTotal > 0 ? metaDemTotal : 600;
+            const metaMinReserva3m = custoFixoRefReserva * 3;
+            const reservaPrecisaPrioridade = totalReserva < metaMinReserva3m;
+            const destinoRecomendadoInvest = reservaPrecisaPrioridade
+                ? `na sua <strong>Reserva de Emergência</strong> (priorizando liquidez e segurança até acumular 3 a 6 meses dos seus Custos Fixos: ${formatBRL(metaMinReserva3m)} a ${formatBRL(custoFixoRefReserva * 6)})`
+                : `na sua <strong>Carteira de Investimentos (13% a.a.)</strong>`;
+
             let tema = {};
             if (estado === 'vermelho') {
                 tema = {
                     cardBorder: 'border-red-300 bg-gradient-to-br from-white via-red-50/40 to-red-50/70 alert-pulse',
                     sinalBadgeBg: 'bg-crimson text-white shadow-sm',
                     sinalTexto: 'SINAL VERMELHO • RITMO MUITO ACELERADO',
-                    titulo: 'Temperatura Crítica: Gastos Acima da Velocidade do Mês',
+                    titulo: 'Temperatura Crítica: Ritmo Acima da Previsão ou Categorias Estouradas',
                     corPrimaria: '#C94A4A',
                     corSecundaria: '#FCA5A5',
                     corTextoDestaque: 'text-crimson',
                     corBarraGasto: 'bg-gradient-to-r from-amber-500 via-red-500 to-crimson',
                     grauTemp: `${Math.min(42, (38.5 + Math.max(0, deltaRitmo) * 0.08)).toFixed(1)}°C`,
                     rotuloTemp: 'Febre Orçamentária',
-                    motivoDiagnostico: `O termômetro está <strong class="text-crimson">vermelho</strong> porque você já consumiu <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. base' : ''}) tendo decorrido apenas <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}). Seu ritmo está <strong>+${ Math.max(1, deltaRitmo) } pontos percentuais acima</strong> do calendário (${formatBRL(excessoAcimaDoEsperado)} acima do teto proporcional de hoje) e, nessa velocidade (${formatBRL(gastoDiarioMedio)}/dia), seu orçamento se esgotará no <strong>dia ${diaEstouro}</strong>.`,
+                    motivoDiagnostico: `O termômetro está <strong class="text-crimson">vermelho</strong> porque você já consumiu <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}) tendo decorrido <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}). ${nomesEmAlerta ? `Blocos exigindo atenção imediata: ${nomesEmAlerta}.` : `Seu gasto está ${formatBRL(excessoAcimaDoEsperado)} acima do teto proporcional de hoje e se esgotará no <strong>dia ${diaEstouro}</strong>.`}`,
                     pilulaBg: 'bg-red-950 text-white border-red-800',
-                    pilulaTag: '💊 Pílula de Aconselhamento • Freio de Emergência',
-                    pilulaTitulo: 'Congele gastos não essenciais por 72h e recalibre seu teto diário',
-                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Ative um <strong>bloqueio de 72 horas</strong> para compras por impulso, delivery ou lazer; (2) Reduza seu ritmo pelos próximos ${diasRestantesMes} dias para no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (3) Audite abaixo suas últimas saídas variáveis para cortar excessos imediatamente.`,
+                    pilulaTag: '💊 Pílula de Aconselhamento • Freio de Emergência nos Blocos Variados',
+                    pilulaTitulo: 'Congele Conforto e Prazeres por 72h e preserve seus R$ 150 de Investimentos',
+                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Pause gastos nos blocos variáveis (<strong>Conforto 15%</strong> e <strong>Prazeres 10%</strong>) por 72 horas; (2) Trave seu teto nos próximos ${diasRestantesMes} dias em no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (3) Mantenha blindados os seus <strong>10% de Investimentos</strong> ${destinoRecomendadoInvest}.`,
                     btnAcaoTexto: 'Auditar Saídas do Mês',
                     btnAcaoClass: 'bg-crimson hover:bg-red-700 text-white',
                     btnAcaoFn: `acaoPilulaTermometro('auditar_saidas')`,
-                    btnSecTexto: 'Revisar Teto 10/10/2/78',
+                    btnSecTexto: 'Ajustar 8 Categorias',
                     btnSecFn: `openModal('modal-planejamento')`
                 };
             } else if (estado === 'laranja') {
@@ -1906,22 +2186,22 @@
                     cardBorder: 'border-amber-300 bg-gradient-to-br from-white via-amber-50/30 to-amber-50/60',
                     sinalBadgeBg: 'bg-amber-500 text-white shadow-sm',
                     sinalTexto: 'SINAL LARANJA • ESTADO DE ATENÇÃO',
-                    titulo: 'Temperatura Morna: Ritmo no Limite da Previsão',
+                    titulo: 'Temperatura Morna: Ritmo no Limite ou Categoria em Alerta',
                     corPrimaria: '#D97706',
                     corSecundaria: '#FCD34D',
                     corTextoDestaque: 'text-amber-600',
                     corBarraGasto: 'bg-gradient-to-r from-emerald-500 via-amber-400 to-amber-600',
                     grauTemp: `${(37.1 + Math.max(0, deltaRitmo + 3) * 0.07).toFixed(1)}°C`,
                     rotuloTemp: 'Zona de Vigilância',
-                    motivoDiagnostico: `O sinal está <strong class="text-amber-600">laranja (atenção)</strong> porque você já utilizou <strong>${percOrcamentoConsumido}% da sua previsão mensal</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. base' : ''}) com <strong>${percTempoDecorrido}% do mês decorrido</strong> (Dia ${diaCorreto} de ${diasNoMes}). Como a margem entre o gasto e o tempo está estreita (${deltaRitmo >= 0 ? '+' + deltaRitmo : deltaRitmo}% de diferença), qualquer despesa extra não planejada empurrará seu orçamento para o vermelho.`,
+                    motivoDiagnostico: `O sinal está <strong class="text-amber-600">laranja (atenção)</strong> com <strong>${percOrcamentoConsumido}% da previsão utilizada</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}) em <strong>${percTempoDecorrido}% do mês decorrido</strong> (Dia ${diaCorreto} de ${diasNoMes}). ${nomesEmAlerta ? `Categorias em vigilância/alerta: ${nomesEmAlerta}.` : `A margem entre gasto e calendário está estreita (${deltaRitmo >= 0 ? '+' + deltaRitmo : deltaRitmo}%).`}`,
                     pilulaBg: 'bg-amber-950 text-white border-amber-800',
-                    pilulaTag: '💊 Pílula de Aconselhamento • Manobra de Estabilização',
-                    pilulaTitulo: 'Trave o teto diário e desacople pequenos gastos variáveis',
-                    pilulaTexto: `Para fazer o termômetro voltar ao sinal verde e abrir folga para investir: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo da cota segura de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) Adie compras não urgentes da cota de 10% (Lazer) para a próxima semana; (3) Se ainda não quitou seu "Pague-se Primeiro", blinde-o agora antes que o giro livre seja consumido.`,
-                    btnAcaoTexto: 'Quitar Pague-se 1º',
+                    pilulaTag: '💊 Pílula de Aconselhamento • Equilíbrio entre Blocos Fixos e Variados',
+                    pilulaTitulo: 'Garanta os R$ 150 na Reserva de Emergência e segure pequenos gastos',
+                    pilulaTexto: `Para retornar ao sinal verde: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) Se um bloco variável (Conforto ou Prazeres) estiver amarelo/vermelho, compense usando a folga de blocos verdes; (3) Garanta primeiro seus <strong>10% de Investimentos</strong> ${destinoRecomendadoInvest}.`,
+                    btnAcaoTexto: 'Alocar 10% (Reserva/Invest.)',
                     btnAcaoClass: 'bg-amber-500 hover:bg-amber-600 text-white',
                     btnAcaoFn: `abrirModalPagueSe()`,
-                    btnSecTexto: 'Ver Saídas Variáveis',
+                    btnSecTexto: 'Ver Saídas por Bloco',
                     btnSecFn: `acaoPilulaTermometro('auditar_saidas')`
                 };
             } else {
@@ -1929,25 +2209,54 @@
                     cardBorder: 'border-emerald-300 bg-gradient-to-br from-white via-emerald-50/30 to-sage-50/70',
                     sinalBadgeBg: 'bg-forest text-white shadow-sm',
                     sinalTexto: 'SINAL VERDE • RITMO LENTIFICADO & ECONÔMICO',
-                    titulo: 'Temperatura Ideal: Ritmo Desacelerado com Folga de Caixa',
+                    titulo: 'Temperatura Ideal: Os 8 Blocos em Equilíbrio e Folga de Caixa',
                     corPrimaria: '#1B4332',
                     corSecundaria: '#6EE7B7',
                     corTextoDestaque: 'text-forest',
                     corBarraGasto: 'bg-gradient-to-r from-emerald-600 to-forest',
                     grauTemp: '36.2°C',
                     rotuloTemp: 'Saúde Financeira Ótima',
-                    motivoDiagnostico: `O sinal está <strong class="text-forest">verde</strong> porque o seu ritmo de gastos está <strong>lentificado e controlado</strong>: já se passaram <strong>${percTempoDecorrido}% do decorrer do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}), mas você consumiu apenas <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. base' : ''}). Essa desaceleração gerou uma <strong>folga acumulada de ${formatBRL(economiaPotencialHoje)}</strong> abaixo do teto esperado para hoje!`,
+                    motivoDiagnostico: `O sinal está <strong class="text-forest">verde</strong> porque seu ritmo está <strong>lentificado e saudável</strong>: decorreram <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}), mas você utilizou apenas <strong>${percOrcamentoConsumido}% da previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}), gerando uma <strong>folga acumulada de ${formatBRL(economiaPotencialHoje)}</strong>!`,
                     pilulaBg: ' hero-gradient text-white border-emerald-800',
-                    pilulaTag: '💊 Pílula de Aconselhamento • Multiplicação de Patrimônio',
-                    pilulaTitulo: `Converta sua economia em um aporte extra de ${formatBRL(valorSugeridoAporteExtra)} agora`,
-                    pilulaTexto: `Como seu ritmo está lentificado, não deixe essa sobra parada na conta corrente (onde ela corre risco de ser gasta por impulso): (1) Aproveite a janela verde para fazer um <strong>aporte extra de ${formatBRL(valorSugeridoAporteExtra)}</strong> na sua Carteira (a 13% a.a.) ou Reserva; (2) Mantendo esse ritmo até o dia ${diasNoMes}, você fechará o mês economizando <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras rumo à sua meta de renda passiva!`,
+                    pilulaTag: '💊 Pílula de Aconselhamento • Aceleração da Reserva & Patrimônio',
+                    pilulaTitulo: `Direcione seus 10% + sobra de ${formatBRL(valorSugeridoAporteExtra)} para Liquidez/Investimentos`,
+                    pilulaTexto: `Com suas categorias em saúde verde: (1) Priorize construir sua <strong>Reserva de Emergência</strong> dentro dos 10% de Investimentos + esta folga de <strong>${formatBRL(valorSugeridoAporteExtra)}</strong> ${destinoRecomendadoInvest}; (2) Mantendo esse ritmo até o dia ${diasNoMes}, você economizará <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras no mês!`,
                     btnAcaoTexto: `Aportar Economia (${formatBRL(valorSugeridoAporteExtra)})`,
                     btnAcaoClass: 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold',
                     btnAcaoFn: `acaoPilulaTermometro('aportar_economia', ${valorSugeridoAporteExtra})`,
-                    btnSecTexto: 'Simular Juros (13% a.a.)',
-                    btnSecFn: `switchTab('investimentos')`
+                    btnSecTexto: 'Ver Reserva de Emergência',
+                    btnSecFn: `switchTab('reserva')`
                 };
             }
+
+            // Renderização dos 8 Mini-Cards de Saúde das Categorias (Verde, Amarelo e Vermelho)
+            const htmlSaudeOitoCategorias = diagnosticoOitoBlocos.map(b => {
+                const badgeStyle = b.status === 'vermelho'
+                    ? 'bg-red-50 border-red-300 text-red-900'
+                    : (b.status === 'amarelo' ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-emerald-50/70 border-emerald-200 text-forest');
+                const barColor = b.status === 'vermelho' ? 'bg-crimson' : (b.status === 'amarelo' ? 'bg-amber-500' : 'bg-forest');
+                const wBar = Math.min(100, Math.max(4, b.perc));
+                return `
+                    <div class="p-2.5 rounded-xl border ${badgeStyle} flex flex-col justify-between transition hover:shadow-2xs">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[11px] font-extrabold truncate">${b.corEmoji} ${b.nome}</span>
+                            <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/80 border border-black/5 shrink-0">${b.natureza} • ${b.percMeta}%</span>
+                        </div>
+                        <div class="my-1.5">
+                            <div class="flex justify-between items-baseline text-[11px]">
+                                <strong class="money-val font-extrabold">${formatBRL(b.usado)}</strong>
+                                <span class="text-[10px] opacity-75">de ${formatBRL(b.meta)} (${b.perc}%)</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-white/90 rounded-full overflow-hidden mt-1 border border-black/5">
+                                <div class="h-full ${barColor} rounded-full transition-all" style="width: ${wBar}%"></div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold block truncate">${b.label}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const percFixosComprometido = metaDemTotal > 0 ? Math.round((gastosNaturezaFixaMes / metaDemTotal) * 100) : 0;
 
             card.className = `rounded-3xl p-5 md:p-6 card-shadow border-2 transition-all duration-300 ${tema.cardBorder}`;
 
@@ -1991,22 +2300,16 @@
 
                         <!-- Arte do Termômetro de Vidro e Mercúrio -->
                         <div class="relative flex items-center py-3 select-none">
-                            <!-- Bulbo Esquerdo do Termômetro (SVG Artístico) -->
                             <div class="relative z-10 -mr-2 shrink-0 thermometer-bulb">
                                 <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-md border-4 border-slate-800" style="background: radial-gradient(circle at 30% 30%, ${tema.corSecundaria}, ${tema.corPrimaria});">
                                     <i data-lucide="thermometer" class="w-5 h-5 text-white"></i>
                                 </div>
                             </div>
 
-                            <!-- Tubo Graduado do Termômetro -->
                             <div class="relative flex-1 h-7 bg-slate-900 rounded-r-full border-4 border-l-0 border-slate-800 p-1 flex items-center shadow-inner overflow-visible">
-                                <!-- Trilha tricolor de fundo sutil -->
                                 <div class="absolute inset-1 rounded-r-full opacity-35" style="background: linear-gradient(90deg, #10B981 0%, #10B981 40%, #F59E0B 45%, #F59E0B 68%, #EF4444 72%, #DC2626 100%);"></div>
-
-                                <!-- Coluna de Mercúrio Dinâmica -->
                                 <div class="thermo-mercury relative h-full rounded-r-full shadow-xs" style="width: ${posPont}%; background: linear-gradient(90deg, #1B4332 0%, ${tema.corPrimaria} 100%);"></div>
 
-                                <!-- Marcações de Escala do Termômetro -->
                                 <div class="absolute inset-0 flex justify-between px-3 items-center pointer-events-none">
                                     <span class="w-0.5 h-2 bg-white/40"></span>
                                     <span class="w-0.5 h-3 bg-white/50"></span>
@@ -2017,7 +2320,6 @@
                                     <span class="w-0.5 h-2 bg-white/40"></span>
                                 </div>
 
-                                <!-- Ponteiro Indicador Flutuante -->
                                 <div class="thermo-pointer absolute -top-7 -translate-x-1/2 flex flex-col items-center z-20" style="left: ${posPont}%;">
                                     <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold text-white shadow-sm whitespace-nowrap" style="background-color: ${tema.corPrimaria};">
                                         ${deltaRitmo > 0 ? '+' + deltaRitmo + '% rápido' : (deltaRitmo < 0 ? Math.abs(deltaRitmo) + '% econômico' : 'No ritmo')}
@@ -2027,7 +2329,7 @@
                             </div>
                         </div>
 
-                        <!-- Comparativo Duplo de Barras: Gasto Realizado vs Tempo do Mês -->
+                        <!-- Comparativo Duplo de Barras: Gasto Realizado vs Tempo do Mês + Previsão Fixos -->
                         <div class="space-y-2.5 pt-1 border-t border-slate-100">
                             <div>
                                 <div class="flex justify-between text-xs mb-1">
@@ -2047,6 +2349,11 @@
                                 <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                                     <div class="h-full bg-slate-400 rounded-full transition-all duration-500" style="width: ${posTempo}%"></div>
                                 </div>
+                            </div>
+
+                            <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                                <span class="text-slate-500 font-medium">📌 Previsão de Custos Fixos (40%):</span>
+                                <strong class="text-slate-700 money-val">${formatBRL(gastosNaturezaFixaMes)} de ${formatBRL(metaDemTotal)} (${percFixosComprometido}%)</strong>
                             </div>
                         </div>
                     </div>
@@ -2085,16 +2392,36 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
+                <!-- RADAR DE SAÚDE DAS 8 CATEGORIAS (VERDE, AMARELO E VERMELHO) -->
+                <div class="mt-5 pt-4 border-t border-slate-200/80">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Semáforo de Saúde dos 8 Blocos (Fixos & Variados)</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px] font-bold">
+                            <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-forest">🟢 ${qtdVerdes} Saudáveis</span>
+                            <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">🟡 ${qtdAmarelos} Atenção</span>
+                            <span class="px-2 py-0.5 rounded-md bg-red-100 text-crimson">🔴 ${qtdVermelhos} Críticos</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+                        ${htmlSaudeOitoCategorias}
+                    </div>
                 </div>
             `;
         }
 
         function acaoPilulaTermometro(acao, valorSugerido = 150) {
             if (acao === 'aportar_economia') {
+                const totalRes = reservaMovs.reduce((acc, r) => r.tipo === 'aporte' ? acc + toNum(r.valor) : acc - toNum(r.valor), 0);
+                const priorizarReserva = totalRes < 1800;
                 document.getElementById('pague-se-valor-input').value = Number(valorSugerido || 150).toFixed(2);
-                document.getElementById('pague-se-destino-select').value = 'investimento';
-                document.getElementById('pague-se-local-input').value = 'Aporte Extra (Economia do Termômetro Verde)';
+                document.getElementById('pague-se-destino-select').value = priorizarReserva ? 'reserva' : 'investimento';
+                document.getElementById('pague-se-local-input').value = priorizarReserva
+                    ? 'Tesouro Selic / CDB Liquidez Diária (Reserva 3-6m)'
+                    : 'Aporte Extra (Economia do Termômetro Verde)';
                 openModal('modal-pague-se');
             } else if (acao === 'auditar_saidas') {
                 const filtroSelect = document.getElementById('dash-type-filter');
@@ -2247,7 +2574,7 @@
                 document.getElementById('sai-descricao').value = item.descricao;
                 document.getElementById('sai-categoria').value = item.categoria;
                 document.getElementById('sai-natureza').value = item.natureza || 'Variavel';
-                document.getElementById('sai-essencialidade').value = item.essencialidade || 'Essencial';
+                document.getElementById('sai-essencialidade').value = identificarBlocoSaida(item);
                 document.getElementById('sai-pagamento').value = item.forma_pagamento || 'Pix';
                 document.getElementById('sai-data').value = item.data;
                 document.getElementById('btn-submit-saida').innerText = 'Atualizar Saída';
@@ -2628,62 +2955,119 @@
             document.getElementById('ind-investido').innerText = formatBRL(totalInvestidoCarteira);
             document.getElementById('ind-reserva').innerText = formatBRL(totalReserva);
 
-            const metaEcoBase = rendaRegularMes * (config.perc_economia / 100);
+            config = normalizarConfigOitoBlocos(config);
+            // Usa a renda regular cadastrada no mês ou R$ 1.500,00 como referência padrão para os 8 blocos
+            const rendaBaseCalculo = rendaRegularMes > 0 ? rendaRegularMes : 1500;
+            const usandoRendaPadrao1500 = rendaRegularMes <= 0;
+
+            const metaEcoBase = rendaBaseCalculo * (toNum(config.perc_economia) / 100);
             const metaEcoExtra = rendaExtraMes * 0.50;
-            const metaEcoTotal = metaEcoBase + metaEcoExtra;
+            const metaEcoTotal = metaEcoBase + metaEcoExtra; // 1. Investimentos (10% = R$ 150 + 50% Extra)
 
-            const metaEntBase = rendaRegularMes * (config.perc_entretenimento / 100);
+            const metaDemTotal = rendaBaseCalculo * (toNum(config.perc_demais) / 100); // 2. Custos fixos (40% = R$ 600)
+            const metaConfortoTotal = rendaBaseCalculo * (toNum(config.perc_conforto) / 100); // 3. Conforto (15% = R$ 225)
+            const metaMetasTotal = rendaBaseCalculo * (toNum(config.perc_metas) / 100); // 4. Metas (10% = R$ 150)
+
+            const metaEntBase = rendaBaseCalculo * (toNum(config.perc_entretenimento) / 100);
             const metaEntExtra = rendaExtraMes * 0.50;
-            const metaEntTotal = metaEntBase + metaEntExtra;
+            const metaEntTotal = metaEntBase + metaEntExtra; // 5. Prazeres (10% = R$ 150 + 50% Extra)
 
-            const metaDoaTotal = rendaRegularMes * (config.perc_doacoes / 100);
-            const metaDemTotal = rendaRegularMes * (config.perc_demais / 100);
+            const metaConhecimentoTotal = rendaBaseCalculo * (toNum(config.perc_conhecimento) / 100); // 6. Conhecimento (5% = R$ 75)
+            const metaDoaTotal = rendaBaseCalculo * (toNum(config.perc_doacoes) / 100); // 7. Lei de Anha (2% = R$ 30)
+            const metaOutrosTotal = rendaBaseCalculo * (toNum(config.perc_outros) / 100); // 8. Outros gastos (8% = R$ 120)
 
-            document.getElementById('plan-regular-ref').innerText = formatBRL(rendaRegularMes);
+            document.getElementById('plan-regular-ref').innerText = usandoRendaPadrao1500 ? `${formatBRL(1500)} (Padrão)` : formatBRL(rendaRegularMes);
             document.getElementById('plan-extra-ref').innerText = formatBRL(rendaExtraMes);
 
-            document.getElementById('lbl-perc-eco').innerText = `${config.perc_economia}% + 50%`;
-            document.getElementById('lbl-perc-ent').innerText = `${config.perc_entretenimento}% + 50%`;
-            document.getElementById('lbl-perc-doa').innerText = `${config.perc_doacoes}% Base`;
-            document.getElementById('lbl-perc-dem').innerText = `${config.perc_demais}% Base`;
+            document.getElementById('lbl-perc-eco').innerText = `${config.perc_economia}% (${formatBRL(metaEcoBase)})`;
+            document.getElementById('lbl-perc-dem').innerText = `${config.perc_demais}% Fixo`;
+            document.getElementById('lbl-perc-conforto').innerText = `${config.perc_conforto}% Variado`;
+            document.getElementById('lbl-perc-metas').innerText = `${config.perc_metas}% Planejado`;
+            document.getElementById('lbl-perc-ent').innerText = `${config.perc_entretenimento}% Variado`;
+            document.getElementById('lbl-perc-conhecimento').innerText = `${config.perc_conhecimento}% Variado`;
+            document.getElementById('lbl-perc-doa').innerText = `${config.perc_doacoes}% Fixo`;
+            document.getElementById('lbl-perc-outros').innerText = `${config.perc_outros}% Variado`;
 
             document.getElementById('val-perc-eco').innerText = formatBRL(metaEcoTotal);
-            document.getElementById('val-perc-ent').innerText = formatBRL(metaEntTotal);
-            document.getElementById('val-perc-doa').innerText = formatBRL(metaDoaTotal);
             document.getElementById('val-perc-dem').innerText = formatBRL(metaDemTotal);
+            document.getElementById('val-perc-conforto').innerText = formatBRL(metaConfortoTotal);
+            document.getElementById('val-perc-metas').innerText = formatBRL(metaMetasTotal);
+            document.getElementById('val-perc-ent').innerText = formatBRL(metaEntTotal);
+            document.getElementById('val-perc-conhecimento').innerText = formatBRL(metaConhecimentoTotal);
+            document.getElementById('val-perc-doa').innerText = formatBRL(metaDoaTotal);
+            document.getElementById('val-perc-outros').innerText = formatBRL(metaOutrosTotal);
 
-            const gastoLazer = saidasMesLista.filter(s => s.categoria === 'Entretenimento' || s.essencialidade === 'Nao Essencial').reduce((a, b) => a + toNum(b.valor), 0);
-            const gastoDoacoes = saidasMesLista.filter(s => (s.categoria || '').toLowerCase().includes('doa')).reduce((a, b) => a + toNum(b.valor), 0);
-            const gastoEssencialDemais = Math.max(0, saidasMesTotal - gastoLazer - gastoDoacoes);
+            // Cálculo dos gastos por bloco no mês
+            const somaBloco = (nomeBloco) => saidasMesLista
+                .filter(s => identificarBlocoSaida(s) === nomeBloco)
+                .reduce((a, b) => a + toNum(b.valor), 0);
 
-            const percUsoLazer = metaEntTotal > 0 ? Math.min(100, Math.round((gastoLazer / metaEntTotal) * 100)) : 0;
-            const percUsoDoa = metaDoaTotal > 0 ? Math.min(100, Math.round((gastoDoacoes / metaDoaTotal) * 100)) : 0;
-            const percUsoDem = metaDemTotal > 0 ? Math.min(100, Math.round((gastoEssencialDemais / metaDemTotal) * 100)) : 0;
+            const gastoCustosFixos = somaBloco('Custos fixos');
+            const gastoConforto = somaBloco('Conforto');
+            const gastoMetas = somaBloco('Metas');
+            const gastoLazer = somaBloco('Prazeres');
+            const gastoConhecimento = somaBloco('Conhecimento');
+            const gastoDoacoes = somaBloco('Lei de Anha');
+            const gastoOutros = somaBloco('Outros gastos');
 
-            document.getElementById('gasto-ent-status').innerText = `Usado: ${formatBRL(gastoLazer)} (${percUsoLazer}%)`;
-            document.getElementById('bar-ent').style.width = `${percUsoLazer}%`;
-            document.getElementById('bar-ent').className = `h-full rounded-full transition-all ${percUsoLazer > 95 ? 'bg-crimson' : (percUsoLazer > 75 ? 'bg-amber-500' : 'bg-sage-500')}`;
-            document.getElementById('ritmo-ent-msg').innerText = gastoLazer > metaEntTotal ? '🛑 Teto estourado!' : `Livre: ${formatBRL(Math.max(0, metaEntTotal - gastoLazer))}`;
+            // Mecanismo de Previsão dos Gastos Fixos (Despesas com natureza='Fixa' ou em Custos fixos)
+            const gastosNaturezaFixaMes = saidasMesLista
+                .filter(s => s.natureza === 'Fixa' || identificarBlocoSaida(s) === 'Custos fixos' || identificarBlocoSaida(s) === 'Lei de Anha')
+                .reduce((a, b) => a + toNum(b.valor), 0);
 
-            document.getElementById('gasto-doa-status').innerText = `Doado: ${formatBRL(gastoDoacoes)} (${percUsoDoa}%)`;
-            document.getElementById('bar-doa').style.width = `${percUsoDoa}%`;
+            // Helper para atualizar barra e status de cada card de bloco
+            const atualizarCardBlocoUI = (prefixoBar, prefixoStatus, prefixoMsg, gasto, meta, labelAcao, msgOk) => {
+                const percReal = meta > 0 ? Math.round((gasto / meta) * 100) : 0;
+                const percBarra = Math.min(100, percReal);
+                const corBarra = percReal > 100 ? 'bg-crimson' : (percReal >= 80 ? 'bg-amber-500' : 'bg-forest');
+                const statusSinal = percReal > 100 ? '🔴 Estourado!' : (percReal >= 80 ? '🟡 Atenção' : '🟢 Saudável');
+                const elStatus = document.getElementById(prefixoStatus);
+                const elBar = document.getElementById(prefixoBar);
+                const elMsg = document.getElementById(prefixoMsg);
+                if (elStatus) elStatus.innerText = `${labelAcao}: ${formatBRL(gasto)} (${percReal}%)`;
+                if (elBar) {
+                    elBar.style.width = `${percBarra}%`;
+                    elBar.className = `h-full rounded-full transition-all ${corBarra}`;
+                }
+                if (elMsg) {
+                    elMsg.innerText = percReal > 100
+                        ? `${statusSinal} Excesso: ${formatBRL(gasto - meta)}`
+                        : `${statusSinal} • ${msgOk}: ${formatBRL(Math.max(0, meta - gasto))}`;
+                }
+                return { percReal, status: percReal > 100 ? 'vermelho' : (percReal >= 80 ? 'amarelo' : 'verde') };
+            };
 
-            document.getElementById('gasto-dem-status').innerText = `Gasto: ${formatBRL(gastoEssencialDemais)} (${percUsoDem}%)`;
-            document.getElementById('bar-dem').style.width = `${percUsoDem}%`;
-            document.getElementById('bar-dem').className = `h-full rounded-full transition-all ${percUsoDem > 95 ? 'bg-crimson' : 'bg-forest'}`;
-            document.getElementById('ritmo-dem-msg').innerText = gastoEssencialDemais > metaDemTotal ? '⚠️ Acima dos 78%!' : `Margem: ${formatBRL(Math.max(0, metaDemTotal - gastoEssencialDemais))}`;
+            atualizarCardBlocoUI('bar-dem', 'gasto-dem-status', 'ritmo-dem-msg', gastoCustosFixos, metaDemTotal, 'Gasto', 'Margem fixa');
+            atualizarCardBlocoUI('bar-conforto', 'gasto-conforto-status', 'ritmo-conforto-msg', gastoConforto, metaConfortoTotal, 'Usado', 'Livre');
+            atualizarCardBlocoUI('bar-metas', 'gasto-metas-status', 'ritmo-metas-msg', gastoMetas, metaMetasTotal, 'Alocado', 'Restante');
+            atualizarCardBlocoUI('bar-ent', 'gasto-ent-status', 'ritmo-ent-msg', gastoLazer, metaEntTotal, 'Usado', 'Livre');
+            atualizarCardBlocoUI('bar-conhecimento', 'gasto-conhecimento-status', 'ritmo-conhecimento-msg', gastoConhecimento, metaConhecimentoTotal, 'Investido', 'Livre');
+            atualizarCardBlocoUI('bar-doa', 'gasto-doa-status', 'ritmo-doa-msg', gastoDoacoes, metaDoaTotal, 'Destinado', 'Pendente');
+            atualizarCardBlocoUI('bar-outros', 'gasto-outros-status', 'ritmo-outros-msg', gastoOutros, metaOutrosTotal, 'Usado', 'Flexível');
 
             document.getElementById('cfg-eco').value = config.perc_economia;
-            document.getElementById('cfg-ent').value = config.perc_entretenimento;
-            document.getElementById('cfg-doa').value = config.perc_doacoes;
             document.getElementById('cfg-dem').value = config.perc_demais;
+            document.getElementById('cfg-conforto').value = config.perc_conforto;
+            document.getElementById('cfg-metas').value = config.perc_metas;
+            document.getElementById('cfg-ent').value = config.perc_entretenimento;
+            document.getElementById('cfg-conhecimento').value = config.perc_conhecimento;
+            document.getElementById('cfg-doa').value = config.perc_doacoes;
+            document.getElementById('cfg-outros').value = config.perc_outros;
 
             // Isolamento com try/catch em cada módulo para garantir que nenhum erro impeça a renderização das abas
             try {
                 renderizarAlertasComportamentais({
-                    mesSelecionado, rendaRegularMes, rendaExtraMes, entradasMesTotal,
-                    saidasMesLista, saidasMesTotal, metaEcoTotal, gastoLazer, metaEntTotal,
-                    metaDemTotal
+                    mesSelecionado, rendaRegularMes: rendaBaseCalculo, usandoRendaPadrao1500, rendaExtraMes, entradasMesTotal,
+                    saidasMesLista, saidasMesTotal, metaEcoTotal,
+                    gastoCustosFixos, metaDemTotal,
+                    gastoConforto, metaConfortoTotal,
+                    gastoMetas, metaMetasTotal,
+                    gastoLazer, metaEntTotal,
+                    gastoConhecimento, metaConhecimentoTotal,
+                    gastoDoacoes, metaDoaTotal,
+                    gastoOutros, metaOutrosTotal,
+                    gastosNaturezaFixaMes,
+                    totalReserva
                 });
             } catch (e) { console.error('Erro em Alertas:', e); }
 
@@ -3238,14 +3622,15 @@
             const mesesMeta = toNum(config.meses_meta_reserva) || 6;
             document.getElementById('res-meses-meta').value = mesesMeta;
 
-            const saidasEssenciaisMes = transMes
-                .filter(t => t.tipo === 'saida' && t.essencialidade === 'Essencial')
+            const saidasCustosFixosMes = transMes
+                .filter(t => t.tipo === 'saida' && (identificarBlocoSaida(t) === 'Custos fixos' || t.natureza === 'Fixa'))
                 .reduce((acc, t) => acc + toNum(t.valor), 0);
 
-            const custoBase = toNum(config.custo_fixo_estimado) > 0 ? toNum(config.custo_fixo_estimado) : (saidasEssenciaisMes || 1170);
+            const padraoCustosFixos40 = 1500 * (toNum(config.perc_demais || 40) / 100);
+            const custoBase = toNum(config.custo_fixo_estimado) > 0 ? toNum(config.custo_fixo_estimado) : (saidasCustosFixosMes || padraoCustosFixos40);
             document.getElementById('res-custo-origem').innerText = toNum(config.custo_fixo_estimado) > 0
                 ? 'Custo fixado manualmente'
-                : (saidasEssenciaisMes > 0 ? 'Calculado das saídas essenciais do mês' : 'Sugestão padrão 78% de R$ 1.500 (R$ 1.170)');
+                : (saidasCustosFixosMes > 0 ? 'Calculado do bloco Custos Fixos do mês' : `Padrão ${config.perc_demais}% de R$ 1.500 (${formatBRL(padraoCustosFixos40)})`);
 
             const metaTotal = custoBase * mesesMeta;
             const perc = metaTotal > 0 ? Math.min(100, Math.round((saldoReserva / metaTotal) * 100)) : 0;
@@ -3413,16 +3798,15 @@
                     const extra = isTransacaoExtra(t);
                     const vPagueSe = extra ? toNum(t.valor) * 0.5 : toNum(t.valor) * (config.perc_economia / 100);
                     return extra
-                        ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-forest">Extra 50/50 (Pague-se: ${formatBRL(vPagueSe)})</span>`
-                        : `<span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-600">Base 10/10/2/78 (Pague-se: ${formatBRL(vPagueSe)})</span>`;
+                        ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-forest">Extra 50/50 (Investir: ${formatBRL(vPagueSe)})</span>`
+                        : `<span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-600">Renda Base 8 Blocos (Investir 10%: ${formatBRL(vPagueSe)})</span>`;
                 }
-                if ((t.categoria || '').toLowerCase().includes('imprevisto')) {
-                    return `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">⚠️ Imprevisto • ${t.forma_pagamento || 'Pix'}</span>`;
-                }
-                if (t.essencialidade === 'Nao Essencial') {
-                    return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-50 text-crimson">Não Essencial / Lazer • ${t.forma_pagamento || 'Pix'}</span>`;
-                }
-                return `<span class="text-xs text-slate-400">Essencial (${t.natureza || 'Variável'}) • ${t.forma_pagamento || 'Pix'}</span>`;
+                const bloco = identificarBlocoSaida(t);
+                const isFixo = ['Custos fixos', 'Lei de Anha', 'Metas'].includes(bloco) || t.natureza === 'Fixa';
+                const corBadge = bloco === 'Prazeres' || bloco === 'Conforto'
+                    ? 'bg-amber-50 text-amber-800 border border-amber-200/60'
+                    : (bloco === 'Outros gastos' ? 'bg-red-50 text-crimson' : 'bg-sage-50 text-forest');
+                return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold ${corBadge}">${bloco} (${isFixo ? 'Fixo' : 'Variado'}) • ${t.forma_pagamento || 'Pix'}</span>`;
             };
 
             const dashTbody = document.getElementById('dashboard-transactions-list');
@@ -3543,10 +3927,10 @@
 
             const saidas = transMes.filter(t => t.tipo === 'saida');
             const totalSaidas = saidas.reduce((a, b) => a + toNum(b.valor), 0);
-            const totalEssencial = saidas.filter(s => s.essencialidade === 'Essencial').reduce((a, b) => a + toNum(b.valor), 0);
-            const pEssencial = totalSaidas > 0 ? Math.round((totalEssencial / totalSaidas) * 100) : 0;
+            const totalFixos = saidas.filter(s => ['Custos fixos', 'Lei de Anha', 'Metas'].includes(identificarBlocoSaida(s)) || s.natureza === 'Fixa').reduce((a, b) => a + toNum(b.valor), 0);
+            const pFixos = totalSaidas > 0 ? Math.round((totalFixos / totalSaidas) * 100) : 0;
             document.getElementById('rigidez-badge').innerText = totalSaidas > 0
-                ? `Essenciais: ${pEssencial}% • Lazer: ${100 - pEssencial}%`
+                ? `Fixos/Planejados: ${pFixos}% • Variados: ${100 - pFixos}%`
                 : 'Sem saídas no mês';
 
             const msgVazio = document.getElementById('no-expense-msg');
@@ -3554,7 +3938,10 @@
             msgVazio.classList.add('hidden');
 
             const mapaCat = {};
-            saidas.forEach(s => { mapaCat[s.categoria] = (mapaCat[s.categoria] || 0) + toNum(s.valor); });
+            saidas.forEach(s => {
+                const bName = identificarBlocoSaida(s);
+                mapaCat[bName] = (mapaCat[bName] || 0) + toNum(s.valor);
+            });
 
             categoryChartInstance = new Chart(ctxCat, {
                 type: 'doughnut',
@@ -3579,23 +3966,32 @@
         async function salvarPlanejamento(e) {
             e.preventDefault();
             const eco = toNum(document.getElementById('cfg-eco').value);
-            const ent = toNum(document.getElementById('cfg-ent').value);
-            const doa = toNum(document.getElementById('cfg-doa').value);
             const dem = toNum(document.getElementById('cfg-dem').value);
+            const conforto = toNum(document.getElementById('cfg-conforto').value);
+            const metas = toNum(document.getElementById('cfg-metas').value);
+            const ent = toNum(document.getElementById('cfg-ent').value);
+            const conhecimento = toNum(document.getElementById('cfg-conhecimento').value);
+            const doa = toNum(document.getElementById('cfg-doa').value);
+            const outros = toNum(document.getElementById('cfg-outros').value);
 
-            if (Math.round((eco + ent + doa + dem) * 10) / 10 !== 100) {
-                return showToast(`A soma deve fechar em 100%. Atual: ${(eco + ent + doa + dem).toFixed(1)}%`, 'erro');
+            const soma = Math.round((eco + dem + conforto + metas + ent + conhecimento + doa + outros) * 10) / 10;
+            if (soma !== 100) {
+                return showToast(`A soma dos 8 blocos deve fechar em 100%. Soma atual: ${soma.toFixed(1)}%`, 'erro');
             }
 
             config.perc_economia = eco;
-            config.perc_entretenimento = ent;
-            config.perc_doacoes = doa;
             config.perc_demais = dem;
+            config.perc_conforto = conforto;
+            config.perc_metas = metas;
+            config.perc_entretenimento = ent;
+            config.perc_conhecimento = conhecimento;
+            config.perc_doacoes = doa;
+            config.perc_outros = outros;
 
             if (supabaseClient) await supabaseClient.from('configuracoes').upsert({ id: 1, ...config });
             else safeSetStorage('mp_local_config', JSON.stringify(config));
             closeModal('modal-planejamento');
-            showToast('Regra de planejamento atualizada!');
+            showToast('Distribuição dos 8 blocos atualizada com sucesso!');
             atualizarInterfaceCompleta();
         }
 
@@ -3632,4 +4028,3 @@
     </script>
 </body>
 </html>
-```

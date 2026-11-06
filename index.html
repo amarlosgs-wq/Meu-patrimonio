@@ -1494,6 +1494,8 @@
             { nome: 'Saúde', tipo: 'saida' }, { nome: 'Imprevistos / Emergência', tipo: 'saida' }
         ];
 
+        const BLOCOS_ORCAMENTO_VALIDOS = ['Custos fixos', 'Conforto', 'Metas', 'Prazeres', 'Conhecimento', 'Lei de Anha', 'Outros gastos'];
+
         function normalizarConfigOitoBlocos(cfg) {
             const c = { ...cfg };
             if (toNum(c.perc_demais) === 78 || toNum(c.perc_demais) === 79 || c.perc_conforto === undefined) {
@@ -1506,25 +1508,110 @@
                 c.perc_doacoes = 2;
                 c.perc_outros = 8;
             }
+            if (!c.renda_base_prevista || toNum(c.renda_base_prevista) <= 0) {
+                c.renda_base_prevista = 1500;
+            }
             return c;
         }
 
-        function identificarBlocoSaida(s) {
-            const ess = String(s.essencialidade || '').trim();
-            const blocValidos = ['Custos fixos', 'Conforto', 'Metas', 'Prazeres', 'Conhecimento', 'Lei de Anha', 'Outros gastos'];
-            if (blocValidos.includes(ess)) return ess;
+        function extrairCategoriaBase(catRaw) {
+            const str = String(catRaw || '').trim();
+            for (const b of BLOCOS_ORCAMENTO_VALIDOS) {
+                const prefixo = `${b} • `;
+                if (str.toLowerCase().startsWith(prefixo.toLowerCase())) {
+                    return str.slice(prefixo.length).trim();
+                }
+            }
+            return str;
+        }
 
-            const cat = String(s.categoria || '').toLowerCase();
+        function formatarCategoriaComBloco(catInput, blocoEscolhido) {
+            const catLimpa = extrairCategoriaBase(catInput);
+            const bloco = BLOCOS_ORCAMENTO_VALIDOS.includes(blocoEscolhido) ? blocoEscolhido : 'Custos fixos';
+            if (catLimpa.toLowerCase().startsWith(bloco.toLowerCase())) {
+                return catLimpa;
+            }
+            return `${bloco} • ${catLimpa}`;
+        }
+
+        function mapearBlocoParaEssencialidadeDB(blocoEscolhido) {
+            // Compatível com a constraint "transacoes_essencialidade_check" do Supabase ('Essencial' | 'Nao Essencial')
+            return ['Prazeres', 'Conforto'].includes(blocoEscolhido) ? 'Nao Essencial' : 'Essencial';
+        }
+
+        function salvarBlocoLocalTransacao(id, bloco) {
+            if (!id || !bloco) return;
+            try {
+                const mapa = JSON.parse(safeGetStorage('mp_local_blocos_transacoes', '{}'));
+                mapa[String(id)] = bloco;
+                safeSetStorage('mp_local_blocos_transacoes', JSON.stringify(mapa));
+            } catch (e) {}
+        }
+
+        function obterBlocoLocalTransacao(id) {
+            if (!id) return null;
+            try {
+                const mapa = JSON.parse(safeGetStorage('mp_local_blocos_transacoes', '{}'));
+                return mapa[String(id)] || null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function identificarBlocoSaida(s) {
+            if (!s) return 'Custos fixos';
+            const blocoDireto = String(s.bloco_orcamento || '').trim();
+            if (BLOCOS_ORCAMENTO_VALIDOS.includes(blocoDireto)) return blocoDireto;
+
+            const ess = String(s.essencialidade || '').trim();
+            if (BLOCOS_ORCAMENTO_VALIDOS.includes(ess)) return ess;
+
+            const catRaw = String(s.categoria || '').trim();
+            const catLower = catRaw.toLowerCase();
+
+            // 1. Verifica se a categoria já começa explicitamente com o nome de um dos 7 blocos (ex: "Custos fixos (...)" ou "Conforto • Mercado")
+            for (const b of BLOCOS_ORCAMENTO_VALIDOS) {
+                const bLower = b.toLowerCase();
+                if (catLower === bLower || catLower.startsWith(bLower + ' •') || catLower.startsWith(bLower + ' (')) {
+                    return b;
+                }
+            }
+
+            // 2. Verifica mapeamento salvo localmente por ID
+            const blocoSalvoId = obterBlocoLocalTransacao(s.id);
+            if (blocoSalvoId && BLOCOS_ORCAMENTO_VALIDOS.includes(blocoSalvoId)) return blocoSalvoId;
+
+            // 3. Inferência por palavras-chave na categoria e descrição
             const desc = String(s.descricao || '').toLowerCase();
-            const texto = `${cat} ${desc}`;
+            const texto = `${catLower} ${desc}`;
 
             if (texto.includes('anha') || texto.includes('amra') || texto.includes('doaç') || texto.includes('doac')) return 'Lei de Anha';
-            if (texto.includes('conhecimento') || texto.includes('livro') || texto.includes('curso') || texto.includes('congresso') || texto.includes('idioma') || texto.includes('estudo')) return 'Conhecimento';
+            if (texto.includes('conhecimento') || texto.includes('livro') || texto.includes('curso') || texto.includes('congresso') || texto.includes('idioma') || texto.includes('estudo') || texto.includes('faculdade')) return 'Conhecimento';
             if (texto.includes('meta') || texto.includes('viagem') || texto.includes('computador') || texto.includes('carro') || texto.includes('projeto')) return 'Metas';
-            if (texto.includes('conforto') || texto.includes('academia') || texto.includes('esporte') || texto.includes('roupa') || texto.includes('barbeiro') || texto.includes('cuidado') || texto.includes('streaming') || texto.includes('delivery') || texto.includes('uber')) return 'Conforto';
+            if (texto.includes('conforto') || texto.includes('academia') || texto.includes('esporte') || texto.includes('roupa') || texto.includes('barbeiro') || texto.includes('cuidado') || texto.includes('streaming') || texto.includes('assinatura') || texto.includes('delivery') || texto.includes('uber')) return 'Conforto';
             if (texto.includes('prazer') || texto.includes('entretenimento') || texto.includes('cinema') || texto.includes('restaurante') || texto.includes('passeio') || texto.includes('jogo') || texto.includes('lazer') || ess === 'Nao Essencial') return 'Prazeres';
             if (texto.includes('outros') || texto.includes('pet') || texto.includes('medicamento') || texto.includes('farmácia') || texto.includes('farmacia') || texto.includes('imprevisto') || texto.includes('emerg')) return 'Outros gastos';
             return 'Custos fixos';
+        }
+
+        async function persistirConfiguracoes() {
+            safeSetStorage('mp_local_config', JSON.stringify(config));
+            if (supabaseClient) {
+                try {
+                    const payloadCompat = {
+                        id: 1,
+                        perc_economia: toNum(config.perc_economia),
+                        perc_entretenimento: toNum(config.perc_entretenimento),
+                        perc_doacoes: toNum(config.perc_doacoes),
+                        perc_demais: toNum(config.perc_demais),
+                        meses_meta_reserva: parseInt(config.meses_meta_reserva, 10) || 6,
+                        custo_fixo_estimado: toNum(config.custo_fixo_estimado)
+                    };
+                    await supabaseClient.from('configuracoes').upsert(payloadCompat);
+                } catch (e) {
+                    console.warn('Aviso ao sincronizar configuracoes no Supabase:', e);
+                }
+            }
         }
 
         function toggleGuiaBlocos() {
@@ -1744,8 +1831,11 @@
                     if (!resCat.error && resCat.data && resCat.data.length > 0) categorias = resCat.data;
                     else categorias = categoriasPadrao;
 
+                    const localCfg = JSON.parse(safeGetStorage('mp_local_config', '{}'));
                     if (!resCfg.error && resCfg.data) {
-                        config = normalizarConfigOitoBlocos({ ...config, ...resCfg.data });
+                        config = normalizarConfigOitoBlocos({ ...config, ...resCfg.data, ...localCfg });
+                    } else {
+                        config = normalizarConfigOitoBlocos({ ...config, ...localCfg });
                     }
                     if (!resInv.error) investimentos = resInv.data || [];
                     if (!resRes.error) reservaMovs = resRes.data || [];
@@ -1873,7 +1963,9 @@
             const transMes = transacoes.filter(t => t.data && t.data.startsWith(mesSelecionado));
 
             const entradasMes = transMes.filter(t => t.tipo === 'entrada');
-            const rendaRegular = entradasMes.filter(t => !isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0) || 1500;
+            const rendaRegularLancada = entradasMes.filter(t => !isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
+            const pisoRendaBase = toNum(config.renda_base_prevista) || 1500;
+            const rendaRegular = Math.max(rendaRegularLancada, pisoRendaBase);
             const rendaExtra = entradasMes.filter(t => isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
 
             const mapaTetos = {
@@ -2484,30 +2576,56 @@
             const idEdicao = document.getElementById(isEntrada ? 'ent-id' : 'sai-id').value;
             const isExtraMarcado = isEntrada && document.getElementById('ent-is-extra').checked;
 
+            const catSelecionada = document.getElementById(isEntrada ? 'ent-categoria' : 'sai-categoria').value;
+            const blocoEscolhido = !isEntrada ? (document.getElementById('sai-essencialidade').value || 'Custos fixos') : null;
+            const categoriaFinal = !isEntrada ? formatarCategoriaComBloco(catSelecionada, blocoEscolhido) : catSelecionada;
+            const essencialidadeDB = !isEntrada ? mapearBlocoParaEssencialidadeDB(blocoEscolhido) : null;
+
             const payload = {
                 tipo,
                 valor: toNum(document.getElementById(isEntrada ? 'ent-valor' : 'sai-valor').value),
                 descricao: document.getElementById(isEntrada ? 'ent-descricao' : 'sai-descricao').value.trim(),
-                categoria: document.getElementById(isEntrada ? 'ent-categoria' : 'sai-categoria').value,
+                categoria: categoriaFinal,
                 data: document.getElementById(isEntrada ? 'ent-data' : 'sai-data').value,
                 recorrencia: isEntrada ? (isExtraMarcado ? 'Extra_50_50' : document.getElementById('ent-recorrencia').value) : null,
-                natureza: !isEntrada ? document.getElementById('sai-natureza').value : null,
-                essencialidade: !isEntrada ? document.getElementById('sai-essencialidade').value : null,
-                forma_pagamento: !isEntrada ? document.getElementById('sai-pagamento').value : null,
+                natureza: !isEntrada ? (document.getElementById('sai-natureza').value || 'Variavel') : null,
+                essencialidade: essencialidadeDB,
+                forma_pagamento: !isEntrada ? (document.getElementById('sai-pagamento').value || 'Pix') : null,
             };
 
             try {
                 if (supabaseClient) {
-                    const res = idEdicao
-                        ? await supabaseClient.from('transacoes').update(payload).eq('id', idEdicao)
-                        : await supabaseClient.from('transacoes').insert([payload]);
+                    let res = idEdicao
+                        ? await supabaseClient.from('transacoes').update(payload).eq('id', idEdicao).select()
+                        : await supabaseClient.from('transacoes').insert([payload]).select();
+
+                    // Fallback automático caso haja alguma constraint adicional no banco
+                    if (res.error && String(res.error.message || '').includes('check constraint')) {
+                        const payloadFallback = {
+                            ...payload,
+                            essencialidade: !isEntrada ? 'Essencial' : null,
+                            recorrencia: isEntrada ? 'Mensal' : null
+                        };
+                        res = idEdicao
+                            ? await supabaseClient.from('transacoes').update(payloadFallback).eq('id', idEdicao).select()
+                            : await supabaseClient.from('transacoes').insert([payloadFallback]).select();
+                    }
                     if (res.error) throw new Error(res.error.message);
+
+                    const salvoId = (res.data && res.data[0] && res.data[0].id) ? res.data[0].id : idEdicao;
+                    if (!isEntrada && salvoId) {
+                        salvarBlocoLocalTransacao(salvoId, blocoEscolhido);
+                    }
                 } else {
+                    const localItem = { ...payload, bloco_orcamento: blocoEscolhido };
                     if (idEdicao) {
                         const idx = transacoes.findIndex(t => String(t.id) === String(idEdicao));
-                        if (idx > -1) transacoes[idx] = { ...transacoes[idx], ...payload };
+                        if (idx > -1) transacoes[idx] = { ...transacoes[idx], ...localItem };
+                        if (!isEntrada) salvarBlocoLocalTransacao(idEdicao, blocoEscolhido);
                     } else {
-                        transacoes.unshift({ id: crypto.randomUUID(), ...payload });
+                        const novoId = crypto.randomUUID();
+                        transacoes.unshift({ id: novoId, ...localItem });
+                        if (!isEntrada) salvarBlocoLocalTransacao(novoId, blocoEscolhido);
                     }
                     safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
                 }
@@ -2572,7 +2690,14 @@
                 document.getElementById('sai-id').value = item.id;
                 document.getElementById('sai-valor').value = item.valor;
                 document.getElementById('sai-descricao').value = item.descricao;
-                document.getElementById('sai-categoria').value = item.categoria;
+                const catBase = extrairCategoriaBase(item.categoria);
+                const selectCat = document.getElementById('sai-categoria');
+                if (selectCat) {
+                    if (!Array.from(selectCat.options).some(o => o.value === catBase)) {
+                        selectCat.insertAdjacentHTML('beforeend', `<option value="${catBase}">${catBase}</option>`);
+                    }
+                    selectCat.value = catBase;
+                }
                 document.getElementById('sai-natureza').value = item.natureza || 'Variavel';
                 document.getElementById('sai-essencialidade').value = identificarBlocoSaida(item);
                 document.getElementById('sai-pagamento').value = item.forma_pagamento || 'Pix';
@@ -2793,8 +2918,7 @@
 
         async function salvarMetaReserva() {
             config.meses_meta_reserva = parseInt(document.getElementById('res-meses-meta').value, 10) || 6;
-            if (supabaseClient) await supabaseClient.from('configuracoes').upsert({ id: 1, ...config });
-            else safeSetStorage('mp_local_config', JSON.stringify(config));
+            await persistirConfiguracoes();
             atualizarInterfaceCompleta();
         }
 
@@ -2810,8 +2934,7 @@
             });
             if (!resp.confirmado) return;
             config.custo_fixo_estimado = toNum(resp.valor);
-            if (supabaseClient) await supabaseClient.from('configuracoes').upsert({ id: 1, ...config });
-            else safeSetStorage('mp_local_config', JSON.stringify(config));
+            await persistirConfiguracoes();
             atualizarInterfaceCompleta();
         }
 
@@ -2956,9 +3079,10 @@
             document.getElementById('ind-reserva').innerText = formatBRL(totalReserva);
 
             config = normalizarConfigOitoBlocos(config);
-            // Usa a renda regular cadastrada no mês ou R$ 1.500,00 como referência padrão para os 8 blocos
-            const rendaBaseCalculo = rendaRegularMes > 0 ? rendaRegularMes : 1500;
-            const usandoRendaPadrao1500 = rendaRegularMes <= 0;
+            // Garante que a previsão mensal dos 8 blocos respeite o piso de R$ 1.500,00 mesmo quando a renda entra parcelada ao longo do mês
+            const pisoRendaBase = toNum(config.renda_base_prevista) || 1500;
+            const rendaBaseCalculo = Math.max(rendaRegularMes, pisoRendaBase);
+            const usandoRendaPadrao1500 = rendaRegularMes < pisoRendaBase;
 
             const metaEcoBase = rendaBaseCalculo * (toNum(config.perc_economia) / 100);
             const metaEcoExtra = rendaExtraMes * 0.50;
@@ -3988,8 +4112,7 @@
             config.perc_doacoes = doa;
             config.perc_outros = outros;
 
-            if (supabaseClient) await supabaseClient.from('configuracoes').upsert({ id: 1, ...config });
-            else safeSetStorage('mp_local_config', JSON.stringify(config));
+            await persistirConfiguracoes();
             closeModal('modal-planejamento');
             showToast('Distribuição dos 8 blocos atualizada com sucesso!');
             atualizarInterfaceCompleta();

@@ -235,14 +235,14 @@
                         <span class="text-[11px] text-sage-200/80 block mt-1 truncate" id="ind-taxa-poupanca">Resultado: R$ 0,00</span>
                     </div>
 
-                    <!-- Investimentos -->
+                    <!-- Investimentos (Soma Carteira + Reserva de Emergência) -->
                     <div onclick="switchTab('investimentos')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
                         <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
-                            <span class="font-medium truncate">Investimentos</span>
+                            <span class="font-medium truncate">Investimentos (c/ Reserva)</span>
                             <i data-lucide="trending-up" class="w-4 h-4 text-sage-200 shrink-0"></i>
                         </div>
                         <strong class="text-xl font-extrabold text-white money-val block truncate" id="ind-investido">R$ 0,00</strong>
-                        <span class="text-[11px] text-emerald-300 font-medium block mt-1">Ver carteira & 13% a.a. →</span>
+                        <span class="text-[11px] text-emerald-300 font-medium block mt-1 truncate" id="ind-investido-sub">Carteira + Reserva →</span>
                     </div>
 
                     <!-- Reserva de Emergência -->
@@ -316,9 +316,9 @@
                             <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden mb-1.5">
                                 <div id="bar-eco" class="h-full bg-forest rounded-full transition-all" style="width: 0%"></div>
                             </div>
-                            <div class="flex justify-between items-center text-[11px]">
+                            <div class="flex justify-between items-center gap-1 text-[11px]">
                                 <span id="status-pague-se-card" class="font-semibold text-amber-700 truncate">Pendente</span>
-                                <button onclick="abrirModalPagueSe()" class="text-forest font-bold hover:underline shrink-0">Quitar →</button>
+                                <button id="btn-card-pague-se" onclick="abrirModalPagueSe()" class="text-forest font-bold hover:underline shrink-0">Quitar →</button>
                             </div>
                         </div>
                     </div>
@@ -626,43 +626,48 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
-                            <input type="text" id="sai-descricao" required placeholder="Ex: Mercado, Corrida/Esporte, Imprevisto..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Descrição do Gasto</label>
+                            <input type="text" id="sai-descricao" required oninput="autoClassificarPorDescricao()" placeholder="Ex: Supermercado, Barras de proteína, Uber, Academia..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500">
                         </div>
 
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-medium text-slate-600">Categoria</label>
+                                <label class="text-xs font-medium text-slate-600">Categoria (O que foi o gasto?)</label>
                                 <button type="button" onclick="novaCategoriaPrompt('saida')" class="text-[11px] text-sage-600 font-semibold hover:underline">+ Nova categoria</button>
                             </div>
                             <select id="sai-categoria" required onchange="autoSelecionarBlocoPorCategoria(); avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-sage-500"></select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Natureza</label>
-                                <select id="sai-natureza" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
-                                    <option value="Variavel">Variável</option>
-                                    <option value="Fixa">Fixa</option>
-                                </select>
+                        <div class="p-3 rounded-2xl bg-sage-50/60 border border-sage-200/80 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold text-forest">Bloco do Orçamento (Encaixe Automático)</label>
+                                <span class="text-[10px] font-semibold text-sage-600 bg-white px-2 py-0.5 rounded-full border border-sage-200">Auto-selecionado</span>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Bloco do Orçamento</label>
-                                <select id="sai-essencialidade" required onchange="sincronizarNaturezaPorBloco(); avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700">
-                                    <option value="Custos fixos">Custos fixos (40% • Fixo/Essencial)</option>
-                                    <option value="Conforto">Conforto (15% • Variado)</option>
-                                    <option value="Metas">Metas (10% • Planejado)</option>
-                                    <option value="Prazeres">Prazeres (10% • Variado)</option>
-                                    <option value="Conhecimento">Conhecimento (5% • Variado)</option>
-                                    <option value="Lei de Anha">Lei de Anha (2% • Fixo)</option>
-                                    <option value="Outros gastos">Outros gastos (8% • Variado)</option>
-                                </select>
-                            </div>
+                            <select id="sai-essencialidade" required onchange="atualizarDicaBlocoSaida(); avaliarImpactoSaidaTempoReal()" class="w-full bg-white border border-sage-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800">
+                                <option value="Custos fixos">2. Custos fixos (40% • R$ 600 — Essenciais)</option>
+                                <option value="Conforto">3. Conforto (15% • R$ 225 — Bem-estar & Rotina)</option>
+                                <option value="Metas">4. Metas (10% • R$ 150 — Projetos & Compras)</option>
+                                <option value="Prazeres">5. Prazeres (10% • R$ 150 — Lazer & Saídas)</option>
+                                <option value="Conhecimento">6. Conhecimento (5% • R$ 75 — Estudos & Livros)</option>
+                                <option value="Lei de Anha">7. Lei de Anha (2% • R$ 30 — Reserva Específica)</option>
+                                <option value="Outros gastos">8. Outros gastos (8% • R$ 120 — Saúde, Pet & Imprev.)</option>
+                            </select>
+                            <p id="sai-bloco-dica" class="text-[11px] text-slate-500 leading-snug">
+                                📌 <strong>O que entra aqui:</strong> Alimentação básica, supermercado, transporte, contas de casa e mensalidades essenciais.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Recorrência da Cobrança</label>
+                            <select id="sai-natureza" required onchange="avaliarImpactoSaidaTempoReal()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700">
+                                <option value="Variavel">Compra Avulsa / Valor Variável no Mês</option>
+                                <option value="Fixa">Conta Recorrente / Mensalidade Fixa</option>
+                            </select>
                         </div>
 
                         <div id="sai-impact-warning" class="hidden rounded-2xl p-3.5 text-xs space-y-1 border"></div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Pagamento</label>
                                 <select id="sai-pagamento" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
@@ -1268,8 +1273,9 @@
                 <button onclick="closeModal('modal-pague-se')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <p class="text-xs text-slate-500">
-                Seu aporte prioritário será deduzido imediatamente do seu <strong>Saldo Disponível em Conta</strong> e alocado no destino escolhido.
+                Tanto os depósitos na <strong>Reserva de Emergência</strong> quanto na <strong>Carteira de Investimentos</strong> somam juntos para quitar sua meta mensal de 10%.
             </p>
+            <div id="modal-pague-se-resumo" class="p-3 rounded-2xl bg-sage-50 border border-sage-200 text-xs text-slate-700 space-y-1"></div>
             <form onsubmit="confirmarPagueSeRapido(event)" class="space-y-3">
                 <div>
                     <label class="text-xs font-medium text-slate-600">Valor do Aporte Prioritário (R$)</label>
@@ -1473,25 +1479,60 @@
             }
         }
 
+        const CATALOGO_CATEGORIAS_SAIDA = [
+            // 2. Custos fixos (40%)
+            { nome: 'Mercado / Alimentação Básica', bloco: 'Custos fixos', naturezaPadrao: 'Variavel' },
+            { nome: 'Transporte / Combustível', bloco: 'Custos fixos', naturezaPadrao: 'Variavel' },
+            { nome: 'Moradia / Contas (Água, Luz, Internet)', bloco: 'Custos fixos', naturezaPadrao: 'Fixa' },
+            { nome: 'Mensalidades & Despesas Essenciais', bloco: 'Custos fixos', naturezaPadrao: 'Fixa' },
+            // 3. Conforto (15%)
+            { nome: 'Academia / Esportes / Suplementos', bloco: 'Conforto', naturezaPadrao: 'Variavel' },
+            { nome: 'Uber / Delivery / Conveniência', bloco: 'Conforto', naturezaPadrao: 'Variavel' },
+            { nome: 'Streaming / Assinaturas Digitais', bloco: 'Conforto', naturezaPadrao: 'Fixa' },
+            { nome: 'Roupas / Barbeiro / Cuidados Pessoais', bloco: 'Conforto', naturezaPadrao: 'Variavel' },
+            // 4. Metas (10%)
+            { nome: 'Viagens / Projetos Pessoais', bloco: 'Metas', naturezaPadrao: 'Fixa' },
+            { nome: 'Compras Planejadas (Carro / Computador)', bloco: 'Metas', naturezaPadrao: 'Fixa' },
+            // 5. Prazeres (10%)
+            { nome: 'Restaurantes / Bares / Saídas', bloco: 'Prazeres', naturezaPadrao: 'Variavel' },
+            { nome: 'Cinema / Jogos / Entretenimento', bloco: 'Prazeres', naturezaPadrao: 'Variavel' },
+            // 6. Conhecimento (5%)
+            { nome: 'Livros / Cursos / Congressos', bloco: 'Conhecimento', naturezaPadrao: 'Variavel' },
+            { nome: 'Idiomas / Materiais de Estudo', bloco: 'Conhecimento', naturezaPadrao: 'Fixa' },
+            // 7. Lei de Anha (2%)
+            { nome: 'Lei de Anha / Doações', bloco: 'Lei de Anha', naturezaPadrao: 'Fixa' },
+            // 8. Outros gastos (8%)
+            { nome: 'Farmácia / Medicamentos / Saúde', bloco: 'Outros gastos', naturezaPadrao: 'Variavel' },
+            { nome: 'Pet / Ração / Veterinário', bloco: 'Outros gastos', naturezaPadrao: 'Variavel' },
+            { nome: 'Imprevistos / Despesas Extraordinárias', bloco: 'Outros gastos', naturezaPadrao: 'Variavel' }
+        ];
+
+        const DICAS_BLOCOS_ORCAMENTO = {
+            'Custos fixos': '📌 <strong>O que entra em Custos fixos (40%):</strong> Alimentação básica, supermercado, transporte, contas de casa e despesas essenciais.',
+            'Conforto': '📌 <strong>O que entra em Conforto (15%):</strong> Academia, suplementos, roupas, barbeiro, cuidados pessoais, streaming, delivery e Uber.',
+            'Metas': '📌 <strong>O que entra em Metas (10%):</strong> Viagens, computador, carro, projetos pessoais e compras planejadas.',
+            'Prazeres': '📌 <strong>O que entra em Prazeres (10%):</strong> Cinema, restaurantes, passeios, jogos e entretenimento.',
+            'Conhecimento': '📌 <strong>O que entra em Conhecimento (5%):</strong> Livros, cursos, congressos, idiomas e materiais de estudo.',
+            'Lei de Anha': '📌 <strong>O que entra em Lei de Anha (2%):</strong> Reserva específica e doações conforme a finalidade atribuída a esta categoria.',
+            'Outros gastos': '📌 <strong>O que entra em Outros gastos (8%):</strong> Pet, medicamentos, farmácia, imprevistos e despesas extraordinárias.'
+        };
+
+        const CATEGORIAS_LEGADAS_BLOCO = new Set([
+            'Custos fixos (Alimentação, contas, transporte)',
+            'Conforto (Academia, roupas, streaming, Uber)',
+            'Metas (Viagens, carro, projetos, compras)',
+            'Prazeres (Cinema, restaurantes, passeios, jogos)',
+            'Conhecimento (Livros, cursos, congressos, idiomas)',
+            'Lei de Anha (Reserva específica / Doações)',
+            'Outros gastos (Pet, medicamentos, imprevistos)'
+        ]);
+
         const categoriasPadrao = [
             { nome: 'Bolsa/estágio', tipo: 'entrada' }, { nome: 'Salário', tipo: 'entrada' },
             { nome: 'Plantões', tipo: 'entrada' }, { nome: 'Trabalhos extras', tipo: 'entrada' },
             { nome: 'Rendimentos', tipo: 'entrada' }, { nome: 'Presentes', tipo: 'entrada' },
             { nome: 'Outros', tipo: 'entrada' },
-            // 8 Categorias Oficiais da Nova Distribuição Financeira + subcategorias usuais
-            { nome: 'Custos fixos (Alimentação, contas, transporte)', tipo: 'saida' },
-            { nome: 'Conforto (Academia, roupas, streaming, Uber)', tipo: 'saida' },
-            { nome: 'Metas (Viagens, carro, projetos, compras)', tipo: 'saida' },
-            { nome: 'Prazeres (Cinema, restaurantes, passeios, jogos)', tipo: 'saida' },
-            { nome: 'Conhecimento (Livros, cursos, congressos, idiomas)', tipo: 'saida' },
-            { nome: 'Lei de Anha (Reserva específica / Doações)', tipo: 'saida' },
-            { nome: 'Outros gastos (Pet, medicamentos, imprevistos)', tipo: 'saida' },
-            { nome: 'Mercado', tipo: 'saida' }, { nome: 'Entretenimento', tipo: 'saida' },
-            { nome: 'Saúde física e esportes', tipo: 'saida' }, { nome: 'Pets', tipo: 'saida' },
-            { nome: 'Faculdade', tipo: 'saida' }, { nome: 'Assinaturas e internet', tipo: 'saida' },
-            { nome: 'Roupas e acessórios', tipo: 'saida' }, { nome: 'Barbeiro', tipo: 'saida' },
-            { nome: 'Moradia', tipo: 'saida' }, { nome: 'Transporte', tipo: 'saida' },
-            { nome: 'Saúde', tipo: 'saida' }, { nome: 'Imprevistos / Emergência', tipo: 'saida' }
+            ...CATALOGO_CATEGORIAS_SAIDA.map(c => ({ nome: c.nome, tipo: 'saida' }))
         ];
 
         const BLOCOS_ORCAMENTO_VALIDOS = ['Custos fixos', 'Conforto', 'Metas', 'Prazeres', 'Conhecimento', 'Lei de Anha', 'Outros gastos'];
@@ -1619,22 +1660,76 @@
             if (el) el.classList.toggle('hidden');
         }
 
+        function atualizarDicaBlocoSaida() {
+            const bloco = document.getElementById('sai-essencialidade')?.value || 'Custos fixos';
+            const dicaEl = document.getElementById('sai-bloco-dica');
+            if (dicaEl && DICAS_BLOCOS_ORCAMENTO[bloco]) {
+                dicaEl.innerHTML = DICAS_BLOCOS_ORCAMENTO[bloco];
+            }
+        }
+
         function autoSelecionarBlocoPorCategoria() {
             const cat = document.getElementById('sai-categoria')?.value || '';
-            const bloco = identificarBlocoSaida({ categoria: cat, essencialidade: '' });
+            const itemCatalogo = CATALOGO_CATEGORIAS_SAIDA.find(c => c.nome === cat);
+            const bloco = itemCatalogo ? itemCatalogo.bloco : identificarBlocoSaida({ categoria: cat, essencialidade: '' });
             const selectBloco = document.getElementById('sai-essencialidade');
             if (selectBloco) selectBloco.value = bloco;
-            sincronizarNaturezaPorBloco();
+
+            const selectNat = document.getElementById('sai-natureza');
+            if (selectNat) {
+                if (itemCatalogo) {
+                    selectNat.value = itemCatalogo.naturezaPadrao;
+                } else {
+                    const catL = cat.toLowerCase();
+                    const isRecorrente = catL.includes('moradia') || catL.includes('assinatura') || catL.includes('streaming') || catL.includes('mensalidade') || catL.includes('faculdade') || catL.includes('anha');
+                    selectNat.value = isRecorrente ? 'Fixa' : 'Variavel';
+                }
+            }
+            atualizarDicaBlocoSaida();
         }
 
         function sincronizarNaturezaPorBloco() {
-            const bloco = document.getElementById('sai-essencialidade')?.value || 'Custos fixos';
-            const selectNat = document.getElementById('sai-natureza');
-            if (!selectNat) return;
-            if (['Custos fixos', 'Lei de Anha', 'Metas'].includes(bloco)) {
-                selectNat.value = 'Fixa';
-            } else {
-                selectNat.value = 'Variavel';
+            atualizarDicaBlocoSaida();
+        }
+
+        function autoClassificarPorDescricao() {
+            const desc = (document.getElementById('sai-descricao')?.value || '').toLowerCase().trim();
+            if (desc.length < 3) return;
+
+            const regrasDescricao = [
+                { termos: ['barra', 'proteína', 'proteina', 'whey', 'creatina', 'suplemento', 'academia', 'treino', 'corrida', 'esporte'], cat: 'Academia / Esportes / Suplementos', bloco: 'Conforto', nat: 'Variavel' },
+                { termos: ['mercado', 'supermercado', 'padaria', 'feira', 'açougue', 'acougue', 'almoço', 'almoco', 'alimentação'], cat: 'Mercado / Alimentação Básica', bloco: 'Custos fixos', nat: 'Variavel' },
+                { termos: ['uber', '99', 'ifood', 'delivery', 'entrega'], cat: 'Uber / Delivery / Conveniência', bloco: 'Conforto', nat: 'Variavel' },
+                { termos: ['netflix', 'spotify', 'prime', 'streaming', 'icloud', 'assinatura'], cat: 'Streaming / Assinaturas Digitais', bloco: 'Conforto', nat: 'Fixa' },
+                { termos: ['roupa', 'camisa', 'tênis', 'tenis', 'calça', 'barbeiro', 'cabelo', 'perfume'], cat: 'Roupas / Barbeiro / Cuidados Pessoais', bloco: 'Conforto', nat: 'Variavel' },
+                { termos: ['aluguel', 'condomínio', 'condominio', 'energia', 'luz', 'água', 'agua', 'internet'], cat: 'Moradia / Contas (Água, Luz, Internet)', bloco: 'Custos fixos', nat: 'Fixa' },
+                { termos: ['ônibus', 'onibus', 'gasolina', 'combustível', 'combustivel', 'passagem', 'metrô'], cat: 'Transporte / Combustível', bloco: 'Custos fixos', nat: 'Variavel' },
+                { termos: ['restaurante', 'pizza', 'hambúrguer', 'hamburguer', 'bar', 'café', 'sorvete', 'açaí'], cat: 'Restaurantes / Bares / Saídas', bloco: 'Prazeres', nat: 'Variavel' },
+                { termos: ['cinema', 'filme', 'ingresso', 'show', 'jogo', 'passeio'], cat: 'Cinema / Jogos / Entretenimento', bloco: 'Prazeres', nat: 'Variavel' },
+                { termos: ['livro', 'curso', 'congresso', 'apostila', 'estetoscópio', 'jaleco'], cat: 'Livros / Cursos / Congressos', bloco: 'Conhecimento', nat: 'Variavel' },
+                { termos: ['idioma', 'inglês', 'ingles', 'duolingo', 'mensalidade faculdade'], cat: 'Idiomas / Materiais de Estudo', bloco: 'Conhecimento', nat: 'Fixa' },
+                { termos: ['anha', 'amra', 'doação', 'doacao', 'dízimo'], cat: 'Lei de Anha / Doações', bloco: 'Lei de Anha', nat: 'Fixa' },
+                { termos: ['remédio', 'remedio', 'farmácia', 'farmacia', 'medicamento', 'consulta', 'exame'], cat: 'Farmácia / Medicamentos / Saúde', bloco: 'Outros gastos', nat: 'Variavel' },
+                { termos: ['pet', 'ração', 'racao', 'veterinário', 'veterinario', 'gato', 'cachorro'], cat: 'Pet / Ração / Veterinário', bloco: 'Outros gastos', nat: 'Variavel' },
+                { termos: ['viagem', 'hotel', 'computador', 'notebook', 'carro', 'meta'], cat: 'Viagens / Projetos Pessoais', bloco: 'Metas', nat: 'Fixa' }
+            ];
+
+            for (const r of regrasDescricao) {
+                if (r.termos.some(t => desc.includes(t))) {
+                    const selectCat = document.getElementById('sai-categoria');
+                    const selectBloco = document.getElementById('sai-essencialidade');
+                    const selectNat = document.getElementById('sai-natureza');
+                    if (selectCat && Array.from(selectCat.options).some(o => o.value === r.cat)) {
+                        selectCat.value = r.cat;
+                    }
+                    if (selectBloco) selectBloco.value = r.bloco;
+                    if (selectNat) {
+                        selectNat.value = (desc.includes('mensalidade') || desc.includes('assinatura')) ? 'Fixa' : r.nat;
+                    }
+                    atualizarDicaBlocoSaida();
+                    avaliarImpactoSaidaTempoReal();
+                    break;
+                }
             }
         }
 
@@ -1863,24 +1958,31 @@
 
         function popularSelectsCategorias() {
             const listaEnt = categorias.filter(c => c.tipo === 'entrada');
-            const listaSai = [...categorias.filter(c => c.tipo === 'saida')];
-            const oficiaisSaida = [
-                'Custos fixos (Alimentação, contas, transporte)',
-                'Conforto (Academia, roupas, streaming, Uber)',
-                'Metas (Viagens, carro, projetos, compras)',
-                'Prazeres (Cinema, restaurantes, passeios, jogos)',
-                'Conhecimento (Livros, cursos, congressos, idiomas)',
-                'Lei de Anha (Reserva específica / Doações)',
-                'Outros gastos (Pet, medicamentos, imprevistos)'
-            ];
-            oficiaisSaida.reverse().forEach(nomeOficial => {
-                if (!listaSai.some(c => c.nome === nomeOficial)) {
-                    listaSai.unshift({ nome: nomeOficial, tipo: 'saida' });
-                }
+            document.getElementById('ent-categoria').innerHTML = listaEnt.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+
+            const nomesCatalogo = new Set(CATALOGO_CATEGORIAS_SAIDA.map(c => c.nome));
+            const extrasUsuario = categorias
+                .filter(c => c.tipo === 'saida' && c.nome && !nomesCatalogo.has(c.nome) && !CATEGORIAS_LEGADAS_BLOCO.has(c.nome))
+                .map(c => c.nome);
+
+            const grupos = {};
+            BLOCOS_ORCAMENTO_VALIDOS.forEach(b => { grupos[b] = []; });
+            CATALOGO_CATEGORIAS_SAIDA.forEach(item => {
+                if (grupos[item.bloco]) grupos[item.bloco].push(item.nome);
             });
 
-            document.getElementById('ent-categoria').innerHTML = listaEnt.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
-            document.getElementById('sai-categoria').innerHTML = listaSai.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+            let htmlSaida = BLOCOS_ORCAMENTO_VALIDOS.map(bloco => {
+                const opcoes = (grupos[bloco] || []).map(nome => `<option value="${nome}">${nome}</option>`).join('');
+                return `<optgroup label="Bloco: ${bloco}">${opcoes}</optgroup>`;
+            }).join('');
+
+            if (extrasUsuario.length > 0) {
+                const opcoesExtras = extrasUsuario.map(nome => `<option value="${nome}">${nome}</option>`).join('');
+                htmlSaida += `<optgroup label="Outras Categorias / Personalizadas">${opcoesExtras}</optgroup>`;
+            }
+
+            document.getElementById('sai-categoria').innerHTML = htmlSaida;
+            autoSelecionarBlocoPorCategoria();
         }
 
         async function novaCategoriaPrompt(tipo) {
@@ -2009,6 +2111,65 @@
             }
         }
 
+        let ultimoResumoAportesMes = {
+            aportesReservaMes: 0,
+            aportesCarteiraMes: 0,
+            totalInvestidoNoMes: 0,
+            metaEcoTotal: 150
+        };
+
+        function calcularAportesCombinadosNoMes(mesSelecionado) {
+            const hojeMesISO = new Date().toISOString().slice(0, 7);
+
+            // 1. Aportes na Reserva de Emergência no mês (excluindo registros técnicos de 'Investimento:' e 'Sonho:')
+            const aportesReservaMes = reservaMovs
+                .filter(r => {
+                    if (r.tipo !== 'aporte') return false;
+                    const og = String(r.onde_guardado || '');
+                    if (og.startsWith('Investimento:') || og.startsWith('Sonho:')) return false;
+                    const d = String(r.data || r.created_at || '');
+                    return d ? d.startsWith(mesSelecionado) : (mesSelecionado === hojeMesISO);
+                })
+                .reduce((a, b) => a + toNum(b.valor), 0);
+
+            // 2. Aportes em Investimentos que geraram registro datado em reserva_movimentacoes ('Investimento: ...')
+            const movsInvMes = reservaMovs.filter(r => {
+                if (r.tipo !== 'aporte') return false;
+                const og = String(r.onde_guardado || '');
+                if (!og.startsWith('Investimento:')) return false;
+                const d = String(r.data || r.created_at || '');
+                return d ? d.startsWith(mesSelecionado) : (mesSelecionado === hojeMesISO);
+            });
+            const aportesInvViaMovsMes = movsInvMes.reduce((a, b) => a + toNum(b.valor), 0);
+
+            // 3. Ativos cadastrados diretamente na tabela 'investimentos' sem registro correspondente em reserva_movimentacoes
+            const todosMovsInv = reservaMovs.filter(r => r.tipo === 'aporte' && String(r.onde_guardado || '').startsWith('Investimento:'));
+            let aportesInvDiretoSemMov = 0;
+            investimentos.forEach(inv => {
+                const valAp = toNum(inv.valor_aplicado) > 0 ? toNum(inv.valor_aplicado) : toNum(inv.saldo_atual);
+                if (valAp <= 0) return;
+                const nomeAtivo = String(inv.nome || '').trim().toLowerCase();
+                const jaRegistradoTotal = todosMovsInv
+                    .filter(r => String(r.onde_guardado || '').toLowerCase() === `investimento: ${nomeAtivo}`)
+                    .reduce((acc, r) => acc + toNum(r.valor), 0);
+                const diferencaSemMov = Math.max(0, valAp - jaRegistradoTotal);
+                if (diferencaSemMov > 0) {
+                    const dataAtivo = String(inv.data || inv.created_at || '');
+                    if ((dataAtivo && dataAtivo.startsWith(mesSelecionado)) || (!dataAtivo && mesSelecionado === hojeMesISO)) {
+                        aportesInvDiretoSemMov += diferencaSemMov;
+                    }
+                }
+            });
+
+            const aportesCarteiraMes = aportesInvViaMovsMes + aportesInvDiretoSemMov;
+            const totalInvestidoNoMes = aportesReservaMes + aportesCarteiraMes;
+            return {
+                aportesReservaMes,
+                aportesCarteiraMes,
+                totalInvestidoNoMes
+            };
+        }
+
         function renderizarAlertasComportamentais(params) {
             const {
                 mesSelecionado, rendaRegularMes, usandoRendaPadrao1500, entradasMesTotal,
@@ -2027,45 +2188,77 @@
             const container = document.getElementById('behavioral-alerts-container');
             const alertasHTML = [];
 
-            const aportesReservaNoMes = reservaMovs
-                .filter(r => r.tipo === 'aporte' && r.data && String(r.data).startsWith(mesSelecionado))
-                .reduce((a, b) => a + toNum(b.valor), 0);
+            const { aportesReservaMes, aportesCarteiraMes, totalInvestidoNoMes } = calcularAportesCombinadosNoMes(mesSelecionado);
+            const aportesReservaNoMes = totalInvestidoNoMes; // Soma Reserva de Emergência + Carteira de Investimentos
+            ultimoResumoAportesMes = { aportesReservaMes, aportesCarteiraMes, totalInvestidoNoMes, metaEcoTotal };
 
-            const faltaPagarSe = Math.max(0, metaEcoTotal - aportesReservaNoMes);
+            const faltaPagarSe = Math.max(0, metaEcoTotal - totalInvestidoNoMes);
             valorFaltantePagueSeGlobal = faltaPagarSe;
+            const metaInvestimentoQuitada = metaEcoTotal > 0 && totalInvestidoNoMes >= (metaEcoTotal - 0.5);
 
-            const percPagueSe = metaEcoTotal > 0 ? Math.min(100, Math.round((aportesReservaNoMes / metaEcoTotal) * 100)) : 0;
+            const percPagueSe = metaEcoTotal > 0 ? Math.min(100, Math.round((totalInvestidoNoMes / metaEcoTotal) * 100)) : 0;
+            const percPagueSeReal = metaEcoTotal > 0 ? Math.round((totalInvestidoNoMes / metaEcoTotal) * 100) : 0;
             document.getElementById('bar-eco').style.width = `${percPagueSe}%`;
-            document.getElementById('detalhe-eco-composicao').innerText = `Guardado: ${formatBRL(aportesReservaNoMes)} (${percPagueSe}%)`;
+
+            // Mostra claramente a soma de Reserva + Investimento no Card 1
+            if (aportesReservaMes > 0 && aportesCarteiraMes > 0) {
+                document.getElementById('detalhe-eco-composicao').innerText = `Total: ${formatBRL(totalInvestidoNoMes)} (Reserva: ${formatBRL(aportesReservaMes)} + Invest.: ${formatBRL(aportesCarteiraMes)})`;
+            } else if (aportesReservaMes > 0) {
+                document.getElementById('detalhe-eco-composicao').innerText = `Alocado: ${formatBRL(totalInvestidoNoMes)} na Reserva (${percPagueSeReal}%)`;
+            } else if (aportesCarteiraMes > 0) {
+                document.getElementById('detalhe-eco-composicao').innerText = `Alocado: ${formatBRL(totalInvestidoNoMes)} em Investimentos (${percPagueSeReal}%)`;
+            } else {
+                document.getElementById('detalhe-eco-composicao').innerText = `Alocado no mês: R$ 0,00 (0%)`;
+            }
 
             const statusCardPagueSe = document.getElementById('status-pague-se-card');
+            const btnCardPagueSe = document.getElementById('btn-card-pague-se');
+            const cardBlocoInv = document.getElementById('card-bloco-investimentos');
 
-            if (entradasMesTotal > 0 && faltaPagarSe > 1) {
+            if (metaInvestimentoQuitada) {
+                statusCardPagueSe.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-forest font-extrabold text-[10px]">✅ 10% Alocados • OK!</span>`;
+                statusCardPagueSe.className = 'font-bold text-forest truncate';
+                if (btnCardPagueSe) {
+                    btnCardPagueSe.innerHTML = `✓ Concluído (+ Extra)`;
+                    btnCardPagueSe.className = 'text-emerald-700 font-extrabold hover:underline shrink-0 text-[11px]';
+                }
+                if (cardBlocoInv) {
+                    cardBlocoInv.className = 'p-4 rounded-2xl bg-emerald-50/80 border-2 border-emerald-300 flex flex-col justify-between min-w-0 shadow-2xs';
+                }
+            } else if (entradasMesTotal > 0 && faltaPagarSe > 1) {
                 statusCardPagueSe.innerText = `Falta ${formatBRL(faltaPagarSe)}`;
                 statusCardPagueSe.className = 'font-bold text-amber-700 truncate';
+                if (btnCardPagueSe) {
+                    btnCardPagueSe.innerText = `Alocar 10% →`;
+                    btnCardPagueSe.className = 'text-forest font-bold hover:underline shrink-0';
+                }
+                if (cardBlocoInv) {
+                    cardBlocoInv.className = 'p-4 rounded-2xl bg-sage-50/60 border border-sage-200 flex flex-col justify-between min-w-0';
+                }
 
                 alertasHTML.push(`
                     <div class="bg-amber-50 border-l-4 border-amber-500 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
                         <div class="flex items-start gap-3 max-w-3xl">
                             <i data-lucide="flame" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
                             <div>
-                                <h4 class="text-xs font-extrabold text-amber-950 uppercase tracking-wide">Bloco #1 Pendente: Investimentos (${formatBRL(metaEcoTotal)})!</h4>
+                                <h4 class="text-xs font-extrabold text-amber-950 uppercase tracking-wide">Bloco #1 Pendente: Investimentos + Reserva (${formatBRL(metaEcoTotal)})!</h4>
                                 <p class="text-xs text-amber-800 mt-0.5">
-                                    Entraram <strong>${formatBRL(entradasMesTotal)}</strong> neste mês, mas você separou <strong>${formatBRL(aportesReservaNoMes)}</strong> da sua meta de <strong>${formatBRL(metaEcoTotal)}</strong>. Priorize alocar na sua Reserva de Emergência (liquidez diária) até completar de 3 a 6 meses de Custos Fixos.
+                                    Você já destinou <strong>${formatBRL(totalInvestidoNoMes)}</strong> neste mês (Reserva: <strong>${formatBRL(aportesReservaMes)}</strong> + Investimentos: <strong>${formatBRL(aportesCarteiraMes)}</strong>). Faltam <strong>${formatBRL(faltaPagarSe)}</strong> para fechar sua meta de <strong>${formatBRL(metaEcoTotal)}</strong>.
                                 </p>
                             </div>
                         </div>
                         <button onclick="abrirModalPagueSe()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl shrink-0 transition">
-                            Investir Agora (${formatBRL(faltaPagarSe)})
+                            Alocar Restante (${formatBRL(faltaPagarSe)})
                         </button>
                     </div>
                 `);
-            } else if (aportesReservaNoMes >= metaEcoTotal && metaEcoTotal > 0) {
-                statusCardPagueSe.innerText = `🟢 100% Quitado!`;
-                statusCardPagueSe.className = 'font-bold text-forest truncate';
             } else {
-                statusCardPagueSe.innerText = `Meta: ${formatBRL(metaEcoTotal)}`;
+                statusCardPagueSe.innerText = totalInvestidoNoMes > 0 ? `Falta ${formatBRL(faltaPagarSe)}` : `Meta: ${formatBRL(metaEcoTotal)}`;
                 statusCardPagueSe.className = 'font-semibold text-amber-700 truncate';
+                if (btnCardPagueSe) {
+                    btnCardPagueSe.innerText = `Alocar 10% →`;
+                    btnCardPagueSe.className = 'text-forest font-bold hover:underline shrink-0';
+                }
             }
 
             const hoje = new Date();
@@ -2087,9 +2280,9 @@
             const classificarSaudeBloco = (usado, meta, tipoBloco, isInvestimento = false) => {
                 const perc = meta > 0 ? Math.round((usado / meta) * 100) : 0;
                 if (isInvestimento) {
-                    if (perc >= 100) return { status: 'verde', corEmoji: '🟢', label: 'Saudável (Quitado)', perc };
-                    if (perc > 0 || diaCorreto <= 10) return { status: 'amarelo', corEmoji: '🟡', label: 'Atenção (Pendente)', perc };
-                    return { status: 'vermelho', corEmoji: '🔴', label: 'Crítico (Não aportado)', perc };
+                    if (perc >= 100) return { status: 'verde', corEmoji: '✅', label: 'Meta 10% OK (Concluído)', perc };
+                    if (perc > 0 || diaCorreto <= 10) return { status: 'amarelo', corEmoji: '🟡', label: `Falta ${formatBRL(Math.max(0, meta - usado))}`, perc };
+                    return { status: 'vermelho', corEmoji: '🔴', label: 'Pendente no mês', perc };
                 }
                 if (tipoBloco === 'Variado') {
                     // Blocos variáveis seguem o ritmo do mês OU limite de 85%
@@ -2173,7 +2366,13 @@
                 diagnosticoOitoBlocos,
                 gastosNaturezaFixaMes,
                 metaDemTotal,
-                totalReserva
+                totalReserva,
+                aportesReservaMes,
+                aportesCarteiraMes,
+                totalInvestidoNoMes,
+                metaEcoTotal,
+                faltaPagarSe,
+                metaInvestimentoQuitada
             });
 
             if (blocosVermelhos.length > 0) {
@@ -2220,7 +2419,9 @@
                 saidasMesTotal, orcamentoGastoMaximo, usandoOrcamentoRef,
                 gastoDiarioMedio, cotaDiariaOrcamento, gastoEsperadoHoje,
                 economiaPotencialHoje, economiaProjetadaFimMes, valorSugeridoAporteExtra,
-                diagnosticoOitoBlocos = [], gastosNaturezaFixaMes = 0, metaDemTotal = 600, totalReserva = 0
+                diagnosticoOitoBlocos = [], gastosNaturezaFixaMes = 0, metaDemTotal = 600, totalReserva = 0,
+                aportesReservaMes = 0, aportesCarteiraMes = 0, totalInvestidoNoMes = 0,
+                metaEcoTotal = 150, faltaPagarSe = 0, metaInvestimentoQuitada = false
             } = dados;
 
             // Posição visual do mercúrio no termômetro artístico (0% a 100%)
@@ -2249,6 +2450,14 @@
                 ? `na sua <strong>Reserva de Emergência</strong> (priorizando liquidez e segurança até acumular 3 a 6 meses dos seus Custos Fixos: ${formatBRL(metaMinReserva3m)} a ${formatBRL(custoFixoRefReserva * 6)})`
                 : `na sua <strong>Carteira de Investimentos (13% a.a.)</strong>`;
 
+            const resumoComposicaoInvTexto = (aportesReservaMes > 0 && aportesCarteiraMes > 0)
+                ? `${formatBRL(aportesReservaMes)} na Reserva + ${formatBRL(aportesCarteiraMes)} em Investimentos`
+                : (aportesReservaMes > 0 ? `${formatBRL(aportesReservaMes)} na Reserva de Emergência` : `${formatBRL(aportesCarteiraMes)} em Investimentos`);
+
+            const textoPasso3Invest = metaInvestimentoQuitada
+                ? `✅ <strong>Meta de 10% de Investimentos: OK!</strong> Você já destinou <strong>${formatBRL(totalInvestidoNoMes)}</strong> de ${formatBRL(metaEcoTotal)} neste mês (${resumoComposicaoInvTexto}).`
+                : `(3) Garanta seus <strong>10% de Investimentos (${formatBRL(metaEcoTotal)})</strong> — já alocado: <strong>${formatBRL(totalInvestidoNoMes)}</strong>, faltam <strong>${formatBRL(faltaPagarSe)}</strong> ${destinoRecomendadoInvest}.`;
+
             let tema = {};
             if (estado === 'vermelho') {
                 tema = {
@@ -2265,13 +2474,20 @@
                     motivoDiagnostico: `O termômetro está <strong class="text-crimson">vermelho</strong> porque você já consumiu <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}) tendo decorrido <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}). ${nomesEmAlerta ? `Blocos exigindo atenção imediata: ${nomesEmAlerta}.` : `Seu gasto está ${formatBRL(excessoAcimaDoEsperado)} acima do teto proporcional de hoje e se esgotará no <strong>dia ${diaEstouro}</strong>.`}`,
                     pilulaBg: 'bg-red-950 text-white border-red-800',
                     pilulaTag: '💊 Pílula de Aconselhamento • Freio de Emergência nos Blocos Variados',
-                    pilulaTitulo: 'Congele Conforto e Prazeres por 72h e preserve seus R$ 150 de Investimentos',
-                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Pause gastos nos blocos variáveis (<strong>Conforto 15%</strong> e <strong>Prazeres 10%</strong>) por 72 horas; (2) Trave seu teto nos próximos ${diasRestantesMes} dias em no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (3) Mantenha blindados os seus <strong>10% de Investimentos</strong> ${destinoRecomendadoInvest}.`,
-                    btnAcaoTexto: 'Auditar Saídas do Mês',
-                    btnAcaoClass: 'bg-crimson hover:bg-red-700 text-white',
-                    btnAcaoFn: `acaoPilulaTermometro('auditar_saidas')`,
-                    btnSecTexto: 'Ajustar 8 Categorias',
-                    btnSecFn: `openModal('modal-planejamento')`
+                    pilulaTitulo: metaInvestimentoQuitada
+                        ? `10% de Investimentos já estão OK (${formatBRL(totalInvestidoNoMes)})! Agora freie os blocos estourados`
+                        : 'Congele Conforto e Prazeres por 72h e garanta seus R$ 150 de Investimentos',
+                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Pause gastos nos blocos variáveis (<strong>Conforto 15%</strong> e <strong>Prazeres 10%</strong>) por 72 horas; (2) Trave seu teto nos próximos ${diasRestantesMes} dias em no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; ${textoPasso3Invest}`,
+                    btnAcaoTexto: metaInvestimentoQuitada
+                        ? `10% Alocados no Mês: OK (${formatBRL(totalInvestidoNoMes)})`
+                        : `Alocar 10% (Falta ${formatBRL(faltaPagarSe)})`,
+                    btnAcaoIcon: metaInvestimentoQuitada ? 'check-circle-2' : 'zap',
+                    btnAcaoClass: metaInvestimentoQuitada
+                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white ring-2 ring-emerald-300/50'
+                        : 'bg-amber-500 hover:bg-amber-600 text-white',
+                    btnAcaoFn: `abrirModalPagueSe()`,
+                    btnSecTexto: 'Auditar Saídas do Mês',
+                    btnSecFn: `acaoPilulaTermometro('auditar_saidas')`
                 };
             } else if (estado === 'laranja') {
                 tema = {
@@ -2288,10 +2504,17 @@
                     motivoDiagnostico: `O sinal está <strong class="text-amber-600">laranja (atenção)</strong> com <strong>${percOrcamentoConsumido}% da previsão utilizada</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}) em <strong>${percTempoDecorrido}% do mês decorrido</strong> (Dia ${diaCorreto} de ${diasNoMes}). ${nomesEmAlerta ? `Categorias em vigilância/alerta: ${nomesEmAlerta}.` : `A margem entre gasto e calendário está estreita (${deltaRitmo >= 0 ? '+' + deltaRitmo : deltaRitmo}%).`}`,
                     pilulaBg: 'bg-amber-950 text-white border-amber-800',
                     pilulaTag: '💊 Pílula de Aconselhamento • Equilíbrio entre Blocos Fixos e Variados',
-                    pilulaTitulo: 'Garanta os R$ 150 na Reserva de Emergência e segure pequenos gastos',
-                    pilulaTexto: `Para retornar ao sinal verde: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) Se um bloco variável (Conforto ou Prazeres) estiver amarelo/vermelho, compense usando a folga de blocos verdes; (3) Garanta primeiro seus <strong>10% de Investimentos</strong> ${destinoRecomendadoInvest}.`,
-                    btnAcaoTexto: 'Alocar 10% (Reserva/Invest.)',
-                    btnAcaoClass: 'bg-amber-500 hover:bg-amber-600 text-white',
+                    pilulaTitulo: metaInvestimentoQuitada
+                        ? `✅ Meta de 10% Alocada (${formatBRL(totalInvestidoNoMes)})! Agora segure pequenos gastos variáveis`
+                        : 'Garanta os R$ 150 em Investimentos/Reserva e segure pequenos gastos',
+                    pilulaTexto: `Para retornar ao sinal verde: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) Se um bloco variável estiver amarelo/vermelho, compense usando a folga dos blocos verdes; ${textoPasso3Invest}`,
+                    btnAcaoTexto: metaInvestimentoQuitada
+                        ? `10% Alocados no Mês: OK (${formatBRL(totalInvestidoNoMes)})`
+                        : `Alocar 10% (Falta ${formatBRL(faltaPagarSe)})`,
+                    btnAcaoIcon: metaInvestimentoQuitada ? 'check-circle-2' : 'zap',
+                    btnAcaoClass: metaInvestimentoQuitada
+                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white ring-2 ring-emerald-300/60 font-extrabold'
+                        : 'bg-amber-500 hover:bg-amber-600 text-white',
                     btnAcaoFn: `abrirModalPagueSe()`,
                     btnSecTexto: 'Ver Saídas por Bloco',
                     btnSecFn: `acaoPilulaTermometro('auditar_saidas')`
@@ -2311,35 +2534,48 @@
                     motivoDiagnostico: `O sinal está <strong class="text-forest">verde</strong> porque seu ritmo está <strong>lentificado e saudável</strong>: decorreram <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}), mas você utilizou apenas <strong>${percOrcamentoConsumido}% da previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}), gerando uma <strong>folga acumulada de ${formatBRL(economiaPotencialHoje)}</strong>!`,
                     pilulaBg: ' hero-gradient text-white border-emerald-800',
                     pilulaTag: '💊 Pílula de Aconselhamento • Aceleração da Reserva & Patrimônio',
-                    pilulaTitulo: `Direcione seus 10% + sobra de ${formatBRL(valorSugeridoAporteExtra)} para Liquidez/Investimentos`,
-                    pilulaTexto: `Com suas categorias em saúde verde: (1) Priorize construir sua <strong>Reserva de Emergência</strong> dentro dos 10% de Investimentos + esta folga de <strong>${formatBRL(valorSugeridoAporteExtra)}</strong> ${destinoRecomendadoInvest}; (2) Mantendo esse ritmo até o dia ${diasNoMes}, você economizará <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras no mês!`,
-                    btnAcaoTexto: `Aportar Economia (${formatBRL(valorSugeridoAporteExtra)})`,
+                    pilulaTitulo: metaInvestimentoQuitada
+                        ? `✅ 10% do Mês: OK (${formatBRL(totalInvestidoNoMes)})! Aproveite a folga p/ aporte extra`
+                        : `Direcione seus 10% + sobra de ${formatBRL(valorSugeridoAporteExtra)} para Liquidez/Investimentos`,
+                    pilulaTexto: `Com suas categorias em saúde verde: (1) ${textoPasso3Invest} (2) Mantendo esse ritmo até o dia ${diasNoMes}, você economizará <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras no mês!`,
+                    btnAcaoTexto: metaInvestimentoQuitada
+                        ? `10% Alocados: OK! (+ Aportar Sobra ${formatBRL(valorSugeridoAporteExtra)})`
+                        : `Alocar 10% (Falta ${formatBRL(faltaPagarSe)})`,
+                    btnAcaoIcon: metaInvestimentoQuitada ? 'check-circle-2' : 'zap',
                     btnAcaoClass: 'bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold',
-                    btnAcaoFn: `acaoPilulaTermometro('aportar_economia', ${valorSugeridoAporteExtra})`,
-                    btnSecTexto: 'Ver Reserva de Emergência',
-                    btnSecFn: `switchTab('reserva')`
+                    btnAcaoFn: metaInvestimentoQuitada
+                        ? `acaoPilulaTermometro('aportar_economia', ${valorSugeridoAporteExtra})`
+                        : `abrirModalPagueSe()`,
+                    btnSecTexto: 'Ver Reserva & Carteira',
+                    btnSecFn: `switchTab('investimentos')`
                 };
             }
 
-            // Renderização dos 8 Mini-Cards de Saúde das Categorias (Verde, Amarelo e Vermelho)
+            // Renderização dos 8 Mini-Cards de Saúde das Categorias (Com título sempre visível e composição de Reserva + Invest.)
             const htmlSaudeOitoCategorias = diagnosticoOitoBlocos.map(b => {
                 const badgeStyle = b.status === 'vermelho'
                     ? 'bg-red-50 border-red-300 text-red-900'
                     : (b.status === 'amarelo' ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-emerald-50/70 border-emerald-200 text-forest');
                 const barColor = b.status === 'vermelho' ? 'bg-crimson' : (b.status === 'amarelo' ? 'bg-amber-500' : 'bg-forest');
                 const wBar = Math.min(100, Math.max(4, b.perc));
+                const subDetalheInv = b.id === 'investimentos' && b.usado > 0
+                    ? `<span class="text-[9px] opacity-80 block truncate">Reserva: ${formatBRL(aportesReservaMes)} • Inv.: ${formatBRL(aportesCarteiraMes)}</span>`
+                    : '';
                 return `
-                    <div class="p-2.5 rounded-xl border ${badgeStyle} flex flex-col justify-between transition hover:shadow-2xs">
-                        <div class="flex items-center justify-between gap-1">
-                            <span class="text-[11px] font-extrabold truncate">${b.corEmoji} ${b.nome}</span>
-                            <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/80 border border-black/5 shrink-0">${b.natureza} • ${b.percMeta}%</span>
+                    <div class="p-3 rounded-xl border ${badgeStyle} flex flex-col justify-between transition hover:shadow-2xs">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-0.5">
+                                <span class="text-xs font-extrabold truncate">${b.corEmoji} ${b.nome}</span>
+                                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/80 border border-black/5 shrink-0">${b.natureza} • ${b.percMeta}%</span>
+                            </div>
                         </div>
                         <div class="my-1.5">
-                            <div class="flex justify-between items-baseline text-[11px]">
-                                <strong class="money-val font-extrabold">${formatBRL(b.usado)}</strong>
-                                <span class="text-[10px] opacity-75">de ${formatBRL(b.meta)} (${b.perc}%)</span>
+                            <div class="flex flex-wrap justify-between items-baseline gap-1 text-[11px]">
+                                <strong class="money-val font-extrabold text-sm">${formatBRL(b.usado)}</strong>
+                                <span class="text-[10px] opacity-80">de ${formatBRL(b.meta)} (${b.perc}%)</span>
                             </div>
-                            <div class="w-full h-1.5 bg-white/90 rounded-full overflow-hidden mt-1 border border-black/5">
+                            ${subDetalheInv}
+                            <div class="w-full h-1.5 bg-white/90 rounded-full overflow-hidden mt-1.5 border border-black/5">
                                 <div class="h-full ${barColor} rounded-full transition-all" style="width: ${wBar}%"></div>
                             </div>
                         </div>
@@ -2475,7 +2711,7 @@
                             </p>
                             <div class="flex flex-wrap items-center gap-2.5 pt-1">
                                 <button type="button" onclick="${tema.btnAcaoFn}" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 ${tema.btnAcaoClass}">
-                                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                                    <i data-lucide="${tema.btnAcaoIcon || 'zap'}" class="w-4 h-4"></i>
                                     <span>${tema.btnAcaoTexto}</span>
                                 </button>
                                 <button type="button" onclick="${tema.btnSecFn}" class="px-3 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition">
@@ -2498,7 +2734,7 @@
                             <span class="px-2 py-0.5 rounded-md bg-red-100 text-crimson">🔴 ${qtdVermelhos} Críticos</span>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
                         ${htmlSaudeOitoCategorias}
                     </div>
                 </div>
@@ -2528,8 +2764,37 @@
         }
 
         function abrirModalPagueSe() {
-            const vSugerido = valorFaltantePagueSeGlobal > 0 ? valorFaltantePagueSeGlobal.toFixed(2) : 150.00;
+            const { aportesReservaMes, aportesCarteiraMes, totalInvestidoNoMes, metaEcoTotal } = ultimoResumoAportesMes;
+            const falta = Math.max(0, metaEcoTotal - totalInvestidoNoMes);
+            const quitado = metaEcoTotal > 0 && totalInvestidoNoMes >= (metaEcoTotal - 0.5);
+
+            const vSugerido = falta > 0 ? falta.toFixed(2) : 50.00;
             document.getElementById('pague-se-valor-input').value = vSugerido;
+
+            const resumoEl = document.getElementById('modal-pague-se-resumo');
+            if (resumoEl) {
+                if (quitado) {
+                    resumoEl.className = 'p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-xs text-forest space-y-1';
+                    resumoEl.innerHTML = `
+                        <div class="font-extrabold flex items-center gap-1.5 text-emerald-800">
+                            <span>✅ Meta de 10% do Mês Concluída (OK)!</span>
+                        </div>
+                        <p>Você já destinou <strong>${formatBRL(totalInvestidoNoMes)}</strong> de <strong>${formatBRL(metaEcoTotal)}</strong> neste mês:</p>
+                        <p class="text-[11px] font-semibold">• Reserva de Emergência: <strong>${formatBRL(aportesReservaMes)}</strong> | Carteira de Investimentos: <strong>${formatBRL(aportesCarteiraMes)}</strong></p>
+                        <p class="text-[11px] text-emerald-700 pt-0.5">Se desejar fazer um aporte extra voluntário, preencha abaixo:</p>
+                    `;
+                } else {
+                    resumoEl.className = 'p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1';
+                    resumoEl.innerHTML = `
+                        <div class="font-extrabold flex items-center justify-between">
+                            <span>⏳ Progresso dos 10% neste mês:</span>
+                            <span>${formatBRL(totalInvestidoNoMes)} de ${formatBRL(metaEcoTotal)}</span>
+                        </div>
+                        <p class="text-[11px]">• Reserva de Emergência: <strong>${formatBRL(aportesReservaMes)}</strong> | Carteira de Investimentos: <strong>${formatBRL(aportesCarteiraMes)}</strong></p>
+                        <p class="text-[11px] font-bold text-amber-800">Faltam ${formatBRL(falta)} (você pode dividir entre Reserva e Investimentos como preferir).</p>
+                    `;
+                }
+            }
             openModal('modal-pague-se');
         }
 
@@ -2552,18 +2817,39 @@
                     safeSetStorage('mp_local_reserva', JSON.stringify(reservaMovs));
                 }
             } else {
-                const payloadInv = { nome: local, classe: 'CDB / Renda Fixa', instituicao: 'Corretora', valor_aplicado: valor, saldo_atual: valor };
+                const existente = investimentos.find(i => String(i.nome || '').trim().toLowerCase() === local.toLowerCase());
+                const payloadMovInv = { tipo: 'aporte', valor, onde_guardado: `Investimento: ${local}`, data: dataHoje };
+
                 if (supabaseClient) {
-                    const { error } = await supabaseClient.from('investimentos').insert([payloadInv]);
-                    if (error) return showToast('Erro: ' + error.message, 'erro');
+                    if (existente) {
+                        const baseAp = toNum(existente.valor_aplicado) > 0 ? toNum(existente.valor_aplicado) : toNum(existente.saldo_atual);
+                        const { error } = await supabaseClient.from('investimentos').update({
+                            valor_aplicado: baseAp + valor,
+                            saldo_atual: toNum(existente.saldo_atual) + valor
+                        }).eq('id', existente.id);
+                        if (error) return showToast('Erro: ' + error.message, 'erro');
+                    } else {
+                        const payloadInv = { nome: local, classe: 'CDB / Renda Fixa', instituicao: 'Corretora', valor_aplicado: valor, saldo_atual: valor };
+                        const { error } = await supabaseClient.from('investimentos').insert([payloadInv]);
+                        if (error) return showToast('Erro: ' + error.message, 'erro');
+                    }
+                    await supabaseClient.from('reserva_movimentacoes').insert([payloadMovInv]);
                 } else {
-                    investimentos.push({ id: crypto.randomUUID(), ...payloadInv });
+                    if (existente) {
+                        const baseAp = toNum(existente.valor_aplicado) > 0 ? toNum(existente.valor_aplicado) : toNum(existente.saldo_atual);
+                        existente.valor_aplicado = baseAp + valor;
+                        existente.saldo_atual = toNum(existente.saldo_atual) + valor;
+                    } else {
+                        investimentos.push({ id: crypto.randomUUID(), nome: local, classe: 'CDB / Renda Fixa', instituicao: 'Corretora', valor_aplicado: valor, saldo_atual: valor, data: dataHoje });
+                    }
                     safeSetStorage('mp_local_investimentos', JSON.stringify(investimentos));
+                    reservaMovs.unshift({ id: crypto.randomUUID(), ...payloadMovInv });
+                    safeSetStorage('mp_local_reserva', JSON.stringify(reservaMovs));
                 }
             }
 
             closeModal('modal-pague-se');
-            showToast('Parabéns! Pague-se Primeiro executado com sucesso!');
+            showToast('Parabéns! Aporte registrado e contabilizado nos 10% do mês!');
             await loadAllData();
         }
 
@@ -3040,16 +3326,21 @@
             const saidasMesTotal = saidasMesLista.reduce((a, b) => a + toNum(b.valor), 0);
             const saldoMes = entradasMesTotal - saidasMesTotal;
 
-            // CORREÇÃO CRÍTICA: Cálculo explícito e seguro de totalInvestidoCarteira, totalAplicadoCarteira e totalReserva
+            // CORREÇÃO CRÍTICA: Separação limpa da Reserva de Emergência e soma unificada em Investimentos (Carteira + Reserva)
             const totalInvestidoCarteira = investimentos.reduce((acc, i) => acc + toNum(i.saldo_atual), 0);
             const totalAplicadoCarteira = investimentos.reduce((acc, i) => {
                 const ap = toNum(i.valor_aplicado);
                 const at = toNum(i.saldo_atual);
                 return acc + (ap > 0 ? ap : at);
             }, 0);
-            const totalReserva = reservaMovs.reduce((acc, r) => r.tipo === 'aporte' ? acc + toNum(r.valor) : acc - toNum(r.valor), 0);
+            const reservaMovsPuros = reservaMovs.filter(r => {
+                const og = String(r.onde_guardado || '');
+                return !og.startsWith('Investimento:') && !og.startsWith('Sonho:');
+            });
+            const totalReserva = Math.max(0, reservaMovsPuros.reduce((acc, r) => r.tipo === 'aporte' ? acc + toNum(r.valor) : acc - toNum(r.valor), 0));
+            const totalInvestimentosComReserva = totalInvestidoCarteira + totalReserva;
 
-            const patrimonioLiquidoGlobal = Math.max(0, saldoDisponivel) + totalInvestidoCarteira + totalReserva;
+            const patrimonioLiquidoGlobal = Math.max(0, saldoDisponivel) + totalInvestimentosComReserva;
 
             // Taxa equivalente mensal para 13% a.a.
             const taxaOtimistaAnual = toNum(projConfig.taxaOtimista) || 13;
@@ -3075,7 +3366,11 @@
             document.getElementById('ind-detalhe-extra').innerText = `Extra (50/50): ${formatBRL(rendaExtraMes)}`;
             document.getElementById('ind-saidas-mes').innerText = formatBRL(saidasMesTotal);
             document.getElementById('ind-taxa-poupanca').innerText = `Resultado: ${formatBRL(saldoMes)}`;
-            document.getElementById('ind-investido').innerText = formatBRL(totalInvestidoCarteira);
+            document.getElementById('ind-investido').innerText = formatBRL(totalInvestimentosComReserva);
+            const elIndInvSub = document.getElementById('ind-investido-sub');
+            if (elIndInvSub) {
+                elIndInvSub.innerText = `Carteira: ${formatBRL(totalInvestidoCarteira)} + Reserva: ${formatBRL(totalReserva)}`;
+            }
             document.getElementById('ind-reserva').innerText = formatBRL(totalReserva);
 
             config = normalizarConfigOitoBlocos(config);
@@ -3658,7 +3953,9 @@
             });
         }
 
-        function renderizarModuloInvestimentos(totalAtual, totalAplicado, totalReserva = 0) {
+        function renderizarModuloInvestimentos(totalAtualCarteira, totalAplicadoCarteira, totalReserva = 0) {
+            const totalAtual = totalAtualCarteira + totalReserva;
+            const totalAplicado = totalAplicadoCarteira + totalReserva;
             const lucro = totalAtual - totalAplicado;
             const percLucro = totalAplicado > 0 ? ((lucro / totalAplicado) * 100).toFixed(1) : '0.0';
 
@@ -3668,10 +3965,10 @@
             const rendaPassivaCarteiraAno = totalAtual * (taxaOtimista / 100);
 
             document.getElementById('inv-total-atual').innerText = formatBRL(totalAtual);
-            document.getElementById('inv-patrimonio-combinado-sub').innerText = `Soma c/ Reserva: ${formatBRL(totalAtual + totalReserva)}`;
+            document.getElementById('inv-patrimonio-combinado-sub').innerText = `Carteira: ${formatBRL(totalAtualCarteira)} + Reserva: ${formatBRL(totalReserva)}`;
             document.getElementById('inv-total-aplicado').innerText = formatBRL(totalAplicado);
-            document.getElementById('inv-qtd-ativos-sub').innerText = `${investimentos.length} ativo(s) depositado(s)`;
-            document.getElementById('inv-table-sum-badge').innerText = `Total: ${formatBRL(totalAtual)}`;
+            document.getElementById('inv-qtd-ativos-sub').innerText = `${investimentos.length} ativo(s) + Reserva de Emergência`;
+            document.getElementById('inv-table-sum-badge').innerText = `Total (c/ Reserva): ${formatBRL(totalAtual)}`;
 
             const elRend = document.getElementById('inv-rendimento');
             elRend.innerText = `${lucro >= 0 ? '+' : ''}${formatBRL(lucro)} (${percLucro}%)`;
@@ -3681,9 +3978,25 @@
             document.getElementById('inv-renda-passiva-anual-hoje').innerText = `Equivale a ${formatBRL(rendaPassivaCarteiraAno)}/ano (${taxaOtimista}% a.a.)`;
 
             const tbody = document.getElementById('lista-investimentos-tbody');
-            tbody.innerHTML = investimentos.length === 0
-                ? `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Nenhum ativo cadastrado na carteira. Cadastre ao lado para acompanhar seus depósitos e rentabilidade.</td></tr>`
-                : investimentos.map(i => {
+            const linhaReservaHTML = totalReserva > 0 ? `
+                <tr class="bg-emerald-50/50 hover:bg-emerald-50 transition">
+                    <td class="py-3 px-2">
+                        <p class="font-bold text-forest flex items-center gap-1.5">🛡️ Reserva de Emergência (Contabilizada como Investimento)</p>
+                        <span class="text-xs text-slate-500">Liquidez Diária • Gera ~${formatBRL(totalReserva * taxaMensalOtimista)}/mês (${taxaOtimista}% a.a.)</span>
+                    </td>
+                    <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-emerald-100 text-forest font-bold">Reserva / Liquidez</span></td>
+                    <td class="py-3 px-2 text-right text-slate-600 money-val">${formatBRL(totalReserva)}</td>
+                    <td class="py-3 px-2 text-right font-extrabold text-forest money-val">${formatBRL(totalReserva)}</td>
+                    <td class="py-3 px-2 text-right text-xs font-bold text-forest">Liquidez 100%</td>
+                    <td class="py-3 px-2 text-right whitespace-nowrap">
+                        <button onclick="switchTab('reserva')" class="px-2.5 py-1 rounded-lg bg-white border border-emerald-200 hover:bg-emerald-100 text-forest text-xs font-bold transition">Gerenciar Reserva →</button>
+                    </td>
+                </tr>
+            ` : '';
+
+            tbody.innerHTML = (investimentos.length === 0 && totalReserva <= 0)
+                ? `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Nenhum ativo ou reserva cadastrada ainda. Cadastre ao lado para acompanhar seus depósitos e rentabilidade.</td></tr>`
+                : linhaReservaHTML + investimentos.map(i => {
                     const saldoAt = toNum(i.saldo_atual);
                     const valAp = toNum(i.valor_aplicado) > 0 ? toNum(i.valor_aplicado) : saldoAt;
                     const dif = saldoAt - valAp;
@@ -3713,10 +4026,13 @@
             if (!canvasPort) return;
             if (portfolioChartInstance) portfolioChartInstance.destroy();
             const msgEmpty = document.getElementById('no-inv-msg');
-            if (investimentos.length === 0) return msgEmpty.classList.remove('hidden');
+            if (investimentos.length === 0 && totalReserva <= 0) return msgEmpty.classList.remove('hidden');
             msgEmpty.classList.add('hidden');
 
             const porClasse = {};
+            if (totalReserva > 0) {
+                porClasse['Reserva de Emergência'] = totalReserva;
+            }
             investimentos.forEach(i => {
                 const cl = i.classe || 'Renda Fixa';
                 porClasse[cl] = (porClasse[cl] || 0) + toNum(i.saldo_atual);
@@ -3775,9 +4091,14 @@
             document.getElementById('res-falta-label').innerText = falta > 0 ? `Faltam ${formatBRL(falta)}` : 'Reserva 100% blindada!';
             document.getElementById('res-progress-bar').style.width = `${perc}%`;
 
+            const movsReservaPura = reservaMovs.filter(r => {
+                const og = String(r.onde_guardado || '');
+                return !og.startsWith('Investimento:') && !og.startsWith('Sonho:');
+            });
+
             // Agrupamento por Local de Custódia da Reserva
             const porLocal = {};
-            reservaMovs.forEach(r => {
+            movsReservaPura.forEach(r => {
                 const loc = r.onde_guardado || 'Reserva de Liquidez';
                 const delta = r.tipo === 'aporte' ? toNum(r.valor) : -toNum(r.valor);
                 porLocal[loc] = (porLocal[loc] || 0) + delta;
@@ -3796,9 +4117,9 @@
             }
 
             const tbody = document.getElementById('lista-reserva-tbody');
-            tbody.innerHTML = reservaMovs.length === 0
+            tbody.innerHTML = movsReservaPura.length === 0
                 ? `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Nenhuma movimentação na reserva ainda.</td></tr>`
-                : reservaMovs.map(r => `
+                : movsReservaPura.map(r => `
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(r.data || r.created_at)}</td>
                         <td class="py-3 px-2">
@@ -3926,11 +4247,11 @@
                         : `<span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-600">Renda Base 8 Blocos (Investir 10%: ${formatBRL(vPagueSe)})</span>`;
                 }
                 const bloco = identificarBlocoSaida(t);
-                const isFixo = ['Custos fixos', 'Lei de Anha', 'Metas'].includes(bloco) || t.natureza === 'Fixa';
+                const cobrancaLabel = t.natureza === 'Fixa' ? 'Conta Fixa' : 'Gasto Variável';
                 const corBadge = bloco === 'Prazeres' || bloco === 'Conforto'
                     ? 'bg-amber-50 text-amber-800 border border-amber-200/60'
                     : (bloco === 'Outros gastos' ? 'bg-red-50 text-crimson' : 'bg-sage-50 text-forest');
-                return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold ${corBadge}">${bloco} (${isFixo ? 'Fixo' : 'Variado'}) • ${t.forma_pagamento || 'Pix'}</span>`;
+                return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold ${corBadge}">${bloco} • ${cobrancaLabel} • ${t.forma_pagamento || 'Pix'}</span>`;
             };
 
             const dashTbody = document.getElementById('dashboard-transactions-list');
@@ -3940,7 +4261,7 @@
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-3 px-2 text-xs text-slate-500 whitespace-nowrap">${formatDataBR(t.data)}</td>
                         <td class="py-3 px-2 font-semibold text-slate-800">${t.descricao}</td>
-                        <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${t.categoria}</span></td>
+                        <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${extrairCategoriaBase(t.categoria)}</span></td>
                         <td class="py-3 px-2">${badgeDiagnostico(t)}</td>
                         <td class="py-3 px-2 text-right font-bold whitespace-nowrap money-val ${t.tipo === 'entrada' ? 'text-forest' : 'text-crimson'}">
                             ${t.tipo === 'entrada' ? '+' : '-'} ${formatBRL(t.valor)}
@@ -3959,7 +4280,7 @@
                     <tr>
                         <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(t.data)}</td>
                         <td class="py-3 px-2 font-semibold text-slate-800">${t.descricao}</td>
-                        <td class="py-3 px-2 text-xs text-slate-600">${t.categoria}</td>
+                        <td class="py-3 px-2 text-xs text-slate-600">${extrairCategoriaBase(t.categoria)}</td>
                         <td class="py-3 px-2">${badgeDiagnostico(t)}</td>
                         <td class="py-3 px-2 text-right font-bold text-forest money-val">+ ${formatBRL(t.valor)}</td>
                         <td class="py-3 px-2 text-right">
@@ -3976,7 +4297,7 @@
                     <tr>
                         <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(t.data)}</td>
                         <td class="py-3 px-2 font-semibold text-slate-800">${t.descricao}</td>
-                        <td class="py-3 px-2 text-xs text-slate-600">${t.categoria}</td>
+                        <td class="py-3 px-2 text-xs text-slate-600">${extrairCategoriaBase(t.categoria)}</td>
                         <td class="py-3 px-2">${badgeDiagnostico(t)}</td>
                         <td class="py-3 px-2 text-right font-bold text-crimson money-val">- ${formatBRL(t.valor)}</td>
                         <td class="py-3 px-2 text-right">

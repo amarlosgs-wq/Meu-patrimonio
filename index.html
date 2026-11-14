@@ -71,6 +71,65 @@
         .thermometer-bulb { animation: mercury-glow 2.5s infinite ease-in-out; }
         .thermo-pointer { transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
         .thermo-mercury { transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        /* MODO ESCURO (DARK MODE PALETA VERDE-FLORESTA) */
+        body.dark-mode { background-color: #0B1612; color: #E2E8F0; }
+        body.dark-mode aside,
+        body.dark-mode nav.md\:hidden,
+        body.dark-mode .bg-white { background-color: #12221B !important; color: #E2E8F0; border-color: #1F382D !important; }
+        body.dark-mode .bg-white\/90,
+        body.dark-mode .bg-white\/80 { background-color: rgba(18, 34, 27, 0.92) !important; color: #E2E8F0; border-color: #1F382D !important; }
+        body.dark-mode .bg-slate-50,
+        body.dark-mode .bg-slate-50\/70,
+        body.dark-mode .bg-slate-100 { background-color: #182C23 !important; color: #CBD5E1; border-color: #244034 !important; }
+        body.dark-mode .bg-sage-50,
+        body.dark-mode .bg-sage-50\/50,
+        body.dark-mode .bg-sage-50\/60,
+        body.dark-mode .bg-sage-50\/70,
+        body.dark-mode .bg-sage-50\/80,
+        body.dark-mode .bg-sage-100,
+        body.dark-mode .bg-sage-100\/70 { background-color: #193328 !important; color: #D1FAE5 !important; border-color: #284E3D !important; }
+        body.dark-mode .bg-emerald-50,
+        body.dark-mode .bg-emerald-50\/40,
+        body.dark-mode .bg-emerald-50\/50,
+        body.dark-mode .bg-emerald-50\/70,
+        body.dark-mode .bg-emerald-50\/80,
+        body.dark-mode .bg-emerald-50\/90,
+        body.dark-mode .bg-emerald-100,
+        body.dark-mode .bg-emerald-100\/70,
+        body.dark-mode .bg-emerald-100\/80 { background-color: #163829 !important; color: #A7F3D0 !important; border-color: #235740 !important; }
+        body.dark-mode .bg-amber-50,
+        body.dark-mode .bg-amber-50\/60,
+        body.dark-mode .bg-amber-100,
+        body.dark-mode .bg-amber-100\/80 { background-color: #2D2310 !important; color: #FDE68A !important; border-color: #5C4518 !important; }
+        body.dark-mode .bg-red-50,
+        body.dark-mode .bg-red-50\/50,
+        body.dark-mode .bg-red-100 { background-color: #311518 !important; color: #FECACA !important; border-color: #63262B !important; }
+        body.dark-mode .text-slate-800,
+        body.dark-mode .text-slate-900 { color: #F1F5F9 !important; }
+        body.dark-mode .text-slate-700,
+        body.dark-mode .text-slate-600 { color: #CBD5E1 !important; }
+        body.dark-mode .text-slate-500,
+        body.dark-mode .text-slate-400 { color: #94A3B8 !important; }
+        body.dark-mode .text-forest,
+        body.dark-mode .text-emerald-700,
+        body.dark-mode .text-emerald-800 { color: #6EE7B7 !important; }
+        body.dark-mode .text-amber-800,
+        body.dark-mode .text-amber-900,
+        body.dark-mode .text-amber-950 { color: #FCD34D !important; }
+        body.dark-mode .border-slate-100,
+        body.dark-mode .border-slate-200,
+        body.dark-mode .border-slate-200\/70,
+        body.dark-mode .border-slate-200\/80,
+        body.dark-mode .border-slate-200\/90,
+        body.dark-mode .border-sage-100,
+        body.dark-mode .border-sage-200,
+        body.dark-mode .border-sage-200\/80,
+        body.dark-mode .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #1F382D !important; }
+        body.dark-mode input,
+        body.dark-mode select { background-color: #0E1B15 !important; color: #F1F5F9 !important; border-color: #284E3D !important; }
+        body.dark-mode .nav-active { background-color: #1E3F30 !important; color: #6EE7B7 !important; }
+        body.dark-mode .mobile-nav-active { color: #6EE7B7 !important; }
+        body.dark-mode #spending-thermometer-card { background: linear-gradient(135deg, #12221B 0%, #172B22 100%) !important; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
@@ -125,6 +184,14 @@
         </nav>
 
         <div class="pt-4 border-t border-slate-100 space-y-1">
+            <button onclick="abrirModalViradaMes()" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="calendar-sync" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Virada de Mês & Sobra</span>
+            </button>
+            <button onclick="abrirModalBackup()" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
+                <i data-lucide="hard-drive-download" class="w-4 h-4 shrink-0"></i>
+                <span class="truncate">Backup Completo (.json)</span>
+            </button>
             <button onclick="openModal('modal-planejamento')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
                 <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
                 <span class="truncate">8 Blocos (10/40/15/10/10/5/2/8)</span>
@@ -150,12 +217,18 @@
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
+                <button onclick="toggleDarkMode()" id="btn-dark-mode" title="Alternar Modo Escuro / Claro" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
+                    <i data-lucide="moon" id="dark-mode-icon" class="w-4 h-4"></i>
+                </button>
                 <button onclick="togglePrivacy()" title="Ocultar/Mostrar Valores" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
                     <i data-lucide="eye" id="privacy-icon" class="w-4 h-4"></i>
                 </button>
 
                 <input type="month" id="month-filter" onchange="loadAllData()" class="min-w-[155px] bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs md:text-sm font-semibold text-slate-700 focus:outline-none focus:border-sage-500 shadow-2xs">
                 
+                <button onclick="abrirModalBackup()" title="Backup Completo (.json)" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
+                    <i data-lucide="hard-drive-download" class="w-4 h-4"></i>
+                </button>
                 <button onclick="openModal('modal-db')" class="md:hidden p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600">
                     <i data-lucide="database" class="w-4 h-4"></i>
                 </button>
@@ -271,7 +344,13 @@
                             <span class="text-emerald-700 font-semibold">Nota: priorize os R$ 150 de Investimentos na Reserva de Emergência (3 a 6 meses de Custos Fixos)</span>
                         </p>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <button type="button" onclick="abrirModalViradaMes()" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-forest border border-emerald-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                            <i data-lucide="calendar-sync" class="w-3.5 h-3.5"></i> Virada de Mês
+                        </button>
+                        <button type="button" onclick="abrirModalFechamentoMes()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i> Fechamento do Mês
+                        </button>
                         <button type="button" onclick="toggleGuiaBlocos()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                             <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> O que colocar em cada bloco?
                         </button>
@@ -590,8 +669,40 @@
                     </form>
                 </div>
 
-                <div class="lg:col-span-2 bg-white rounded-3xl p-6 card-shadow border border-slate-100">
-                    <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Entradas do Mês</h3>
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- SIMULADOR: QUANTO VALE ESTE PLANTÃO / RENDA EXTRA NO FUTURO? (REGRA 50/50) -->
+                    <div class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-sage-200 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-forest">Regra 50/50 • Efeito Juros Compostos</span>
+                                <h3 class="font-extrabold text-slate-800 text-base mt-1">Simulador: Quanto Vale Este Plantão no Futuro?</h3>
+                                <p class="text-xs text-slate-500">Veja como cada plantão ou renda extra se divide hoje (50% Lazer Livre / 50% Investido) e quanto a metade investida cresce em 5 e 10 anos</p>
+                            </div>
+                            <button type="button" onclick="preencherPlantaoSimuladoNoForm()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold hero-gradient text-white shadow-xs hover:opacity-95 transition flex items-center gap-1.5 shrink-0">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Lançar Plantão na Conta
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/70">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Valor de 1 Plantão / Extra (R$)</label>
+                                <input type="number" id="sim-plantao-unit" value="1200" min="50" step="50" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-extrabold text-forest mt-1">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Qtd. de Plantões Extras no Mês</label>
+                                <input type="number" id="sim-plantao-qtd" value="2" min="1" max="30" step="1" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-extrabold text-slate-800 mt-1">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Rentabilidade Anual (% a.a.)</label>
+                                <input type="number" id="sim-plantao-taxa" value="13" min="1" max="30" step="0.5" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-emerald-50 border border-emerald-300 rounded-xl px-3 py-1.5 text-sm font-extrabold text-forest mt-1">
+                            </div>
+                        </div>
+
+                        <div id="sim-plantao-resultados" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Entradas do Mês</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -607,6 +718,7 @@
                             <tbody id="lista-entradas-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -615,9 +727,22 @@
         <section id="tab-saidas" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 h-fit">
-                    <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
+                    <h3 class="font-bold text-slate-800 text-base mb-3 flex items-center gap-2">
                         <i data-lucide="arrow-down-circle" class="w-5 h-5 text-crimson"></i> Registrar Despesa
                     </h3>
+
+                    <!-- ATALHOS DE 1 CLIQUE PARA GASTOS RECORRENTES / FIXOS -->
+                    <div class="mb-4 p-3 rounded-2xl bg-sage-50/70 border border-sage-200/80 space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-forest flex items-center gap-1">
+                                <i data-lucide="zap" class="w-3.5 h-3.5"></i> Atalhos 1 Clique (Fixos & Recorrentes)
+                            </span>
+                            <button type="button" onclick="criarAtalhoSaidaRapidaPrompt()" class="text-[10px] font-bold text-forest hover:underline">+ Criar atalho</button>
+                        </div>
+                        <div id="atalhos-saida-container" class="flex flex-wrap gap-1.5"></div>
+                        <p class="text-[10px] text-slate-400 leading-tight">Toque em um atalho para preencher automaticamente valor, categoria e bloco (ou clique no "×" de um atalho criado para removê-lo).</p>
+                    </div>
+
                     <form id="form-saida" onsubmit="salvarTransacao(event, 'saida')" class="space-y-4">
                         <input type="hidden" id="sai-id">
                         <div>
@@ -1121,83 +1246,132 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 space-y-4 h-fit">
-                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <i data-lucide="sliders" class="w-4 h-4 text-forest"></i> Calibrar Fases e Veículo
-                    </h4>
+                <div class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-slate-100 space-y-4 h-fit">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-forest"></i> Calibrar Fases e Veículo
+                        </h4>
+                        <span class="text-[10px] font-bold bg-sage-100 text-forest px-2 py-0.5 rounded-full">8 Blocos Integrados</span>
+                    </div>
 
-                    <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                        <p class="text-xs font-bold text-slate-700">1. Fase Acadêmica (32 aos 34a — Formatura Dez/28)</p>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[10px] text-slate-500">Renda Atual (R$)</label>
-                                <input type="number" id="sim-renda-f1" value="1500" oninput="rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold">
+                    <!-- Seletor de Regra para Estimativa do que Resta + Chave de Poder de Compra Real (IPCA) -->
+                    <div class="p-3 rounded-2xl bg-sage-50/60 border border-sage-200/80 space-y-2.5">
+                        <div>
+                            <label class="block text-[10px] font-extrabold uppercase tracking-wider text-forest mb-1">Regra de Divisão do Saldo Restante (Pós-Aporte)</label>
+                            <select id="sim-modo-divisao-gastos" onchange="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira()" class="w-full bg-white border border-sage-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-800">
+                                <option value="proporcional" selected>Proporcional à Sobra (Escala os 7 Blocos do App)</option>
+                                <option value="direto_bruto">% Direto na Renda Bruta (Lazer 10% & Lei AMRA/Anha 2% Fixos)</option>
+                            </select>
+                            <p class="text-[10px] text-slate-500 leading-tight mt-1" id="sim-modo-divisao-desc">
+                                Distribui o que sobra após o investimento mantendo o peso relativo de cada bloco (Fixos, Conforto, Metas, Lazer, Estudos, Lei de Anha/AMRA e Outros).
+                            </p>
+                        </div>
+
+                        <div class="pt-2 border-t border-sage-200/70 flex items-center justify-between gap-2">
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-extrabold text-forest block">Poder de Compra Real (Descontar IPCA)</span>
+                                <span class="text-[10px] text-slate-500 block">Converte valores futuros p/ poder de compra de hoje</span>
                             </div>
-                            <div>
-                                <label class="text-[10px] text-slate-500">Aporte Mensal (R$)</label>
-                                <input type="number" id="sim-aporte-f1" value="150" oninput="rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <input type="number" id="sim-ipca-anual" value="4.0" step="0.5" min="0" max="15" title="Inflação anual estimada (IPCA %)" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira()" class="w-14 bg-white border border-sage-200 rounded-lg px-1.5 py-1 text-[11px] font-bold text-center text-slate-700">
+                                <span class="text-[10px] font-bold text-slate-500">%</span>
+                                <input type="checkbox" id="sim-descontar-ipca" onchange="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira()" class="w-4 h-4 accent-forest rounded cursor-pointer" title="Ativar desconto de inflação">
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
-                        <p class="text-xs font-bold text-forest">2. Janela de Ouro (Jan–Jun/2029 — Sem Aluguel)</p>
-                        <div class="grid grid-cols-2 gap-2">
+                    <!-- FASE 1 -->
+                    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="text-xs font-bold text-slate-800">1. Fase Acadêmica (32–34a • Até Dez/28)</p>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200/80 text-slate-700" id="sim-f1-badge-inv">10% Inv.</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 items-end">
                             <div>
-                                <label class="text-[10px] text-slate-600">Aporte/mês (6 meses)</label>
-                                <input type="number" id="sim-aporte-janela" value="7000" oninput="rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                                <label class="text-[10px] text-slate-500 block leading-tight mb-1">Renda Atual (R$)</label>
+                                <input type="number" id="sim-renda-f1" value="1500" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold">
                             </div>
                             <div>
-                                <label class="text-[10px] text-slate-600">Desembolso Carro + Casa (Jul/29)</label>
-                                <input type="number" id="sim-custo-carro" value="32000" oninput="rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-crimson">
+                                <label class="text-[10px] text-slate-500 block leading-tight mb-1">Aporte Mensal (R$)</label>
+                                <input type="number" id="sim-aporte-f1" value="150" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                            </div>
+                        </div>
+                        <div id="sim-dist-f1" class="pt-2 border-t border-slate-200/70 space-y-1.5"></div>
+                    </div>
+
+                    <!-- FASE 2: JANELA DE OURO -->
+                    <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2.5">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="text-xs font-bold text-forest">2. Janela de Ouro (Jan–Jun/2029 — Sem Aluguel)</p>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-200/70 text-forest" id="sim-f2-janela-badge">70% Inv.</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 items-end">
+                            <div>
+                                <label class="text-[10px] text-slate-600 block leading-tight mb-1">Aporte/mês (6 meses)</label>
+                                <input type="number" id="sim-aporte-janela" value="7000" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-600 block leading-tight mb-1">Carro + Casa (Jul/29)</label>
+                                <input type="number" id="sim-custo-carro" value="32000" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-red-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-crimson">
                             </div>
                         </div>
                         <p class="text-[10px] text-slate-500">Ex: R$ 28k–35k (entrada/compra do carro) + caução moradia em Jul/2029.</p>
+                        <div id="sim-dist-f2-janela" class="pt-2 border-t border-emerald-200/70 space-y-1.5"></div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-sage-50/70 border border-sage-200 space-y-2">
-                        <p class="text-xs font-bold text-forest">3. Generalista (Jul/2029 a Nov/2031 — 34 aos 37a)</p>
-                        <div class="grid grid-cols-2 gap-2">
+                    <!-- FASE 3: GENERALISTA -->
+                    <div class="p-3.5 rounded-2xl bg-sage-50/70 border border-sage-200 space-y-2.5">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="text-xs font-bold text-forest">3. Generalista (Jul/2029 a Nov/2031 — 34–37a)</p>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sage-200/80 text-forest" id="sim-f3-badge-inv">R$ 3.000 Inv.</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 items-end">
                             <div>
-                                <label class="text-[10px] text-slate-600">Renda Médica (R$)</label>
-                                <input type="number" id="sim-renda-f2" value="10000" oninput="atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-sage-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                                <label class="text-[10px] text-slate-600 block leading-tight mb-1">Renda Médica (R$)</label>
+                                <input type="number" id="sim-renda-f2" value="10000" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-sage-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
                             </div>
                             <div>
-                                <label class="text-[10px] text-slate-600">% Aporte Mensal</label>
-                                <select id="sim-perc-f2" onchange="atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-sage-200 rounded-lg px-2 py-1.5 text-xs font-bold text-forest">
-                                    <option value="25">25% (R$ 2.500/mês)</option>
-                                    <option value="30" selected>30% (R$ 3.000/mês - Meta)</option>
-                                    <option value="40">40% (R$ 4.000/mês)</option>
-                                    <option value="50">50% (R$ 5.000/mês)</option>
+                                <label class="text-[10px] text-slate-600 block leading-tight mb-1">% Aporte Mensal</label>
+                                <select id="sim-perc-f2" onchange="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-sage-200 rounded-lg px-2 py-1.5 text-xs font-bold text-forest">
+                                    <option value="25">25% (R$ 2.500)</option>
+                                    <option value="30" selected>30% (R$ 3.000 ★)</option>
+                                    <option value="40">40% (R$ 4.000)</option>
+                                    <option value="50">50% (R$ 5.000)</option>
                                 </select>
                             </div>
                         </div>
-                        <p class="text-[10px] text-slate-500">Orçamento p/ Moradia + Carro + Lazer: <strong id="sim-custo-vida-f2" class="text-slate-700">R$ 7.000,00</strong>/mês.</p>
+                        <p class="text-[10px] text-slate-500">Restante p/ Viver (Moradia + Carro + Lazer + AMRA): <strong id="sim-custo-vida-f2" class="text-slate-800">R$ 7.000,00</strong>/mês.</p>
+                        <div id="sim-dist-f3" class="pt-2 border-t border-sage-200/80 space-y-1.5"></div>
                     </div>
 
-                    <div class="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-300 space-y-2">
-                        <p class="text-xs font-bold text-forest">4. Pós-Residência (Dez/2031+ — Aos 37+ anos)</p>
-                        <div class="grid grid-cols-2 gap-2">
+                    <!-- FASE 4: PÓS-RESIDÊNCIA -->
+                    <div class="p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-300 space-y-2.5">
+                        <div class="flex items-center justify-between gap-1">
+                            <p class="text-xs font-bold text-forest">4. Pós-Residência (Dez/2031+ — Aos 37+ anos)</p>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-200/80 text-forest" id="sim-f4-badge-inv">R$ 4.500 Inv.</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 items-end">
                             <div>
-                                <label class="text-[10px] text-slate-600">Nova Renda Média (R$)</label>
-                                <input type="number" id="sim-renda-f4" value="15000" oninput="atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
+                                <label class="text-[10px] text-slate-600 block leading-tight mb-1">Nova Renda Média (R$)</label>
+                                <input type="number" id="sim-renda-f4" value="15000" oninput="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-forest">
                             </div>
                             <div>
-                                <label class="text-[10px] text-slate-600">% Aporte Pós-2031</label>
-                                <select id="sim-perc-f4" onchange="atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2 py-1.5 text-xs font-bold text-forest">
-                                    <option value="25">25% (R$ 3.750/mês)</option>
-                                    <option value="30" selected>30% (R$ 4.500/mês)</option>
-                                    <option value="40">40% (R$ 6.000/mês)</option>
-                                    <option value="50">50% (R$ 7.500/mês)</option>
+                                <label class="text-[10px] text-slate-600 block leading-tight mb-1">% Aporte Pós-2031</label>
+                                <select id="sim-perc-f4" onchange="salvarConfigSimCarreira(); atualizarAporteF2(); rodarSimulacaoCarreira(); renderizarProjecaoRentabilidade()" class="w-full bg-white border border-emerald-200 rounded-lg px-2 py-1.5 text-xs font-bold text-forest">
+                                    <option value="25">25% (R$ 3.750)</option>
+                                    <option value="30" selected>30% (R$ 4.500 ★)</option>
+                                    <option value="40">40% (R$ 6.000)</option>
+                                    <option value="50">50% (R$ 7.500)</option>
                                 </select>
                             </div>
                         </div>
-                        <p class="text-[10px] text-slate-500">Aporte mensal a partir de Dez/2031: <strong id="sim-aporte-f4-txt" class="text-forest">R$ 4.500,00</strong>/mês.</p>
+                        <p class="text-[10px] text-slate-500">Aporte: <strong id="sim-aporte-f4-txt" class="text-forest">R$ 4.500,00</strong>/mês • Restante p/ Viver: <strong id="sim-custo-vida-f4" class="text-slate-800">R$ 10.500,00</strong>/mês.</p>
+                        <div id="sim-dist-f4" class="pt-2 border-t border-emerald-200/80 space-y-1.5"></div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Cenário de Rentabilidade Anual da Carteira</label>
-                        <select id="sim-taxa-anual" onchange="rodarSimulacaoCarreira()" class="w-full bg-emerald-50/70 border border-emerald-300 rounded-xl px-3 py-2 text-xs font-bold text-forest">
+                        <select id="sim-taxa-anual" onchange="salvarConfigSimCarreira(); rodarSimulacaoCarreira()" class="w-full bg-emerald-50/70 border border-emerald-300 rounded-xl px-3 py-2 text-xs font-bold text-forest">
                             <option value="6">6% a.a. Real (Conservador)</option>
                             <option value="8">8% a.a. Real (Realista Brasil)</option>
                             <option value="10">10% a.a. (Moderado / Selic)</option>
@@ -1222,6 +1396,34 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="marcos-patrimonio-grid"></div>
+
+                    <!-- Mapa Detalhado: Divisão dos Gastos por Fase (O que sobra além do Investimento) -->
+                    <div class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-sage-200 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-forest bg-sage-100 px-2.5 py-0.5 rounded-full">Raio-X do Orçamento por Fase</span>
+                                <h4 class="font-bold text-slate-800 text-sm mt-1">Estimativa Mensal por Categoria (O que resta além do Investimento)</h4>
+                                <p class="text-[11px] text-slate-400">Veja exatamente quanto caberá em Lazer (Prazeres), Lei de Anha (AMRA), Conforto, Custos Fixos e Metas em cada degrau da carreira</p>
+                            </div>
+                            <button onclick="openModal('modal-planejamento')" class="text-xs font-bold text-forest bg-sage-50 hover:bg-sage-100 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                                <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Ajustar % dos 8 Blocos
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto -mx-2 px-2">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-[10px] uppercase text-slate-400">
+                                        <th class="py-2.5 px-2">Bloco / Categoria</th>
+                                        <th class="py-2.5 px-2 text-right">1. Acadêmica</th>
+                                        <th class="py-2.5 px-2 text-right">2. Janela Ouro</th>
+                                        <th class="py-2.5 px-2 text-right text-forest">3. Generalista</th>
+                                        <th class="py-2.5 px-2 text-right text-emerald-800">4. Pós-Residência</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sim-tabela-blocos-fases" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
 
                     <!-- Resumo de Renda Passiva 2, 5 e 10 anos integrado ao Simulador 2029 -->
                     <div class="bg-white rounded-3xl p-6 card-shadow border border-sage-200">
@@ -1390,6 +1592,110 @@
                 </button>
             </div>
             <button onclick="closeModal('modal-quick-choice')" class="text-xs text-slate-400 hover:text-slate-600">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: BACKUP COMPLETO E RESTAURAÇÃO (.JSON) -->
+    <div id="modal-backup" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-xl">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2 text-forest font-bold">
+                    <i data-lucide="hard-drive-download" class="w-5 h-5"></i>
+                    <h3>Backup Completo & Restauração (.json)</h3>
+                </div>
+                <button type="button" onclick="closeModal('modal-backup')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Exporte ou restaure todos os dados do <strong>Meu Patrimônio</strong> (histórico de todos os meses, carteira de investimentos, reserva de emergência, sonhos, atalhos e calibragem 2029) em um único arquivo seguro.
+            </p>
+            <div id="backup-stats-box" class="p-3.5 rounded-2xl bg-sage-50/80 border border-sage-200 text-xs text-slate-700 space-y-1"></div>
+
+            <div class="space-y-2.5 pt-1">
+                <button type="button" onclick="exportarBackupJSON()" class="w-full hero-gradient text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm hover:opacity-95 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i> Baixar Backup Completo (.json)
+                </button>
+
+                <label for="input-restore-json" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2 cursor-pointer transition border border-slate-200">
+                    <i data-lucide="upload" class="w-4 h-4 text-forest"></i> Restaurar Dados de um Arquivo (.json)
+                </label>
+                <input type="file" id="input-restore-json" accept=".json,application/json" onchange="importarBackupJSON(event)" class="hidden">
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VIRADA DE MÊS INTELIGENTE (CLONAR FIXOS + VARRER SOBRA) -->
+    <div id="modal-virada-mes" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2 text-forest font-bold">
+                    <i data-lucide="calendar-sync" class="w-5 h-5"></i>
+                    <h3>Virada de Mês Inteligente</h3>
+                </div>
+                <button type="button" onclick="closeModal('modal-virada-mes')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <!-- Etapa 1: Clonar Receitas Mensais e Despesas Fixas -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">1. Importar Contas Fixas e Renda Base</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sage-100 text-forest" id="virada-mes-origem-badge">Mês anterior</span>
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed" id="virada-clonar-resumo">
+                    Calculando lançamentos recorrentes do mês anterior...
+                </p>
+                <button type="button" onclick="clonarFixosMesAnterior()" class="w-full bg-forest hover:opacity-95 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <i data-lucide="copy-plus" class="w-4 h-4"></i> Clonar Receitas Mensais & Gastos Fixos para Este Mês
+                </button>
+            </div>
+
+            <!-- Etapa 2: Varrer Sobra Líquida do Mês para Reserva ou Investimentos -->
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-extrabold text-forest uppercase tracking-wider">2. Varrer Sobra de Caixa para o Patrimônio</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-200/70 text-forest">Acelerador 40+</span>
+                </div>
+                <p class="text-xs text-slate-600 leading-relaxed" id="virada-sobra-resumo">
+                    Transforme a sobra de caixa do mês em novos aportes para sua Reserva ou Carteira de Investimentos (13% a.a.).
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase">Valor da Sobra a Aportar (R$)</label>
+                        <input type="number" step="0.01" min="1" id="virada-sobra-valor" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-sm font-extrabold text-forest mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-600 uppercase">Destino da Sobra</label>
+                        <select id="virada-sobra-destino" class="w-full bg-white border border-emerald-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 mt-1">
+                            <option value="reserva">Reserva de Emergência (Liquidez)</option>
+                            <option value="investimento">Carteira de Investimentos (13% a.a.)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" onclick="confirmarVarreduraSobraMes()" class="w-full hero-gradient text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> Transferir Sobra para o Patrimônio Agora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CARD DE FECHAMENTO DO MÊS (COPIÁVEL) -->
+    <div id="modal-fechamento-mes" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2 text-forest font-bold">
+                    <i data-lucide="award" class="w-5 h-5"></i>
+                    <h3>Relatório & Score de Fechamento do Mês</h3>
+                </div>
+                <button type="button" onclick="closeModal('modal-fechamento-mes')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <div id="fechamento-mes-card-content" class="space-y-3"></div>
+
+            <div class="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeModal('modal-fechamento-mes')" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 transition">Fechar</button>
+                <button type="button" onclick="copiarResumoFechamentoMes()" class="px-4 py-2.5 rounded-xl text-xs font-extrabold text-white hero-gradient flex items-center gap-1.5 shadow-sm hover:opacity-95 transition">
+                    <i data-lucide="copy" class="w-4 h-4"></i> Copiar Resumo em Texto
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1812,6 +2118,201 @@
             }
         }
 
+        let darkMode = false;
+
+        function initDarkMode() {
+            const salvo = safeGetStorage('mp_dark_mode');
+            if (salvo === 'true') {
+                darkMode = true;
+                document.body.classList.add('dark-mode');
+            }
+            atualizarIconeDarkMode();
+        }
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark-mode', darkMode);
+            safeSetStorage('mp_dark_mode', darkMode ? 'true' : 'false');
+            atualizarIconeDarkMode();
+            showToast(darkMode ? 'Modo Escuro (Verde-Floresta) ativado!' : 'Modo Claro ativado!');
+        }
+
+        function atualizarIconeDarkMode() {
+            const icon = document.getElementById('dark-mode-icon');
+            if (icon) {
+                icon.setAttribute('data-lucide', darkMode ? 'sun' : 'moon');
+                lucide.createIcons();
+            }
+        }
+
+        function obterAtalhosSaidaPadrao() {
+            const rendaBase = toNum(config.renda_base_prevista) || 1500;
+            const valorAnha = Math.round(rendaBase * ((toNum(config.perc_doacoes) || 2) / 100));
+            return [
+                { id: 'fix_anha', label: `⚖️ Lei de Anha/AMRA (${formatBRL(valorAnha)})`, valor: valorAnha, descricao: 'Reserva Lei de Anha / AMRA', categoria: 'Lei de Anha / Doações', bloco: 'Lei de Anha', natureza: 'Fixa', pagamento: 'Pix', padrao: true },
+                { id: 'fix_acad', label: '🏋️ Academia / Treino (R$ 110)', valor: 110, descricao: 'Mensalidade Academia', categoria: 'Academia / Esportes / Suplementos', bloco: 'Conforto', natureza: 'Fixa', pagamento: 'Cartão de Crédito', padrao: true },
+                { id: 'fix_merc', label: '🛒 Mercado Básico (R$ 150)', valor: 150, descricao: 'Compras Supermercado Básica', categoria: 'Mercado / Alimentação Básica', bloco: 'Custos fixos', natureza: 'Variavel', pagamento: 'Pix', padrao: true },
+                { id: 'fix_contas', label: '⚡ Contas / Internet (R$ 120)', valor: 120, descricao: 'Internet / Energia / Contas Fixas', categoria: 'Moradia / Contas (Água, Luz, Internet)', bloco: 'Custos fixos', natureza: 'Fixa', pagamento: 'Pix', padrao: true },
+                { id: 'fix_stream', label: '🎬 Assinaturas / Streaming (R$ 40)', valor: 40, descricao: 'Assinatura Digital / Streaming', categoria: 'Streaming / Assinaturas Digitais', bloco: 'Conforto', natureza: 'Fixa', pagamento: 'Cartão de Crédito', padrao: true },
+                { id: 'fix_pet', label: '🐾 Ração / Pet (R$ 85)', valor: 85, descricao: 'Ração e Cuidados Gatos', categoria: 'Pet / Ração / Veterinário', bloco: 'Outros gastos', natureza: 'Variavel', pagamento: 'Pix', padrao: true }
+            ];
+        }
+
+        function renderizarAtalhosSaida() {
+            const container = document.getElementById('atalhos-saida-container');
+            if (!container) return;
+            let custom = [];
+            try {
+                custom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]'));
+            } catch (e) { custom = []; }
+            const lista = [...obterAtalhosSaidaPadrao(), ...custom];
+            container.innerHTML = lista.map(a => `
+                <div class="inline-flex items-center rounded-xl bg-white border border-sage-200 shadow-2xs overflow-hidden">
+                    <button type="button" onclick="usarAtalhoSaida('${a.id}')" class="px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-sage-100 hover:text-forest transition">
+                        ${a.label}
+                    </button>
+                    ${!a.padrao ? `<button type="button" onclick="removerAtalhoSaidaCustom('${a.id}')" title="Remover atalho" class="px-1.5 py-1 text-[10px] text-slate-400 hover:text-crimson border-l border-slate-100">×</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function usarAtalhoSaida(id) {
+            let custom = [];
+            try { custom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]')); } catch (e) {}
+            const todos = [...obterAtalhosSaidaPadrao(), ...custom];
+            const item = todos.find(x => String(x.id) === String(id));
+            if (!item) return;
+
+            document.getElementById('sai-valor').value = toNum(item.valor).toFixed(2);
+            document.getElementById('sai-descricao').value = item.descricao;
+            const selectCat = document.getElementById('sai-categoria');
+            if (selectCat) {
+                if (!Array.from(selectCat.options).some(o => o.value === item.categoria)) {
+                    selectCat.insertAdjacentHTML('beforeend', `<option value="${item.categoria}">${item.categoria}</option>`);
+                }
+                selectCat.value = item.categoria;
+            }
+            document.getElementById('sai-essencialidade').value = item.bloco || 'Custos fixos';
+            document.getElementById('sai-natureza').value = item.natureza || 'Fixa';
+            document.getElementById('sai-pagamento').value = item.pagamento || 'Pix';
+            if (!document.getElementById('sai-data').value) {
+                document.getElementById('sai-data').value = new Date().toISOString().slice(0, 10);
+            }
+            atualizarDicaBlocoSaida();
+            avaliarImpactoSaidaTempoReal();
+            showToast(`Atalho "${item.descricao}" preenchido! Confira e clique em Salvar Saída.`);
+        }
+
+        async function criarAtalhoSaidaRapidaPrompt() {
+            const descAtual = document.getElementById('sai-descricao')?.value.trim() || '';
+            const valAtual = toNum(document.getElementById('sai-valor')?.value) || 50;
+            const catAtual = document.getElementById('sai-categoria')?.value || 'Mercado / Alimentação Básica';
+            const blocoAtual = document.getElementById('sai-essencialidade')?.value || 'Custos fixos';
+            const natAtual = document.getElementById('sai-natureza')?.value || 'Fixa';
+            const pgtoAtual = document.getElementById('sai-pagamento')?.value || 'Pix';
+
+            const resp = await abrirDialogoCustom({
+                titulo: 'Salvar Atalho de 1 Clique',
+                mensagem: 'Digite Nome e Valor separados por vírgula (ex: Café Especial, 65) para criar um botão rápido com a categoria e bloco selecionados abaixo:',
+                comInput: true,
+                valorInicial: descAtual ? `${descAtual}, ${valAtual}` : 'Conta Fixa, 100',
+                placeholder: 'Ex: Café Especial, 65',
+                textoConfirmar: 'Salvar Atalho'
+            });
+            if (!resp.confirmado || !resp.valor) return;
+            const partes = resp.valor.split(',');
+            const nome = (partes[0] || 'Gasto Rápido').trim();
+            const valor = toNum(partes[1] !== undefined ? partes[1] : valAtual) || 50;
+
+            let custom = [];
+            try { custom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]')); } catch (e) {}
+            custom.push({
+                id: 'cust_' + Date.now(),
+                label: `⚡ ${nome} (${formatBRL(valor)})`,
+                valor,
+                descricao: nome,
+                categoria: catAtual,
+                bloco: blocoAtual,
+                natureza: natAtual,
+                pagamento: pgtoAtual,
+                padrao: false
+            });
+            safeSetStorage('mp_atalhos_saidas_custom', JSON.stringify(custom));
+            renderizarAtalhosSaida();
+            showToast(`Atalho "${nome}" criado na barra de 1 clique!`);
+        }
+
+        function removerAtalhoSaidaCustom(id) {
+            let custom = [];
+            try { custom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]')); } catch (e) {}
+            custom = custom.filter(x => String(x.id) !== String(id));
+            safeSetStorage('mp_atalhos_saidas_custom', JSON.stringify(custom));
+            renderizarAtalhosSaida();
+            showToast('Atalho removido.');
+        }
+
+        async function aplicarFaseAoOrcamentoApp(numFase) {
+            const modoDivisao = document.getElementById('sim-modo-divisao-gastos')?.value || 'proporcional';
+            let rendaAlvo = 1500;
+            let aporteAlvo = 150;
+            let nomeFase = 'Fase 1 (Acadêmica)';
+
+            if (numFase === 1) {
+                rendaAlvo = toNum(document.getElementById('sim-renda-f1')?.value) || 1500;
+                aporteAlvo = toNum(document.getElementById('sim-aporte-f1')?.value) || 150;
+                nomeFase = 'Fase 1 (Acadêmica)';
+            } else if (numFase === 2) {
+                const rendaMed = toNum(document.getElementById('sim-renda-f2')?.value) || 10000;
+                aporteAlvo = toNum(document.getElementById('sim-aporte-janela')?.value) || 7000;
+                rendaAlvo = Math.max(rendaMed, aporteAlvo);
+                nomeFase = 'Fase 2 (Janela de Ouro)';
+            } else if (numFase === 3) {
+                rendaAlvo = toNum(document.getElementById('sim-renda-f2')?.value) || 10000;
+                const p = toNum(document.getElementById('sim-perc-f2')?.value) || 30;
+                aporteAlvo = rendaAlvo * (p / 100);
+                nomeFase = 'Fase 3 (Generalista)';
+            } else if (numFase === 4) {
+                rendaAlvo = toNum(document.getElementById('sim-renda-f4')?.value) || 15000;
+                const p = toNum(document.getElementById('sim-perc-f4')?.value) || 30;
+                aporteAlvo = rendaAlvo * (p / 100);
+                nomeFase = 'Fase 4 (Pós-Residência)';
+            }
+
+            const div = calcularDivisaoSeteBlocosFase(rendaAlvo, aporteAlvo, modoDivisao);
+            const percInv = Math.round((aporteAlvo / Math.max(1, rendaAlvo)) * 1000) / 10;
+
+            const resp = await abrirDialogoCustom({
+                titulo: `Ativar ${nomeFase} no App`,
+                mensagem: `Deseja atualizar a Renda Base de referência do Dashboard para ${formatBRL(rendaAlvo)} e ajustar a meta de Investimentos para ${percInv}% (${formatBRL(aporteAlvo)}/mês)?`,
+                textoConfirmar: 'Sim, Aplicar ao Dashboard'
+            });
+            if (!resp.confirmado) return;
+
+            const pFix = Math.round((div.custosFixos / rendaAlvo) * 1000) / 10;
+            const pConf = Math.round((div.conforto / rendaAlvo) * 1000) / 10;
+            const pMet = Math.round((div.metas / rendaAlvo) * 1000) / 10;
+            const pLaz = Math.round((div.lazer / rendaAlvo) * 1000) / 10;
+            const pConh = Math.round((div.conhecimento / rendaAlvo) * 1000) / 10;
+            const pAnh = Math.round((div.leiAnha / rendaAlvo) * 1000) / 10;
+            const somaParcial = percInv + pFix + pConf + pMet + pLaz + pConh + pAnh;
+            const pOut = Math.max(0, Math.round((100 - somaParcial) * 10) / 10);
+
+            config.renda_base_prevista = rendaAlvo;
+            config.perc_economia = percInv;
+            config.perc_demais = pFix;
+            config.perc_conforto = pConf;
+            config.perc_metas = pMet;
+            config.perc_entretenimento = pLaz;
+            config.perc_conhecimento = pConh;
+            config.perc_doacoes = pAnh;
+            config.perc_outros = pOut;
+
+            await persistirConfiguracoes();
+            renderizarAtalhosSaida();
+            atualizarInterfaceCompleta();
+            showToast(`${nomeFase} aplicada ao Orçamento Principal (${formatBRL(rendaAlvo)}/mês)!`);
+        }
+
         function togglePrivacy() {
             privacyMode = !privacyMode;
             document.querySelectorAll('.money-val').forEach(el => el.classList.toggle('privacy-blur', privacyMode));
@@ -1839,7 +2340,10 @@
             document.getElementById('sai-data').value = dataHoje;
             document.getElementById('res-data').value = dataHoje;
 
+            initDarkMode();
             carregarConfigProjecao();
+            carregarConfigSimCarreira();
+            renderizarAtalhosSaida();
             initSupabase();
         });
 
@@ -2034,11 +2538,20 @@
             const titulo = document.getElementById('prev-titulo-regra');
             const container = document.getElementById('prev-linhas-container');
 
+            const taxaOtimista = toNum(projConfig.taxaOtimista) || 13;
+            const fator5a = Math.pow(1 + (taxaOtimista / 100), 5);
+            const fator10a = Math.pow(1 + (taxaOtimista / 100), 10);
+
             if (isExtra) {
+                const metadeInv = v * 0.5;
                 titulo.innerText = 'Regra Renda Extra (50/50) — Pague-se Primeiro:';
                 container.innerHTML = `
-                    <div class="flex justify-between"><span>1º Pague-se (50% Investimentos / Reserva):</span> <strong class="text-emerald-300">${formatBRL(v * 0.5)}</strong></div>
+                    <div class="flex justify-between"><span>1º Pague-se (50% Investimentos / Reserva):</span> <strong class="text-emerald-300">${formatBRL(metadeInv)}</strong></div>
                     <div class="flex justify-between"><span>50% Prazeres / Metas Livres:</span> <strong class="text-emerald-300">${formatBRL(v * 0.5)}</strong></div>
+                    <div class="pt-1.5 mt-1.5 border-t border-white/10 text-[11px] text-emerald-200 flex justify-between">
+                        <span>🚀 Valor futuro desses 50% (${taxaOtimista}% a.a.):</span>
+                        <strong>5a: ${formatBRL(metadeInv * fator5a)} • 10a: ${formatBRL(metadeInv * fator10a)}</strong>
+                    </div>
                 `;
             } else {
                 titulo.innerText = `Distribuição nos 8 Blocos (${config.perc_economia}/${config.perc_demais}/${config.perc_conforto}/${config.perc_metas}/${config.perc_entretenimento}/${config.perc_conhecimento}/${config.perc_doacoes}/${config.perc_outros}):`;
@@ -3496,6 +4009,7 @@
             try { renderizarModuloReserva(totalReserva, transMes); } catch (e) { console.error('Erro em Reserva:', e); }
             try { renderizarModuloSonhos(); } catch (e) { console.error('Erro em Sonhos:', e); }
             try { renderizarProjecaoRentabilidade(); } catch (e) { console.error('Erro em Projeção 13%:', e); }
+            try { calcularSimuladorPlantaoFuturo(); } catch (e) { console.error('Erro no Simulador de Plantão:', e); }
 
             if (privacyMode) {
                 document.querySelectorAll('.money-val').forEach(el => el.classList.add('privacy-blur'));
@@ -3795,20 +4309,270 @@
             });
         }
 
-        function atualizarAporteF2() {
-            const rendaF2 = toNum(document.getElementById('sim-renda-f2').value) || 10000;
-            const percF2 = toNum(document.getElementById('sim-perc-f2').value) || 30;
-            const sobra = rendaF2 * (1 - percF2 / 100);
-            document.getElementById('sim-custo-vida-f2').innerText = formatBRL(sobra);
+        function carregarConfigSimCarreira() {
+            const salvo = safeGetStorage('mp_sim_carreira_config');
+            if (!salvo) return;
+            try {
+                const c = JSON.parse(salvo);
+                if (c.rendaF1 !== undefined && document.getElementById('sim-renda-f1')) document.getElementById('sim-renda-f1').value = c.rendaF1;
+                if (c.aporteF1 !== undefined && document.getElementById('sim-aporte-f1')) document.getElementById('sim-aporte-f1').value = c.aporteF1;
+                if (c.aporteJanela !== undefined && document.getElementById('sim-aporte-janela')) document.getElementById('sim-aporte-janela').value = c.aporteJanela;
+                if (c.custoCarro !== undefined && document.getElementById('sim-custo-carro')) document.getElementById('sim-custo-carro').value = c.custoCarro;
+                if (c.rendaF2 !== undefined && document.getElementById('sim-renda-f2')) document.getElementById('sim-renda-f2').value = c.rendaF2;
+                if (c.percF2 !== undefined && document.getElementById('sim-perc-f2')) document.getElementById('sim-perc-f2').value = c.percF2;
+                if (c.rendaF4 !== undefined && document.getElementById('sim-renda-f4')) document.getElementById('sim-renda-f4').value = c.rendaF4;
+                if (c.percF4 !== undefined && document.getElementById('sim-perc-f4')) document.getElementById('sim-perc-f4').value = c.percF4;
+                if (c.taxaAnual !== undefined && document.getElementById('sim-taxa-anual')) document.getElementById('sim-taxa-anual').value = c.taxaAnual;
+                if (c.modoDivisao && document.getElementById('sim-modo-divisao-gastos')) document.getElementById('sim-modo-divisao-gastos').value = c.modoDivisao;
+                if (c.ipcaAnual !== undefined && document.getElementById('sim-ipca-anual')) document.getElementById('sim-ipca-anual').value = c.ipcaAnual;
+                if (c.descontarIpca !== undefined && document.getElementById('sim-descontar-ipca')) document.getElementById('sim-descontar-ipca').checked = !!c.descontarIpca;
+            } catch (e) {}
+        }
 
+        function salvarConfigSimCarreira() {
+            const payload = {
+                rendaF1: toNum(document.getElementById('sim-renda-f1')?.value) || 1500,
+                aporteF1: toNum(document.getElementById('sim-aporte-f1')?.value) || 150,
+                aporteJanela: toNum(document.getElementById('sim-aporte-janela')?.value) || 7000,
+                custoCarro: toNum(document.getElementById('sim-custo-carro')?.value) || 32000,
+                rendaF2: toNum(document.getElementById('sim-renda-f2')?.value) || 10000,
+                percF2: toNum(document.getElementById('sim-perc-f2')?.value) || 30,
+                rendaF4: toNum(document.getElementById('sim-renda-f4')?.value) || 15000,
+                percF4: toNum(document.getElementById('sim-perc-f4')?.value) || 30,
+                taxaAnual: toNum(document.getElementById('sim-taxa-anual')?.value) || 13,
+                modoDivisao: document.getElementById('sim-modo-divisao-gastos')?.value || 'proporcional',
+                ipcaAnual: toNum(document.getElementById('sim-ipca-anual')?.value) || 4.0,
+                descontarIpca: !!document.getElementById('sim-descontar-ipca')?.checked
+            };
+            safeSetStorage('mp_sim_carreira_config', JSON.stringify(payload));
+        }
+
+        function calcularDivisaoSeteBlocosFase(rendaTotal, valorAporte, modo) {
+            const sobraTotal = Math.max(0, rendaTotal - valorAporte);
+            const pFixos = toNum(config.perc_demais) || 40;
+            const pConforto = toNum(config.perc_conforto) || 15;
+            const pMetas = toNum(config.perc_metas) || 10;
+            const pLazer = toNum(config.perc_entretenimento) || 10;
+            const pConhec = toNum(config.perc_conhecimento) || 5;
+            const pAnha = toNum(config.perc_doacoes) || 2;
+            const pOutros = toNum(config.perc_outros) || 8;
+            const somaPesosGasto = Math.max(1, pFixos + pConforto + pMetas + pLazer + pConhec + pAnha + pOutros);
+
+            // No modo 'direto_bruto', Lazer (10%), Lei de Anha/AMRA (2%), Conhecimento (5%), Metas (10%) e Outros (8%)
+            // tentam preservar seu % direto sobre a Renda Bruta, ajustando Custos Fixos e Conforto quando o investimento sobe para 30%.
+            // Se a sobra total for menor (ex: Janela de Ouro com 70% de aporte), escala proporcionalmente à sobra.
+            const somaNaoFixosBruto = rendaTotal * ((pConforto + pMetas + pLazer + pConhec + pAnha + pOutros) / 100);
+            if (modo === 'direto_bruto' && sobraTotal > somaNaoFixosBruto) {
+                const vConforto = rendaTotal * (pConforto / 100);
+                const vMetas = rendaTotal * (pMetas / 100);
+                const vLazer = rendaTotal * (pLazer / 100);
+                const vConhec = rendaTotal * (pConhec / 100);
+                const vAnha = rendaTotal * (pAnha / 100);
+                const vOutros = rendaTotal * (pOutros / 100);
+                const vFixos = Math.max(0, sobraTotal - (vConforto + vMetas + vLazer + vConhec + vAnha + vOutros));
+                return {
+                    rendaTotal,
+                    valorAporte,
+                    sobraTotal,
+                    custosFixos: vFixos,
+                    conforto: vConforto,
+                    metas: vMetas,
+                    lazer: vLazer,
+                    conhecimento: vConhec,
+                    leiAnha: vAnha,
+                    outros: vOutros
+                };
+            }
+
+            return {
+                rendaTotal,
+                valorAporte,
+                sobraTotal,
+                custosFixos: sobraTotal * (pFixos / somaPesosGasto),
+                conforto: sobraTotal * (pConforto / somaPesosGasto),
+                metas: sobraTotal * (pMetas / somaPesosGasto),
+                lazer: sobraTotal * (pLazer / somaPesosGasto),
+                conhecimento: sobraTotal * (pConhec / somaPesosGasto),
+                leiAnha: sobraTotal * (pAnha / somaPesosGasto),
+                outros: sobraTotal * (pOutros / somaPesosGasto)
+            };
+        }
+
+        function aplicarDeflatorIpcaDivisao(div, anosAteFase, descontarIpca, ipcaAnual) {
+            if (!descontarIpca || anosAteFase <= 0 || ipcaAnual <= 0) return div;
+            const fator = Math.pow(1 + (ipcaAnual / 100), anosAteFase);
+            return {
+                rendaTotal: div.rendaTotal / fator,
+                valorAporte: div.valorAporte / fator,
+                sobraTotal: div.sobraTotal / fator,
+                custosFixos: div.custosFixos / fator,
+                conforto: div.conforto / fator,
+                metas: div.metas / fator,
+                lazer: div.lazer / fator,
+                conhecimento: div.conhecimento / fator,
+                leiAnha: div.leiAnha / fator,
+                outros: div.outros / fator
+            };
+        }
+
+        function gerarMiniCardBlocoFaseHTML(divisao, numFase = 1, notaContextual = '', tagIpca = '') {
+            const percSobra = divisao.rendaTotal > 0 ? Math.round((divisao.sobraTotal / divisao.rendaTotal) * 100) : 0;
+            return `
+                <div class="flex items-center justify-between text-[11px]">
+                    <span class="font-bold text-slate-700">Restante p/ Gastos (${percSobra}%)${tagIpca}:</span>
+                    <strong class="text-slate-900 font-extrabold money-val">${formatBRL(divisao.sobraTotal)}/mês</strong>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+                    <div class="px-2 py-1 rounded-lg bg-emerald-100/80 border border-emerald-300/80 flex items-center justify-between">
+                        <span class="font-bold text-forest truncate">🎉 Lazer:</span>
+                        <strong class="text-forest font-extrabold money-val ml-1">${formatBRL(divisao.lazer)}</strong>
+                    </div>
+                    <div class="px-2 py-1 rounded-lg bg-amber-100/80 border border-amber-300/80 flex items-center justify-between">
+                        <span class="font-bold text-amber-950 truncate">⚖️ Lei AMRA/Anha:</span>
+                        <strong class="text-amber-950 font-extrabold money-val ml-1">${formatBRL(divisao.leiAnha)}</strong>
+                    </div>
+                    <div class="px-2 py-1 rounded-lg bg-white/90 border border-slate-200/80 flex items-center justify-between">
+                        <span class="text-slate-600 truncate">🏠 Fixos:</span>
+                        <strong class="text-slate-800 font-bold money-val ml-1">${formatBRL(divisao.custosFixos)}</strong>
+                    </div>
+                    <div class="px-2 py-1 rounded-lg bg-white/90 border border-slate-200/80 flex items-center justify-between">
+                        <span class="text-slate-600 truncate">✨ Conforto:</span>
+                        <strong class="text-slate-800 font-bold money-val ml-1">${formatBRL(divisao.conforto)}</strong>
+                    </div>
+                    <div class="px-2 py-1 rounded-lg bg-white/90 border border-slate-200/80 flex items-center justify-between">
+                        <span class="text-slate-600 truncate">🎯 Metas:</span>
+                        <strong class="text-slate-800 font-bold money-val ml-1">${formatBRL(divisao.metas)}</strong>
+                    </div>
+                    <div class="px-2 py-1 rounded-lg bg-white/90 border border-slate-200/80 flex items-center justify-between">
+                        <span class="text-slate-600 truncate">📚 Estudos:</span>
+                        <strong class="text-slate-800 font-bold money-val ml-1">${formatBRL(divisao.conhecimento)}</strong>
+                    </div>
+                    <div class="col-span-2 px-2 py-1 rounded-lg bg-white/90 border border-slate-200/80 flex items-center justify-between">
+                        <span class="text-slate-600 truncate">🐾 Outros (Pet, Saúde & Imprevistos):</span>
+                        <strong class="text-slate-800 font-bold money-val ml-1">${formatBRL(divisao.outros)}</strong>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between gap-2 pt-1">
+                    <span class="text-[9px] text-slate-500 italic truncate">${notaContextual || 'Valores mensais estimados'}</span>
+                    <button type="button" onclick="aplicarFaseAoOrcamentoApp(${numFase})" class="text-[10px] font-extrabold text-forest hover:underline shrink-0 flex items-center gap-0.5">
+                        Aplicar ao App →
+                    </button>
+                </div>
+            `;
+        }
+
+        function atualizarAporteF2() {
+            const modoDivisao = document.getElementById('sim-modo-divisao-gastos')?.value || 'proporcional';
+            const descModoEl = document.getElementById('sim-modo-divisao-desc');
+            if (descModoEl) {
+                descModoEl.innerText = modoDivisao === 'direto_bruto'
+                    ? 'Mantém Lazer (10%), Lei de Anha/AMRA (2%), Conforto (15%), Metas (10%), Estudos (5%) e Outros (8%) sobre a Renda Bruta, ajustando Custos Fixos.'
+                    : 'Distribui o saldo restante após o investimento mantendo a proporção exata entre os 7 blocos de gastos configurados no app.';
+            }
+
+            // Fase 1
+            const rendaF1 = toNum(document.getElementById('sim-renda-f1')?.value) || 1500;
+            const aporteF1 = toNum(document.getElementById('sim-aporte-f1')?.value) || 150;
+            const percInvF1 = rendaF1 > 0 ? Math.round((aporteF1 / rendaF1) * 100) : 10;
+            const badgeF1 = document.getElementById('sim-f1-badge-inv');
+            if (badgeF1) badgeF1.innerText = `${percInvF1}% Inv. (${formatBRL(aporteF1)})`;
+
+            // Fase 3 (Generalista)
+            const rendaF2 = toNum(document.getElementById('sim-renda-f2')?.value) || 10000;
+            const selectF2 = document.getElementById('sim-perc-f2');
+            if (selectF2) {
+                Array.from(selectF2.options).forEach(opt => {
+                    const p = toNum(opt.value);
+                    const val = rendaF2 * (p / 100);
+                    opt.text = `${p}% (${formatBRL(val)}${p === 30 ? ' ★' : ''})`;
+                });
+            }
+            const percF2 = toNum(selectF2?.value) || 30;
+            const aporteF2 = rendaF2 * (percF2 / 100);
+            const sobraF2 = Math.max(0, rendaF2 - aporteF2);
+            const elCustoVidaF2 = document.getElementById('sim-custo-vida-f2');
+            if (elCustoVidaF2) elCustoVidaF2.innerText = formatBRL(sobraF2);
+            const badgeF3 = document.getElementById('sim-f3-badge-inv');
+            if (badgeF3) badgeF3.innerText = `${percF2}% Inv. (${formatBRL(aporteF2)})`;
+
+            // Fase 2 (Janela de Ouro - usa a Renda Médica inicial como referência de entrada)
+            const aporteJanela = toNum(document.getElementById('sim-aporte-janela')?.value) || 7000;
+            const rendaJanelaRef = Math.max(rendaF2, aporteJanela);
+            const percJanela = rendaJanelaRef > 0 ? Math.round((aporteJanela / rendaJanelaRef) * 100) : 70;
+            const badgeJanela = document.getElementById('sim-f2-janela-badge');
+            if (badgeJanela) badgeJanela.innerText = `${percJanela}% Inv. (${formatBRL(aporteJanela)})`;
+
+            // Fase 4 (Pós-Residência)
             const rendaF4 = toNum(document.getElementById('sim-renda-f4')?.value) || 15000;
-            const percF4 = toNum(document.getElementById('sim-perc-f4')?.value) || 30;
+            const selectF4 = document.getElementById('sim-perc-f4');
+            if (selectF4) {
+                Array.from(selectF4.options).forEach(opt => {
+                    const p = toNum(opt.value);
+                    const val = rendaF4 * (p / 100);
+                    opt.text = `${p}% (${formatBRL(val)}${p === 30 ? ' ★' : ''})`;
+                });
+            }
+            const percF4 = toNum(selectF4?.value) || 30;
             const aporteF4 = rendaF4 * (percF4 / 100);
+            const sobraF4 = Math.max(0, rendaF4 - aporteF4);
             const elF4 = document.getElementById('sim-aporte-f4-txt');
             if (elF4) elF4.innerText = formatBRL(aporteF4);
+            const elCustoVidaF4 = document.getElementById('sim-custo-vida-f4');
+            if (elCustoVidaF4) elCustoVidaF4.innerText = formatBRL(sobraF4);
+            const badgeF4 = document.getElementById('sim-f4-badge-inv');
+            if (badgeF4) badgeF4.innerText = `${percF4}% Inv. (${formatBRL(aporteF4)})`;
+
+            const descontarIpca = !!document.getElementById('sim-descontar-ipca')?.checked;
+            const ipcaAnual = toNum(document.getElementById('sim-ipca-anual')?.value) || 4.0;
+            const tagIpca = descontarIpca ? ` • Real (-${ipcaAnual}% IPCA)` : '';
+
+            // Calcular e renderizar a divisão dos 7 blocos para cada uma das 4 fases (com opção de deflator IPCA: F1=0a, F2=2.2a, F3=2.7a, F4=5.1a)
+            const divF1 = aplicarDeflatorIpcaDivisao(calcularDivisaoSeteBlocosFase(rendaF1, aporteF1, modoDivisao), 0, descontarIpca, ipcaAnual);
+            const divF2Janela = aplicarDeflatorIpcaDivisao(calcularDivisaoSeteBlocosFase(rendaJanelaRef, aporteJanela, modoDivisao), 2.2, descontarIpca, ipcaAnual);
+            const divF3 = aplicarDeflatorIpcaDivisao(calcularDivisaoSeteBlocosFase(rendaF2, aporteF2, modoDivisao), 2.7, descontarIpca, ipcaAnual);
+            const divF4 = aplicarDeflatorIpcaDivisao(calcularDivisaoSeteBlocosFase(rendaF4, aporteF4, modoDivisao), 5.1, descontarIpca, ipcaAnual);
+
+            const elDistF1 = document.getElementById('sim-dist-f1');
+            if (elDistF1) elDistF1.innerHTML = gerarMiniCardBlocoFaseHTML(divF1, 1, 'Fase atual de formação', '');
+
+            const elDistF2Janela = document.getElementById('sim-dist-f2-janela');
+            if (elDistF2Janela) elDistF2Janela.innerHTML = gerarMiniCardBlocoFaseHTML(divF2Janela, 2, `Ref. renda inicial de ${formatBRL(rendaJanelaRef)}/mês`, tagIpca);
+
+            const elDistF3 = document.getElementById('sim-dist-f3');
+            if (elDistF3) elDistF3.innerHTML = gerarMiniCardBlocoFaseHTML(divF3, 3, descontarIpca ? 'Poder de compra real em Jul/2029' : 'Orçamento nominal em Jul/2029', tagIpca);
+
+            const elDistF4 = document.getElementById('sim-dist-f4');
+            if (elDistF4) elDistF4.innerHTML = gerarMiniCardBlocoFaseHTML(divF4, 4, descontarIpca ? 'Poder de compra real em Dez/2031' : 'Orçamento nominal em Dez/2031', tagIpca);
+
+            // Preencher a Tabela Comparativa Completa na coluna direita
+            const tbodyComp = document.getElementById('sim-tabela-blocos-fases');
+            if (tbodyComp) {
+                const linhas = [
+                    { nome: '💰 Renda Mensal Bruta', f1: divF1.rendaTotal, f2: divF2Janela.rendaTotal, f3: divF3.rendaTotal, f4: divF4.rendaTotal, destaque: 'bg-slate-50 font-bold text-slate-800' },
+                    { nome: '🛡️ 1. Investimentos (Pague-se 1º)', f1: divF1.valorAporte, f2: divF2Janela.valorAporte, f3: divF3.valorAporte, f4: divF4.valorAporte, destaque: 'bg-emerald-50/70 font-extrabold text-forest' },
+                    { nome: '🔓 Sobra Líquida p/ Gastos (2 a 8)', f1: divF1.sobraTotal, f2: divF2Janela.sobraTotal, f3: divF3.sobraTotal, f4: divF4.sobraTotal, destaque: 'bg-sage-50/80 font-extrabold text-slate-900 border-y border-sage-200' },
+                    { nome: '🏠 2. Custos Fixos (Moradia, Contas, Mercado)', f1: divF1.custosFixos, f2: divF2Janela.custosFixos, f3: divF3.custosFixos, f4: divF4.custosFixos, destaque: '' },
+                    { nome: '✨ 3. Conforto (Academia, Uber, Streaming)', f1: divF1.conforto, f2: divF2Janela.conforto, f3: divF3.conforto, f4: divF4.conforto, destaque: '' },
+                    { nome: '🎯 4. Metas (Viagens, Projetos, Troca Carro)', f1: divF1.metas, f2: divF2Janela.metas, f3: divF3.metas, f4: divF4.metas, destaque: '' },
+                    { nome: '🎉 5. Prazeres / Lazer (Restaurantes, Saídas)', f1: divF1.lazer, f2: divF2Janela.lazer, f3: divF3.lazer, f4: divF4.lazer, destaque: 'bg-emerald-50/40 font-bold text-forest' },
+                    { nome: '📚 6. Conhecimento (Livros, Congressos, Cursos)', f1: divF1.conhecimento, f2: divF2Janela.conhecimento, f3: divF3.conhecimento, f4: divF4.conhecimento, destaque: '' },
+                    { nome: '⚖️ 7. Lei de Anha / AMRA (Proporcionalidade)', f1: divF1.leiAnha, f2: divF2Janela.leiAnha, f3: divF3.leiAnha, f4: divF4.leiAnha, destaque: 'bg-amber-50/60 font-bold text-amber-900' },
+                    { nome: '🐾 8. Outros Gastos (Pet, Saúde, Imprevistos)', f1: divF1.outros, f2: divF2Janela.outros, f3: divF3.outros, f4: divF4.outros, destaque: '' }
+                ];
+                tbodyComp.innerHTML = linhas.map(l => `
+                    <tr class="hover:bg-slate-50/80 transition ${l.destaque}">
+                        <td class="py-2 px-2 whitespace-nowrap">${l.nome}</td>
+                        <td class="py-2 px-2 text-right money-val">${formatBRL(l.f1)}</td>
+                        <td class="py-2 px-2 text-right money-val">${formatBRL(l.f2)}</td>
+                        <td class="py-2 px-2 text-right money-val font-semibold">${formatBRL(l.f3)}</td>
+                        <td class="py-2 px-2 text-right money-val font-semibold">${formatBRL(l.f4)}</td>
+                    </tr>
+                `).join('');
+            }
         }
 
         function rodarSimulacaoCarreira() {
+            atualizarAporteF2();
             const totalInvestidoCarteira = investimentos.reduce((acc, i) => acc + toNum(i.saldo_atual), 0);
             const totalReserva = reservaMovs.reduce((acc, r) => r.tipo === 'aporte' ? acc + toNum(r.valor) : acc - toNum(r.valor), 0);
             const capitalBase = totalInvestidoCarteira + totalReserva;
@@ -3830,9 +4594,17 @@
             const percF4 = toNum(document.getElementById('sim-perc-f4')?.value) || 30;
             const aportePosDez2031 = rendaF4 * (percF4 / 100);
 
-            const taxaAnual = toNum(document.getElementById('sim-taxa-anual').value) || 13;
+            const taxaAnualNominal = toNum(document.getElementById('sim-taxa-anual').value) || 13;
+            const descontarIpcaSim = !!document.getElementById('sim-descontar-ipca')?.checked;
+            const ipcaSim = toNum(document.getElementById('sim-ipca-anual')?.value) || 4.0;
+            const taxaAnual = descontarIpcaSim
+                ? (((1 + taxaAnualNominal / 100) / (1 + ipcaSim / 100) - 1) * 100)
+                : taxaAnualNominal;
             const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
-            const taxaComparacao = taxaAnual === 13 ? 8 : 13;
+            const taxaCompNominal = taxaAnualNominal === 13 ? 8 : 13;
+            const taxaComparacao = descontarIpcaSim
+                ? (((1 + taxaCompNominal / 100) / (1 + ipcaSim / 100) - 1) * 100)
+                : taxaCompNominal;
             const taxaMensalComp = Math.pow(1 + taxaComparacao / 100, 1 / 12) - 1;
 
             const alvoPatrimonioRendaPassiva = taxaMensal > 0 ? Math.round(rendaPassivaMeta / taxaMensal) : 488432;
@@ -4463,6 +5235,447 @@
             atualizarInterfaceCompleta();
             if (tabId === 'carreira') rodarSimulacaoCarreira();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==================== 1. SIMULADOR DE PLANTÃO FUTURO (ABA ENTRADAS) ====================
+        function calcularSimuladorPlantaoFuturo() {
+            const container = document.getElementById('sim-plantao-resultados');
+            if (!container) return;
+            const valorUnit = toNum(document.getElementById('sim-plantao-unit')?.value) || 1200;
+            const qtdMes = Math.max(1, toNum(document.getElementById('sim-plantao-qtd')?.value) || 2);
+            const taxaAnual = toNum(document.getElementById('sim-plantao-taxa')?.value) || 13;
+            const taxaMensal = Math.pow(1 + (taxaAnual / 100), 1 / 12) - 1;
+
+            const brutoTotalMes = valorUnit * qtdMes;
+            const lazerHoje = brutoTotalMes * 0.5;
+            const aporteHoje = brutoTotalMes * 0.5;
+
+            const vf5AnosUnico = aporteHoje * Math.pow(1 + (taxaAnual / 100), 5);
+            const vf10AnosUnico = aporteHoje * Math.pow(1 + (taxaAnual / 100), 10);
+
+            // Se repetir essa quantidade de plantões por 12 meses e deixar render por 10 anos
+            let acum12Meses = 0;
+            for (let m = 1; m <= 12; m++) {
+                acum12Meses = acum12Meses * (1 + taxaMensal) + aporteHoje;
+            }
+            const vf1AnoEm10Anos = acum12Meses * Math.pow(1 + (taxaAnual / 100), 9);
+            const rendaPassivaGerada10a = vf10AnosUnico * taxaMensal;
+
+            container.innerHTML = `
+                <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold uppercase text-forest">🎉 50% Lazer Hoje (Sem Culpa)</span>
+                    <strong class="text-lg font-extrabold text-forest money-val mt-1">${formatBRL(lazerHoje)}</strong>
+                    <span class="text-[10px] text-slate-500 mt-0.5">De ${formatBRL(brutoTotalMes)} em ${qtdMes} plantão(ões)</span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-sage-50/80 border border-sage-200 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold uppercase text-forest">🛡️ 50% Investido Hoje</span>
+                    <strong class="text-lg font-extrabold text-slate-800 money-val mt-1">${formatBRL(aporteHoje)}</strong>
+                    <span class="text-[10px] text-slate-500 mt-0.5">Em 5 anos vira <strong class="text-forest">${formatBRL(vf5AnosUnico)}</strong></span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-emerald-100/70 border border-emerald-300 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold uppercase text-forest">🚀 Este Mês em 10 Anos (${taxaAnual}%)</span>
+                    <strong class="text-lg font-extrabold text-forest money-val mt-1">${formatBRL(vf10AnosUnico)}</strong>
+                    <span class="text-[10px] text-emerald-800 font-semibold mt-0.5">Gera +${formatBRL(rendaPassivaGerada10a)}/mês passivos</span>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-slate-800 text-white flex flex-col justify-between">
+                    <span class="text-[10px] font-bold uppercase text-emerald-300">💎 1 Ano desse Ritmo em 10a</span>
+                    <strong class="text-lg font-extrabold text-white money-val mt-1">${formatBRL(vf1AnoEm10Anos)}</strong>
+                    <span class="text-[10px] text-slate-300 mt-0.5">Mantendo ${qtdMes} plantão(ões)/mês por 12m</span>
+                </div>
+            `;
+        }
+
+        function preencherPlantaoSimuladoNoForm() {
+            const valorUnit = toNum(document.getElementById('sim-plantao-unit')?.value) || 1200;
+            const qtdMes = Math.max(1, toNum(document.getElementById('sim-plantao-qtd')?.value) || 1);
+            const total = valorUnit * qtdMes;
+
+            document.getElementById('ent-valor').value = total.toFixed(2);
+            const selectCat = document.getElementById('ent-categoria');
+            if (selectCat && Array.from(selectCat.options).some(o => o.value === 'Plantões')) {
+                selectCat.value = 'Plantões';
+            }
+            document.getElementById('ent-is-extra').checked = true;
+            document.getElementById('ent-recorrencia').value = 'Extra_50_50';
+            document.getElementById('ent-descricao').value = qtdMes > 1 ? `${qtdMes} Plantões Extras (${formatBRL(valorUnit)} cada)` : `Plantão Extra`;
+            if (!document.getElementById('ent-data').value) {
+                document.getElementById('ent-data').value = new Date().toISOString().slice(0, 10);
+            }
+            calcularPreviaDistribuicao();
+            document.getElementById('ent-valor').focus();
+            showToast(`Plantão de ${formatBRL(total)} (Regra 50/50) preenchido no formulário! Clique em Salvar Entrada.`);
+        }
+
+        // ==================== 2. BACKUP COMPLETO E RESTAURAÇÃO (.JSON) ====================
+        function abrirModalBackup() {
+            const box = document.getElementById('backup-stats-box');
+            if (box) {
+                const totalCarteira = investimentos.reduce((a, b) => a + toNum(b.saldo_atual), 0);
+                box.innerHTML = `
+                    <div class="font-extrabold text-forest mb-1">📦 Resumo dos Dados Prontos para Backup:</div>
+                    <div class="grid grid-cols-2 gap-1 text-[11px]">
+                        <span>• Lançamentos totais: <strong>${transacoes.length}</strong></span>
+                        <span>• Ativos na carteira: <strong>${investimentos.length} (${formatBRL(totalCarteira)})</strong></span>
+                        <span>• Registros na reserva: <strong>${reservaMovs.length}</strong></span>
+                        <span>• Sonhos / Metas: <strong>${sonhos.length}</strong></span>
+                    </div>
+                `;
+            }
+            openModal('modal-backup');
+            lucide.createIcons();
+        }
+
+        function exportarBackupJSON() {
+            let atalhosCustom = [];
+            let blocosLocais = {};
+            let simCarreiraConfig = {};
+            try { atalhosCustom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]')); } catch (e) {}
+            try { blocosLocais = JSON.parse(safeGetStorage('mp_local_blocos_transacoes', '{}')); } catch (e) {}
+            try { simCarreiraConfig = JSON.parse(safeGetStorage('mp_sim_carreira_config', '{}')); } catch (e) {}
+
+            const pacoteBackup = {
+                app: 'Meu Patrimônio',
+                versao: '2.1',
+                dataExportacao: new Date().toISOString(),
+                config,
+                projConfig,
+                simCarreiraConfig,
+                atalhosCustom,
+                blocosLocais,
+                categorias,
+                transacoes,
+                investimentos,
+                reservaMovs,
+                sonhos
+            };
+
+            const jsonStr = JSON.stringify(pacoteBackup, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const hojeStr = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `meu_patrimonio_backup_${hojeStr}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            showToast('Backup completo (.json) exportado com sucesso!');
+        }
+
+        function importarBackupJSON(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const dados = JSON.parse(String(e.target?.result || '{}'));
+                    if (!dados || (!Array.isArray(dados.transacoes) && !Array.isArray(dados.investimentos))) {
+                        return showToast('Arquivo JSON inválido para restauração.', 'erro');
+                    }
+
+                    if (dados.config) {
+                        config = normalizarConfigOitoBlocos(dados.config);
+                        safeSetStorage('mp_local_config', JSON.stringify(config));
+                    }
+                    if (dados.projConfig) {
+                        projConfig = { ...projConfig, ...dados.projConfig };
+                        safeSetStorage('mp_proj_config', JSON.stringify(projConfig));
+                    }
+                    if (dados.simCarreiraConfig) {
+                        safeSetStorage('mp_sim_carreira_config', JSON.stringify(dados.simCarreiraConfig));
+                    }
+                    if (Array.isArray(dados.atalhosCustom)) {
+                        safeSetStorage('mp_atalhos_saidas_custom', JSON.stringify(dados.atalhosCustom));
+                    }
+                    if (dados.blocosLocais) {
+                        safeSetStorage('mp_local_blocos_transacoes', JSON.stringify(dados.blocosLocais));
+                    }
+                    if (Array.isArray(dados.categorias) && dados.categorias.length > 0) {
+                        categorias = dados.categorias;
+                        safeSetStorage('mp_local_categorias', JSON.stringify(categorias));
+                    }
+                    if (Array.isArray(dados.transacoes)) {
+                        transacoes = dados.transacoes;
+                        safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+                    }
+                    if (Array.isArray(dados.investimentos)) {
+                        investimentos = dados.investimentos;
+                        safeSetStorage('mp_local_investimentos', JSON.stringify(investimentos));
+                    }
+                    if (Array.isArray(dados.reservaMovs)) {
+                        reservaMovs = dados.reservaMovs;
+                        safeSetStorage('mp_local_reserva', JSON.stringify(reservaMovs));
+                    }
+                    if (Array.isArray(dados.sonhos)) {
+                        sonhos = dados.sonhos;
+                        safeSetStorage('mp_local_sonhos', JSON.stringify(sonhos));
+                    }
+
+                    carregarConfigProjecao();
+                    carregarConfigSimCarreira();
+                    renderizarAtalhosSaida();
+                    popularSelectsCategorias();
+                    atualizarInterfaceCompleta();
+                    rodarSimulacaoCarreira();
+                    closeModal('modal-backup');
+                    showToast('Backup restaurado com sucesso!');
+                } catch (err) {
+                    showToast('Erro ao ler arquivo JSON: ' + err.message, 'erro');
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ==================== 3. VIRADA DE MÊS INTELIGENTE (CLONAR FIXOS + VARRER SOBRA) ====================
+        function obterMesAnteriorISO(mesSelecionado) {
+            const [ano, mes] = mesSelecionado.split('-').map(Number);
+            const d = new Date(ano, mes - 2, 1);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        function listarCandidatosClonagemMes(mesSelecionado) {
+            const mesAnt = obterMesAnteriorISO(mesSelecionado);
+            let origemMes = mesAnt;
+            let candidatos = transacoes.filter(t => {
+                if (!t.data || !String(t.data).startsWith(mesAnt)) return false;
+                return (t.tipo === 'entrada' && t.recorrencia === 'Mensal') || (t.tipo === 'saida' && (t.natureza === 'Fixa' || identificarBlocoSaida(t) === 'Lei de Anha'));
+            });
+
+            // Se o mês imediatamente anterior estiver vazio, busca no mês mais recente que possua itens fixos
+            if (candidatos.length === 0) {
+                const outrosFixos = transacoes.filter(t => t.data && !String(t.data).startsWith(mesSelecionado) && ((t.tipo === 'entrada' && t.recorrencia === 'Mensal') || (t.tipo === 'saida' && t.natureza === 'Fixa')));
+                if (outrosFixos.length > 0) {
+                    origemMes = String(outrosFixos[0].data).slice(0, 7);
+                    candidatos = outrosFixos.filter(t => String(t.data).startsWith(origemMes));
+                }
+            }
+
+            // Evita duplicar itens que já foram lançados no mês selecionado com mesma descrição e tipo
+            const transMesAtual = transacoes.filter(t => t.data && String(t.data).startsWith(mesSelecionado));
+            const pendentes = candidatos.filter(cand => !transMesAtual.some(at => at.tipo === cand.tipo && String(at.descricao || '').toLowerCase() === String(cand.descricao || '').toLowerCase()));
+            return { origemMes, pendentes };
+        }
+
+        function abrirModalViradaMes() {
+            const mesSelecionado = document.getElementById('month-filter').value;
+            const { origemMes, pendentes } = listarCandidatosClonagemMes(mesSelecionado);
+
+            const badgeOrigem = document.getElementById('virada-mes-origem-badge');
+            if (badgeOrigem) badgeOrigem.innerText = `Origem: ${origemMes}`;
+
+            const resumoClonar = document.getElementById('virada-clonar-resumo');
+            if (resumoClonar) {
+                if (pendentes.length > 0) {
+                    const qtdEnt = pendentes.filter(p => p.tipo === 'entrada').length;
+                    const qtdSai = pendentes.filter(p => p.tipo === 'saida').length;
+                    const somaSai = pendentes.filter(p => p.tipo === 'saida').reduce((a, b) => a + toNum(b.valor), 0);
+                    resumoClonar.innerHTML = `Encontrados <strong>${pendentes.length} lançamento(s) recorrente(s)</strong> de <strong>${origemMes}</strong> ainda não lançados em ${mesSelecionado} (${qtdEnt} receita(s) mensal(is) e ${qtdSai} despesa(s) fixa(s) somando ${formatBRL(somaSai)}).`;
+                } else {
+                    resumoClonar.innerHTML = `Todas as receitas mensais e despesas fixas de <strong>${origemMes}</strong> já estão lançadas em <strong>${mesSelecionado}</strong> (ou não há histórico anterior cadastrado). Selecione um mês futuro no topo para clonar!`;
+                }
+            }
+
+            // Calcular sobra líquida sugerida do mês selecionado
+            const transMes = transacoes.filter(t => t.data && String(t.data).startsWith(mesSelecionado));
+            const entMes = transMes.filter(t => t.tipo === 'entrada').reduce((a, b) => a + toNum(b.valor), 0);
+            const saiMes = transMes.filter(t => t.tipo === 'saida').reduce((a, b) => a + toNum(b.valor), 0);
+            const { totalInvestidoNoMes } = calcularAportesCombinadosNoMes(mesSelecionado);
+            const sobraCaixaMes = Math.max(0, entMes - saiMes - totalInvestidoNoMes);
+
+            const inputSobra = document.getElementById('virada-sobra-valor');
+            if (inputSobra) inputSobra.value = sobraCaixaMes > 0 ? sobraCaixaMes.toFixed(2) : (150).toFixed(2);
+
+            const resumoSobra = document.getElementById('virada-sobra-resumo');
+            if (resumoSobra) {
+                resumoSobra.innerHTML = sobraCaixaMes > 0
+                    ? `Sobra líquida disponível em <strong>${mesSelecionado}</strong> (Entradas - Saídas - Aportes já feitos): <strong class="text-forest">${formatBRL(sobraCaixaMes)}</strong>.`
+                    : `Transfira qualquer valor residual do seu caixa de giro diretamente para a Reserva ou Carteira de Investimentos.`;
+            }
+
+            openModal('modal-virada-mes');
+            lucide.createIcons();
+        }
+
+        async function clonarFixosMesAnterior() {
+            const mesSelecionado = document.getElementById('month-filter').value;
+            const { pendentes } = listarCandidatosClonagemMes(mesSelecionado);
+
+            if (pendentes.length === 0) {
+                return showToast('Nenhum lançamento fixo pendente para clonar neste mês.', 'alerta');
+            }
+
+            const [anoDestino, mesDestino] = mesSelecionado.split('-').map(Number);
+            const ultimoDiaDestino = new Date(anoDestino, mesDestino, 0).getDate();
+
+            const novosLancamentos = pendentes.map(item => {
+                const diaOrig = parseInt(String(item.data).split('-')[2] || '5', 10);
+                const diaValido = Math.min(ultimoDiaDestino, Math.max(1, diaOrig));
+                const novaData = `${mesSelecionado}-${String(diaValido).padStart(2, '0')}`;
+                return {
+                    tipo: item.tipo,
+                    valor: toNum(item.valor),
+                    descricao: item.descricao,
+                    categoria: item.categoria,
+                    data: novaData,
+                    recorrencia: item.recorrencia || (item.tipo === 'entrada' ? 'Mensal' : null),
+                    natureza: item.natureza || (item.tipo === 'saida' ? 'Fixa' : null),
+                    essencialidade: item.essencialidade || (item.tipo === 'saida' ? 'Essencial' : null),
+                    forma_pagamento: item.forma_pagamento || (item.tipo === 'saida' ? 'Pix' : null)
+                };
+            });
+
+            try {
+                if (supabaseClient) {
+                    const { error } = await supabaseClient.from('transacoes').insert(novosLancamentos);
+                    if (error) throw new Error(error.message);
+                } else {
+                    novosLancamentos.forEach(nl => {
+                        const novoId = crypto.randomUUID();
+                        transacoes.unshift({ id: novoId, ...nl });
+                    });
+                    safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+                }
+                closeModal('modal-virada-mes');
+                showToast(`${novosLancamentos.length} lançamento(s) fixo(s) importado(s) para ${mesSelecionado}!`);
+                await loadAllData();
+            } catch (err) {
+                showToast('Erro ao clonar fixos: ' + err.message, 'erro');
+            }
+        }
+
+        async function confirmarVarreduraSobraMes() {
+            const valor = toNum(document.getElementById('virada-sobra-valor')?.value);
+            const destino = document.getElementById('virada-sobra-destino')?.value || 'reserva';
+            if (valor <= 0) return showToast('Informe um valor válido para transferir.', 'erro');
+
+            document.getElementById('pague-se-valor-input').value = valor.toFixed(2);
+            document.getElementById('pague-se-destino-select').value = destino;
+            document.getElementById('pague-se-local-input').value = destino === 'reserva'
+                ? 'Varredura de Sobra Mensal (Reserva Selic/CDI)'
+                : 'Aporte de Sobra Mensal (Carteira 13% a.a.)';
+            closeModal('modal-virada-mes');
+            await confirmarPagueSeRapido({ preventDefault: () => {} });
+        }
+
+        // ==================== 4. CARD DE FECHAMENTO DO MÊS (COPIÁVEL) ====================
+        let ultimoTextoFechamentoMes = '';
+
+        function abrirModalFechamentoMes() {
+            const mesSelecionado = document.getElementById('month-filter').value;
+            const transMes = transacoes.filter(t => t.data && String(t.data).startsWith(mesSelecionado));
+            const entradasMes = transMes.filter(t => t.tipo === 'entrada').reduce((a, b) => a + toNum(b.valor), 0);
+            const saidasMes = transMes.filter(t => t.tipo === 'saida').reduce((a, b) => a + toNum(b.valor), 0);
+            const pisoRendaBase = toNum(config.renda_base_prevista) || 1500;
+            const rendaRef = Math.max(entradasMes, pisoRendaBase);
+
+            const { aportesReservaMes, aportesCarteiraMes, totalInvestidoNoMes, metaEcoTotal } = ultimoResumoAportesMes;
+            const taxaPoupancaReal = rendaRef > 0 ? Math.round((totalInvestidoNoMes / rendaRef) * 100) : 0;
+
+            const totalInvestidoCarteira = investimentos.reduce((acc, i) => acc + toNum(i.saldo_atual), 0);
+            const reservaMovsPuros = reservaMovs.filter(r => !String(r.onde_guardado || '').startsWith('Investimento:') && !String(r.onde_guardado || '').startsWith('Sonho:'));
+            const totalReserva = Math.max(0, reservaMovsPuros.reduce((acc, r) => r.tipo === 'aporte' ? acc + toNum(r.valor) : acc - toNum(r.valor), 0));
+            const patrimonioTotal = totalInvestidoCarteira + totalReserva;
+            const taxaOtimista = toNum(projConfig.taxaOtimista) || 13;
+            const taxaMensalOtimista = Math.pow(1 + taxaOtimista / 100, 1 / 12) - 1;
+            const rendaPassivaHoje = patrimonioTotal * taxaMensalOtimista;
+
+            // Calcular nota de 0 a 100 do mês
+            const orcamentoMaxGastos = rendaRef * ((100 - (toNum(config.perc_economia) || 10)) / 100);
+            const cumpriuInvestimento = totalInvestidoNoMes >= (metaEcoTotal - 0.5);
+            const dentroDoOrcamento = saidasMes <= orcamentoMaxGastos;
+            let score = 50;
+            if (cumpriuInvestimento) score += 30;
+            else if (totalInvestidoNoMes > 0) score += 15;
+            if (dentroDoOrcamento) score += 20;
+            else score -= Math.min(25, Math.round(((saidasMes - orcamentoMaxGastos) / Math.max(1, orcamentoMaxGastos)) * 50));
+            score = Math.max(10, Math.min(100, score));
+
+            const conceito = score >= 90 ? '🏆 Excelente (Padrão Liberdade 40+)' : (score >= 70 ? '🟢 Saudável & Consistente' : '🟡 Atenção aos Blocos Variados');
+
+            ultimoTextoFechamentoMes = [
+                `📊 FECHAMENTO MENSAL — MEU PATRIMÔNIO (${mesSelecionado})`,
+                `• Score do Mês: ${score}/100 (${conceito})`,
+                `• Entradas: ${formatBRL(entradasMes)} (Ref. Base: ${formatBRL(rendaRef)})`,
+                `• Saídas Totais: ${formatBRL(saidasMes)} (Teto: ${formatBRL(orcamentoMaxGastos)})`,
+                `• Investido no Mês (Pague-se 1º): ${formatBRL(totalInvestidoNoMes)} de ${formatBRL(metaEcoTotal)} (${taxaPoupancaReal}% da renda)`,
+                `  ↳ Reserva: ${formatBRL(aportesReservaMes)} | Carteira: ${formatBRL(aportesCarteiraMes)}`,
+                `• Patrimônio Acumulado (Carteira + Reserva): ${formatBRL(patrimonioTotal)}`,
+                `• Renda Passiva Estimada (${taxaOtimista}% a.a.): ${formatBRL(rendaPassivaHoje)}/mês`
+            ].join('\n');
+
+            const container = document.getElementById('fechamento-mes-card-content');
+            if (container) {
+                container.innerHTML = `
+                    <div class="hero-gradient rounded-2xl p-5 text-white space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/15 text-emerald-200">Competência ${mesSelecionado}</span>
+                            <span class="text-xs font-bold text-emerald-300">${conceito}</span>
+                        </div>
+                        <div class="flex items-baseline justify-between">
+                            <div>
+                                <span class="text-xs text-sage-200 block">Nota de Saúde Financeira</span>
+                                <strong class="text-3xl font-extrabold text-white">${score}<span class="text-base font-normal text-sage-200">/100</span></strong>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-sage-200 block">Taxa de Poupança Real</span>
+                                <strong class="text-2xl font-extrabold text-emerald-300">${taxaPoupancaReal}%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 text-xs">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Entradas vs Saídas</span>
+                            <strong class="text-slate-800 money-val block mt-0.5">+${formatBRL(entradasMes)} / -${formatBRL(saidasMes)}</strong>
+                        </div>
+                        <div class="p-3 rounded-xl bg-sage-50 border border-sage-200">
+                            <span class="text-[10px] text-forest uppercase font-bold block">Investido no Mês (Meta 10%)</span>
+                            <strong class="text-forest money-val block mt-0.5">${formatBRL(totalInvestidoNoMes)} de ${formatBRL(metaEcoTotal)}</strong>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold block">Patrimônio (Carteira + Reserva)</span>
+                            <strong class="text-forest money-val block mt-0.5">${formatBRL(patrimonioTotal)}</strong>
+                        </div>
+                        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <span class="text-[10px] text-forest uppercase font-bold block">Renda Passiva Hoje (${taxaOtimista}%)</span>
+                            <strong class="text-forest money-val block mt-0.5">${formatBRL(rendaPassivaHoje)}/mês</strong>
+                        </div>
+                    </div>
+                `;
+            }
+
+            openModal('modal-fechamento-mes');
+            lucide.createIcons();
+        }
+
+        function copiarResumoFechamentoMes() {
+            if (!ultimoTextoFechamentoMes) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(ultimoTextoFechamentoMes).then(() => {
+                    showToast('Resumo do mês copiado para a área de transferência!');
+                }).catch(() => fallbackCopyText(ultimoTextoFechamentoMes));
+            } else {
+                fallbackCopyText(ultimoTextoFechamentoMes);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast('Resumo do mês copiado para a área de transferência!');
+            } catch (e) {
+                showToast('Não foi possível copiar automaticamente.', 'erro');
+            }
+            ta.remove();
         }
 
         function openNovaMovimentacao() { openModal('modal-quick-choice'); }

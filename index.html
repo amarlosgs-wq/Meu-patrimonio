@@ -362,6 +362,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- GRÁFICO SANKEY: FLUXO VISUAL DA RENDA NO MÊS -->
+            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i data-lucide="git-branch" class="w-4 h-4 text-forest"></i>
+                            Fluxo Visual da Renda (Gráfico Sankey)
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Mostra de onde vem sua receita no mês e para onde cada real está indo (blocos, aportes e sobra)</p>
+                    </div>
+                    <span id="sankey-resumo-badge" class="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-sage-50 text-forest money-val">Aguardando lançamentos</span>
+                </div>
+                <div id="sankey-chart-container" class="w-full overflow-x-auto"></div>
+            </div>
         </section>
 
         <!-- ==================== ABA 1B: ORÇAMENTO (8 BLOCOS) & LANÇAMENTOS ==================== -->
@@ -2663,6 +2678,8 @@
             document.querySelectorAll('.money-val').forEach(el => el.classList.toggle('privacy-blur', privacyMode));
             const icon = document.getElementById('privacy-icon');
             icon.setAttribute('data-lucide', privacyMode ? 'eye-off' : 'eye');
+            const mesSel = document.getElementById('month-filter')?.value || '';
+            try { renderizarGraficoSankey(transacoes.filter(t => t.data && String(t.data).startsWith(mesSel))); } catch (e) {}
             lucide.createIcons();
         }
 
@@ -4464,6 +4481,7 @@
 
             try { renderizarTabelas(transMes); } catch (e) { console.error('Erro em Tabelas:', e); }
             try { renderizarGraficos(transMes); } catch (e) { console.error('Erro em Gráficos:', e); }
+            try { renderizarGraficoSankey(transMes); } catch (e) { console.error('Erro em Sankey:', e); }
             try { renderizarModuloInvestimentos(totalInvestidoCarteira, totalAplicadoCarteira, totalReserva); } catch (e) { console.error('Erro em Investimentos:', e); }
             try { renderizarModuloReserva(totalReserva, transMes); } catch (e) { console.error('Erro em Reserva:', e); }
             try { renderizarModuloSonhos(); } catch (e) { console.error('Erro em Sonhos:', e); }
@@ -5715,6 +5733,168 @@
                     plugins: { legend: { position: 'right', labels: { boxWidth: 10, color: ctDash.textColor, font: { size: 11 } } } }
                 }
             });
+        }
+
+        function renderizarGraficoSankey(transMes) {
+            const container = document.getElementById('sankey-chart-container');
+            const badge = document.getElementById('sankey-resumo-badge');
+            if (!container) return;
+
+            const mesSelecionado = document.getElementById('month-filter')?.value || new Date().toISOString().slice(0, 7);
+            const entradas = transMes.filter(t => t.tipo === 'entrada');
+            const saidas = transMes.filter(t => t.tipo === 'saida');
+
+            const rendaBase = entradas.filter(t => !isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
+            const rendaExtra = entradas.filter(t => isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
+            const totalEntradas = rendaBase + rendaExtra;
+
+            const { totalInvestidoNoMes } = calcularAportesCombinadosNoMes(mesSelecionado);
+
+            // Agrupar saídas por bloco
+            const coresBloco = {
+                'Investimentos / Reserva': '#1B4332',
+                'Custos fixos': '#354F52',
+                'Conforto': '#52796F',
+                'Metas': '#2D6A4F',
+                'Prazeres': '#D97706',
+                'Conhecimento': '#7C9A82',
+                'Lei de Anha': '#B45309',
+                'Outros gastos': '#C94A4A',
+                'Saldo Livre no Mês': '#10B981'
+            };
+
+            const destinos = [];
+            if (totalInvestidoNoMes > 0) {
+                destinos.push({ nome: 'Investimentos / Reserva', valor: totalInvestidoNoMes, cor: coresBloco['Investimentos / Reserva'] });
+            }
+
+            const mapaBlocos = {};
+            saidas.forEach(s => {
+                const b = identificarBlocoSaida(s);
+                mapaBlocos[b] = (mapaBlocos[b] || 0) + toNum(s.valor);
+            });
+            Object.entries(mapaBlocos)
+                .filter(([, v]) => v > 0)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([nome, valor]) => {
+                    destinos.push({ nome, valor, cor: coresBloco[nome] || '#7C9A82' });
+                });
+
+            const totalDestinosGastoInv = destinos.reduce((a, b) => a + b.valor, 0);
+            const sobraMes = Math.max(0, totalEntradas - totalDestinosGastoInv);
+            if (sobraMes > 0.01) {
+                destinos.push({ nome: 'Saldo Livre no Mês', valor: sobraMes, cor: coresBloco['Saldo Livre no Mês'] });
+            }
+
+            const fontes = [];
+            if (rendaBase > 0) fontes.push({ nome: 'Renda Base', valor: rendaBase, cor: darkMode ? '#34D399' : '#1B4332' });
+            if (rendaExtra > 0) fontes.push({ nome: 'Renda Extra (50/50)', valor: rendaExtra, cor: '#059669' });
+
+            const totalFluxo = Math.max(totalEntradas, totalDestinosGastoInv);
+            if (totalFluxo <= 0 || destinos.length === 0) {
+                if (badge) badge.innerText = 'Sem fluxo no mês';
+                container.innerHTML = `<div class="py-8 text-center text-xs text-slate-400">Lance uma entrada ou saída neste mês para visualizar o fluxo Sankey da sua renda.</div>`;
+                return;
+            }
+
+            if (fontes.length === 0) {
+                fontes.push({ nome: 'Caixa / Saldo Anterior', valor: totalDestinosGastoInv, cor: '#64748B' });
+            } else if (totalDestinosGastoInv > totalEntradas) {
+                fontes.push({ nome: 'Uso de Saldo Anterior', valor: totalDestinosGastoInv - totalEntradas, cor: '#C94A4A' });
+            }
+
+            if (badge) {
+                badge.innerText = `Fluxo Total: ${formatBRL(totalFluxo)}`;
+            }
+
+            const W = 720;
+            const padY = 18;
+            const nodeW = 14;
+            const leftX = 165;
+            const rightX = 515;
+            const gap = 10;
+            const minNodeH = 16;
+
+            const calcNodes = (lista) => {
+                const n = lista.length;
+                const availH = Math.max(210, n * 34);
+                const totalVal = lista.reduce((a, b) => a + b.valor, 0) || 1;
+                const usableH = availH - (n - 1) * gap;
+                let y = padY;
+                const res = lista.map(item => {
+                    const h = Math.max(minNodeH, (item.valor / totalVal) * usableH);
+                    const obj = { ...item, y, h, used: 0 };
+                    y += h + gap;
+                    return obj;
+                });
+                return { nodes: res, totalH: y - gap + padY };
+            };
+
+            const leftLayout = calcNodes(fontes);
+            const rightLayout = calcNodes(destinos);
+            const H = Math.max(leftLayout.totalH, rightLayout.totalH, 220);
+
+            // Centralizar verticalmente o lado menor
+            const offsetLeft = Math.max(0, (H - leftLayout.totalH) / 2);
+            const offsetRight = Math.max(0, (H - rightLayout.totalH) / 2);
+            leftLayout.nodes.forEach(n => { n.y += offsetLeft; });
+            rightLayout.nodes.forEach(n => { n.y += offsetRight; });
+
+            const textPrimary = darkMode ? '#F1F5F9' : '#1E293B';
+            const textSecondary = darkMode ? '#94A3B8' : '#64748B';
+            const totalLeftVal = leftLayout.nodes.reduce((a, b) => a + b.valor, 0) || 1;
+
+            // Gerar fitas (ribbons) suaves entre cada fonte e cada destino proporcionalmente
+            let ribbonsSVG = '';
+            leftLayout.nodes.forEach(src => {
+                const shareSrc = src.valor / totalLeftVal;
+                rightLayout.nodes.forEach(dst => {
+                    const flowVal = dst.valor * shareSrc;
+                    const srcH = (flowVal / (src.valor || 1)) * src.h;
+                    const dstH = (flowVal / (dst.valor || 1)) * dst.h;
+                    const y0Top = src.y + src.used;
+                    const y0Bot = y0Top + srcH;
+                    const y1Top = dst.y + dst.used;
+                    const y1Bot = y1Top + dstH;
+                    src.used += srcH;
+                    dst.used += dstH;
+
+                    const x0 = leftX + nodeW;
+                    const x1 = rightX;
+                    const cx = (x0 + x1) / 2;
+                    const dPath = `M ${x0} ${y0Top} C ${cx} ${y0Top}, ${cx} ${y1Top}, ${x1} ${y1Top} L ${x1} ${y1Bot} C ${cx} ${y1Bot}, ${cx} ${y0Bot}, ${x0} ${y0Bot} Z`;
+                    ribbonsSVG += `<path d="${dPath}" fill="${dst.cor}" fill-opacity="0.28" class="hover:fill-opacity-55 transition-all"><title>${src.nome} → ${dst.nome}: ${formatBRL(flowVal)}</title></path>`;
+                });
+            });
+
+            const leftNodesSVG = leftLayout.nodes.map(n => {
+                const cy = n.y + n.h / 2;
+                const valTxt = privacyMode ? '••••' : formatBRL(n.valor);
+                return `
+                    <rect x="${leftX}" y="${n.y}" width="${nodeW}" height="${n.h}" rx="4" fill="${n.cor}"></rect>
+                    <text x="${leftX - 8}" y="${cy - 3}" text-anchor="end" font-size="11" font-weight="700" fill="${textPrimary}">${n.nome}</text>
+                    <text x="${leftX - 8}" y="${cy + 11}" text-anchor="end" font-size="10" font-weight="600" fill="${textSecondary}">${valTxt}</text>
+                `;
+            }).join('');
+
+            const rightNodesSVG = rightLayout.nodes.map(n => {
+                const cy = n.y + n.h / 2;
+                const perc = Math.round((n.valor / totalFluxo) * 100);
+                const valTxt = privacyMode ? '••••' : `${formatBRL(n.valor)} (${perc}%)`;
+                return `
+                    <rect x="${rightX}" y="${n.y}" width="${nodeW}" height="${n.h}" rx="4" fill="${n.cor}"></rect>
+                    <text x="${rightX + nodeW + 8}" y="${cy - 3}" text-anchor="start" font-size="11" font-weight="700" fill="${textPrimary}">${n.nome}</text>
+                    <text x="${rightX + nodeW + 8}" y="${cy + 11}" text-anchor="start" font-size="10" font-weight="600" fill="${textSecondary}">${valTxt}</text>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto min-w-[560px]" role="img" aria-label="Gráfico Sankey de fluxo de renda e despesas">
+                    ${ribbonsSVG}
+                    ${leftNodesSVG}
+                    ${rightNodesSVG}
+                </svg>
+            `;
         }
 
         async function salvarPlanejamento(e) {

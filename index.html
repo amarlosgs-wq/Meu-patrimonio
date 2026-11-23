@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#1B4332">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Meu Patrimônio">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Meu Patrim%C3%B4nio","short_name":"Patrim%C3%B4nio","start_url":"./","display":"standalone","background_color":"#F4F6F5","theme_color":"#1B4332","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%3E%3Crect width=%27192%27 height=%27192%27 rx=%2742%27 fill=%27%231B4332%27/%3E%3Ctext x=%2796%27 y=%27128%27 font-family=%27sans-serif%27 font-size=%27104%27 font-weight=%27800%27 fill=%27white%27 text-anchor=%27middle%27%3EM%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
     <title>Meu Patrimônio — Gestão Financeira & Comportamental</title>
     
     <!-- Google Fonts: Plus Jakarta Sans -->
@@ -14,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -44,11 +46,11 @@
     </script>
 
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
 
     <style>
         body { background-color: #F4F6F5; color: #1E293B; -webkit-tap-highlight-color: transparent; }
@@ -71,65 +73,74 @@
         .thermometer-bulb { animation: mercury-glow 2.5s infinite ease-in-out; }
         .thermo-pointer { transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
         .thermo-mercury { transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
-        /* MODO ESCURO (DARK MODE PALETA VERDE-FLORESTA) */
-        body.dark-mode { background-color: #0B1612; color: #E2E8F0; }
+        /* VARIÁVEIS SEMÂNTICAS (CLARO / MODO ESCURO VERDE-FLORESTA) */
+        :root {
+            --mp-bg: #F4F6F5;
+            --mp-surface: #FFFFFF;
+            --mp-surface-glass: rgba(255, 255, 255, 0.92);
+            --mp-surface-2: #F8FAFC;
+            --mp-surface-sage: #F2F6F3;
+            --mp-surface-emerald: #ECFDF5;
+            --mp-surface-amber: #FFFBEB;
+            --mp-surface-red: #FEF2F2;
+            --mp-border: #E2E8F0;
+            --mp-text: #1E293B;
+            --mp-text-2: #475569;
+            --mp-text-muted: #64748B;
+            --mp-accent: #1B4332;
+            --mp-input-bg: #F8FAFC;
+        }
+        body.dark-mode {
+            --mp-bg: #0B1612;
+            --mp-surface: #12221B;
+            --mp-surface-glass: rgba(18, 34, 27, 0.94);
+            --mp-surface-2: #182C23;
+            --mp-surface-sage: #193328;
+            --mp-surface-emerald: #163829;
+            --mp-surface-amber: #2D2310;
+            --mp-surface-red: #311518;
+            --mp-border: #1F382D;
+            --mp-text: #F1F5F9;
+            --mp-text-2: #CBD5E1;
+            --mp-text-muted: #94A3B8;
+            --mp-accent: #6EE7B7;
+            --mp-input-bg: #0E1B15;
+            background-color: var(--mp-bg);
+            color: var(--mp-text);
+        }
         body.dark-mode aside,
         body.dark-mode nav.md\:hidden,
-        body.dark-mode .bg-white { background-color: #12221B !important; color: #E2E8F0; border-color: #1F382D !important; }
+        body.dark-mode .bg-white { background-color: var(--mp-surface); color: var(--mp-text); border-color: var(--mp-border); }
         body.dark-mode .bg-white\/90,
-        body.dark-mode .bg-white\/80 { background-color: rgba(18, 34, 27, 0.92) !important; color: #E2E8F0; border-color: #1F382D !important; }
+        body.dark-mode .bg-white\/80 { background-color: var(--mp-surface-glass); color: var(--mp-text); border-color: var(--mp-border); }
         body.dark-mode .bg-slate-50,
         body.dark-mode .bg-slate-50\/70,
-        body.dark-mode .bg-slate-100 { background-color: #182C23 !important; color: #CBD5E1; border-color: #244034 !important; }
-        body.dark-mode .bg-sage-50,
-        body.dark-mode .bg-sage-50\/50,
-        body.dark-mode .bg-sage-50\/60,
-        body.dark-mode .bg-sage-50\/70,
-        body.dark-mode .bg-sage-50\/80,
-        body.dark-mode .bg-sage-100,
-        body.dark-mode .bg-sage-100\/70 { background-color: #193328 !important; color: #D1FAE5 !important; border-color: #284E3D !important; }
-        body.dark-mode .bg-emerald-50,
-        body.dark-mode .bg-emerald-50\/40,
-        body.dark-mode .bg-emerald-50\/50,
-        body.dark-mode .bg-emerald-50\/70,
-        body.dark-mode .bg-emerald-50\/80,
-        body.dark-mode .bg-emerald-50\/90,
-        body.dark-mode .bg-emerald-100,
-        body.dark-mode .bg-emerald-100\/70,
-        body.dark-mode .bg-emerald-100\/80 { background-color: #163829 !important; color: #A7F3D0 !important; border-color: #235740 !important; }
-        body.dark-mode .bg-amber-50,
-        body.dark-mode .bg-amber-50\/60,
-        body.dark-mode .bg-amber-100,
-        body.dark-mode .bg-amber-100\/80 { background-color: #2D2310 !important; color: #FDE68A !important; border-color: #5C4518 !important; }
-        body.dark-mode .bg-red-50,
-        body.dark-mode .bg-red-50\/50,
-        body.dark-mode .bg-red-100 { background-color: #311518 !important; color: #FECACA !important; border-color: #63262B !important; }
+        body.dark-mode .bg-slate-50\/90,
+        body.dark-mode .bg-slate-100 { background-color: var(--mp-surface-2); color: var(--mp-text-2); border-color: var(--mp-border); }
+        body.dark-mode [class*="bg-sage-"] { background-color: var(--mp-surface-sage); color: #D1FAE5; border-color: #284E3D; }
+        body.dark-mode [class*="bg-emerald-"] { background-color: var(--mp-surface-emerald); color: #A7F3D0; border-color: #235740; }
+        body.dark-mode [class*="bg-amber-"] { background-color: var(--mp-surface-amber); color: #FDE68A; border-color: #5C4518; }
+        body.dark-mode [class*="bg-red-"] { background-color: var(--mp-surface-red); color: #FECACA; border-color: #63262B; }
         body.dark-mode .text-slate-800,
-        body.dark-mode .text-slate-900 { color: #F1F5F9 !important; }
+        body.dark-mode .text-slate-900 { color: var(--mp-text); }
         body.dark-mode .text-slate-700,
-        body.dark-mode .text-slate-600 { color: #CBD5E1 !important; }
+        body.dark-mode .text-slate-600 { color: var(--mp-text-2); }
         body.dark-mode .text-slate-500,
-        body.dark-mode .text-slate-400 { color: #94A3B8 !important; }
+        body.dark-mode .text-slate-400 { color: var(--mp-text-muted); }
         body.dark-mode .text-forest,
         body.dark-mode .text-emerald-700,
-        body.dark-mode .text-emerald-800 { color: #6EE7B7 !important; }
+        body.dark-mode .text-emerald-800 { color: var(--mp-accent); }
         body.dark-mode .text-amber-800,
         body.dark-mode .text-amber-900,
-        body.dark-mode .text-amber-950 { color: #FCD34D !important; }
-        body.dark-mode .border-slate-100,
-        body.dark-mode .border-slate-200,
-        body.dark-mode .border-slate-200\/70,
-        body.dark-mode .border-slate-200\/80,
-        body.dark-mode .border-slate-200\/90,
-        body.dark-mode .border-sage-100,
-        body.dark-mode .border-sage-200,
-        body.dark-mode .border-sage-200\/80,
-        body.dark-mode .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #1F382D !important; }
+        body.dark-mode .text-amber-950 { color: #FCD34D; }
+        body.dark-mode [class*="border-slate-"],
+        body.dark-mode [class*="border-sage-"],
+        body.dark-mode .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--mp-border); }
         body.dark-mode input,
-        body.dark-mode select { background-color: #0E1B15 !important; color: #F1F5F9 !important; border-color: #284E3D !important; }
-        body.dark-mode .nav-active { background-color: #1E3F30 !important; color: #6EE7B7 !important; }
-        body.dark-mode .mobile-nav-active { color: #6EE7B7 !important; }
-        body.dark-mode #spending-thermometer-card { background: linear-gradient(135deg, #12221B 0%, #172B22 100%) !important; }
+        body.dark-mode select { background-color: var(--mp-input-bg); color: var(--mp-text); border-color: #284E3D; }
+        body.dark-mode .nav-active { background-color: #1E3F30; color: var(--mp-accent); }
+        body.dark-mode .mobile-nav-active { color: var(--mp-accent); }
+        body.dark-mode #spending-thermometer-card { background: linear-gradient(135deg, #12221B 0%, #172B22 100%); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
@@ -183,7 +194,7 @@
             </div>
             <button onclick="switchTab('carreira')" data-tab="carreira" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-left text-forest bg-sage-50/70 hover:bg-sage-100 transition font-semibold">
                 <i data-lucide="stethoscope" class="w-4 h-4 text-forest shrink-0"></i>
-                <span class="truncate">Virada Médica 2029</span>
+                <span class="truncate">Projeções &amp; Futuro</span>
             </button>
         </nav>
 
@@ -225,6 +236,7 @@
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
+                <button onclick="instalarPWA()" id="btn-install-pwa" title="Instalar Meu Patrimônio como aplicativo" class="hidden px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-forest text-xs font-bold hover:bg-emerald-100 transition items-center gap-1.5"><i data-lucide="smartphone" class="w-4 h-4"></i><span class="hidden sm:inline">Instalar App</span></button>
                 <button onclick="toggleDarkMode()" id="btn-dark-mode" title="Alternar Modo Escuro / Claro" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
                     <i data-lucide="moon" id="dark-mode-icon" class="w-4 h-4"></i>
                 </button>
@@ -266,11 +278,17 @@
                             <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i>
                             <span>Saldo Disponível em Conta (Giro Livre)</span>
                         </div>
-                        <p class="text-3xl md:text-4xl font-extrabold tracking-tight money-val text-emerald-300" id="ind-saldo">R$ 0,00</p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <p class="text-3xl md:text-4xl font-extrabold tracking-tight money-val text-emerald-300" id="ind-saldo">R$ 0,00</p>
+                            <button type="button" onclick="conciliarSaldoPrompt()" title="Ajustar diferença de centavos com o extrato real do seu banco" class="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[11px] font-bold text-sage-100 transition flex items-center gap-1">
+                                <i data-lucide="scale" class="w-3.5 h-3.5"></i> Conciliar
+                            </button>
+                        </div>
                         <p class="text-[11px] text-sage-200 mt-1 font-medium" id="ind-cota-diaria">
                             Cota diária segura: calculando...
                         </p>
                         <p class="hidden text-[11px] text-amber-200 mt-1 font-semibold" id="ind-saldo-projetado"></p>
+                        <div id="contas-saldos-strip" class="flex flex-wrap items-center gap-1.5 mt-3"></div>
                     </div>
 
                     <!-- Bloco do Patrimônio Total com Olhinho Próprio (Oculto por padrão) -->
@@ -363,20 +381,20 @@
                 </div>
             </div>
 
-            <!-- GRÁFICO SANKEY: FLUXO VISUAL DA RENDA NO MÊS -->
-            <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
+            <!-- GRÁFICO SANKEY RECOLHÍVEL (RELATÓRIO VISUAL SOB DEMANDA) -->
+            <details class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-slate-100 group">
+                <summary class="flex flex-wrap items-center justify-between gap-2 cursor-pointer list-none select-none">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <i data-lucide="git-branch" class="w-4 h-4 text-forest"></i>
-                            Fluxo Visual da Renda (Gráfico Sankey)
+                            Ver Fluxo Visual da Renda (Gráfico Sankey)
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Mostra de onde vem sua receita no mês e para onde cada real está indo (blocos, aportes e sobra)</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Clique para expandir de onde vem cada real e para quais blocos ele está indo</p>
                     </div>
                     <span id="sankey-resumo-badge" class="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-sage-50 text-forest money-val">Aguardando lançamentos</span>
-                </div>
-                <div id="sankey-chart-container" class="w-full overflow-x-auto"></div>
-            </div>
+                </summary>
+                <div id="sankey-chart-container" class="w-full overflow-x-auto mt-4 pt-4 border-t border-slate-100"></div>
+            </details>
         </section>
 
         <!-- ==================== ABA 1B: ORÇAMENTO (8 BLOCOS) & LANÇAMENTOS ==================== -->
@@ -593,6 +611,21 @@
 
 
 
+            <!-- TENDÊNCIA DOS 8 BLOCOS: MÊS ATUAL VS. MÉDIA RECENTE (3–6 MESES) -->
+            <details class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-slate-100">
+                <summary class="flex flex-wrap items-center justify-between gap-2 cursor-pointer list-none select-none">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i data-lucide="activity" class="w-4 h-4 text-forest"></i>
+                            Tendência dos Blocos (Mês Atual vs. Média dos Últimos Meses)
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Identifique cedo se algum bloco está sofrendo "inflação de estilo de vida"</p>
+                    </div>
+                    <span id="tendencia-blocos-badge" class="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-sage-50 text-forest">Comparativo 3–6m</span>
+                </summary>
+                <div id="tendencia-blocos-container" class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+            </details>
+
             <!-- MOVIMENTAÇÕES DO MÊS (COM FILTRO E EXPORTAÇÃO CSV) -->
             <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -618,6 +651,9 @@
                             <option value="Lei de Anha">Lei de Anha</option>
                             <option value="Outros gastos">Outros gastos</option>
                         </select>
+                        <button onclick="abrirModalImportarCSV()" title="Importar extrato ou fatura CSV do banco (Nubank, Inter, Itaú...)" class="bg-emerald-50 hover:bg-emerald-100 text-forest border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                            <i data-lucide="file-up" class="w-3.5 h-3.5"></i> Importar CSV
+                        </button>
                         <button onclick="exportarLancamentosCSV()" title="Exportar lançamentos do mês para planilha CSV" class="bg-sage-50 hover:bg-sage-100 text-forest text-xs font-semibold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
                             <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar CSV
                         </button>
@@ -704,6 +740,10 @@
                             </div>
                         </div>
 
+                        <div class="mb-2">
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Conta de Destino</label>
+                            <select id="ent-conta" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-700"></select>
+                        </div>
                         <button type="submit" id="btn-submit-entrada" class="w-full hero-gradient hover:opacity-95 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
                             Salvar Entrada
                         </button>
@@ -711,39 +751,11 @@
                 </div>
 
                 <div class="lg:col-span-2 space-y-6">
-                    <!-- SIMULADOR: QUANTO VALE ESTE PLANTÃO / RENDA EXTRA NO FUTURO? (REGRA 50/50) -->
-                    <div class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-sage-200 space-y-4">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <div>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-forest">Regra 50/50 • Efeito Juros Compostos</span>
-                                <h3 class="font-extrabold text-slate-800 text-base mt-1">Simulador: Quanto Vale Este Plantão no Futuro?</h3>
-                                <p class="text-xs text-slate-500">Veja como cada plantão ou renda extra se divide hoje (50% Lazer Livre / 50% Investido) e quanto a metade investida cresce em 5 e 10 anos</p>
-                            </div>
-                            <button type="button" onclick="preencherPlantaoSimuladoNoForm()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold hero-gradient text-white shadow-xs hover:opacity-95 transition flex items-center gap-1.5 shrink-0">
-                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Lançar Plantão na Conta
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/70">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Valor de 1 Plantão / Extra (R$)</label>
-                                <input type="number" id="sim-plantao-unit" value="1200" min="50" step="50" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-extrabold text-forest mt-1">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Qtd. de Plantões Extras no Mês</label>
-                                <input type="number" id="sim-plantao-qtd" value="2" min="1" max="30" step="1" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-extrabold text-slate-800 mt-1">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Rentabilidade Anual (% a.a.)</label>
-                                <input type="number" id="sim-plantao-taxa" value="13" min="1" max="30" step="0.5" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-emerald-50 border border-emerald-300 rounded-xl px-3 py-1.5 text-sm font-extrabold text-forest mt-1">
-                            </div>
-                        </div>
-
-                        <div id="sim-plantao-resultados" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
-                    </div>
-
                     <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
-                        <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Entradas do Mês</h3>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <h3 class="font-bold text-slate-800 text-base">Histórico de Entradas do Mês</h3>
+                            <button type="button" onclick="switchTab('carreira')" class="text-xs font-bold text-forest bg-sage-50 hover:bg-sage-100 px-3 py-1.5 rounded-xl transition">Simular plantão em 10 anos →</button>
+                        </div>
                     <div id="lista-entradas-mobile" class="md:hidden space-y-2.5"></div>
                     <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -911,14 +923,22 @@
                             </div>
                         </div>
 
+                        <div class="mb-2">
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Conta de Saída</label>
+                            <select id="sai-conta" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-700"></select>
+                        </div>
                         <button type="submit" id="btn-submit-saida" class="w-full bg-crimson hover:bg-red-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
                             Salvar Saída
                         </button>
                     </form>
                 </div>
 
-                <div class="lg:col-span-2 bg-white rounded-3xl p-6 card-shadow border border-slate-100">
-                    <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Despesas do Mês</h3>
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- GESTÃO REAL DE FATURA DO CARTÃO DE CRÉDITO (ONDA 3) -->
+                    <div id="fatura-cartao-card" class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-slate-100"></div>
+
+                    <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
+                        <h3 class="font-bold text-slate-800 text-base mb-4">Histórico de Despesas do Mês</h3>
                     <div id="lista-saidas-mobile" class="md:hidden space-y-2.5"></div>
                     <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -934,6 +954,7 @@
                             </thead>
                             <tbody id="lista-saidas-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1137,6 +1158,9 @@
                             <p id="no-inv-msg" class="hidden text-xs text-slate-400 absolute">Cadastre seu primeiro investimento ao lado.</p>
                         </div>
                     </div>
+
+                    <!-- REBALANCEADOR INTELIGENTE DE CARTEIRA (ALVO VS. ATUAL) -->
+                    <div id="rebalanceador-carteira-card" class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-slate-100 space-y-3"></div>
 
                     <div class="bg-white rounded-3xl p-6 card-shadow border border-slate-100">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -1539,6 +1563,37 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="sim-carreira-passiva-cards"></div>
                     </div>
+
+<!-- SIMULADOR: QUANTO VALE ESTE PLANTÃO / RENDA EXTRA NO FUTURO? (REGRA 50/50) -->
+                    <div class="bg-white rounded-3xl p-5 md:p-6 card-shadow border border-sage-200 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-forest">Regra 50/50 • Efeito Juros Compostos</span>
+                                <h3 class="font-extrabold text-slate-800 text-base mt-1">Simulador: Quanto Vale Este Plantão no Futuro?</h3>
+                                <p class="text-xs text-slate-500">Veja como cada plantão ou renda extra se divide hoje (50% Lazer Livre / 50% Investido) e quanto a metade investida cresce em 5 e 10 anos</p>
+                            </div>
+                            <button type="button" onclick="preencherPlantaoSimuladoNoForm()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold hero-gradient text-white shadow-xs hover:opacity-95 transition flex items-center gap-1.5 shrink-0">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> Lançar Plantão na Conta
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/70">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Valor de 1 Plantão / Extra (R$)</label>
+                                <input type="number" id="sim-plantao-unit" value="1200" min="50" step="50" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-extrabold text-forest mt-1">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Qtd. de Plantões Extras no Mês</label>
+                                <input type="number" id="sim-plantao-qtd" value="2" min="1" max="30" step="1" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-sm font-extrabold text-slate-800 mt-1">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Rentabilidade Anual (% a.a.)</label>
+                                <input type="number" id="sim-plantao-taxa" value="13" min="1" max="30" step="0.5" oninput="calcularSimuladorPlantaoFuturo()" class="w-full bg-emerald-50 border border-emerald-300 rounded-xl px-3 py-1.5 text-sm font-extrabold text-forest mt-1">
+                            </div>
+                        </div>
+
+                        <div id="sim-plantao-resultados" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1576,7 +1631,7 @@
                 <button onclick="closeModal('modal-mobile-more'); switchTab('saidas')" class="p-3 rounded-2xl bg-red-50/70 border border-red-200 text-crimson flex items-center gap-2"><i data-lucide="arrow-down-circle" class="w-4 h-4 shrink-0"></i> Saídas</button>
                 <button onclick="closeModal('modal-mobile-more'); switchTab('reserva')" class="p-3 rounded-2xl bg-sage-50 border border-sage-200 text-forest flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 shrink-0"></i> Reserva Emerg.</button>
                 <button onclick="closeModal('modal-mobile-more'); switchTab('sonhos')" class="p-3 rounded-2xl bg-sage-50 border border-sage-200 text-forest flex items-center gap-2"><i data-lucide="target" class="w-4 h-4 shrink-0"></i> Sonhos &amp; Metas</button>
-                <button onclick="closeModal('modal-mobile-more'); switchTab('carreira')" class="col-span-2 p-3 rounded-2xl hero-gradient text-white flex items-center justify-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4 shrink-0"></i> Virada Médica 2029 &amp; 40+</button>
+                <button onclick="closeModal('modal-mobile-more'); switchTab('carreira')" class="col-span-2 p-3 rounded-2xl hero-gradient text-white flex items-center justify-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4 shrink-0"></i> Projeções &amp; Futuro (2029 / 40+)</button>
             </div>
             <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
                 <button onclick="closeModal('modal-mobile-more'); abrirModalViradaMes()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2"><i data-lucide="calendar-sync" class="w-4 h-4 text-forest shrink-0"></i> Virada de Mês</button>
@@ -1605,6 +1660,10 @@
                 </button>
                 <button onclick="closeModal('modal-config-hub'); abrirModalViradaMes()" class="w-full p-3 rounded-2xl bg-slate-50 hover:bg-sage-50 text-slate-700 flex items-center justify-between transition">
                     <span class="flex items-center gap-2.5"><i data-lucide="calendar-sync" class="w-4 h-4 text-forest"></i> Virada de Mês &amp; Varrer Sobra</span>
+                    <span>→</span>
+                </button>
+                <button onclick="closeModal('modal-config-hub'); abrirModalImportarCSV()" class="w-full p-3 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100 text-forest flex items-center justify-between transition border border-emerald-200/70">
+                    <span class="flex items-center gap-2.5"><i data-lucide="file-up" class="w-4 h-4"></i> Importar Extrato / Fatura (.csv)</span>
                     <span>→</span>
                 </button>
                 <button onclick="closeModal('modal-config-hub'); abrirModalBackup(false)" class="w-full p-3 rounded-2xl bg-slate-50 hover:bg-sage-50 text-slate-700 flex items-center justify-between transition">
@@ -1722,11 +1781,14 @@
         </div>
     </div>
 
-    <!-- MODAL: CONFIGURAÇÃO SUPABASE -->
+    <!-- MODAL: CONFIGURAÇÃO SUPABASE (CONEXÃO + MAGIC LINK + SQL ONDA 2) -->
     <div id="modal-db" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 max-h-[90vh] overflow-y-auto shadow-xl">
             <div class="flex justify-between items-center">
-                <h3 class="font-bold text-slate-800">Conexão Supabase</h3>
+                <div class="flex items-center gap-2 text-forest font-bold">
+                    <i data-lucide="database" class="w-5 h-5"></i>
+                    <h3>Conexão &amp; Segurança Supabase</h3>
+                </div>
                 <button onclick="closeModal('modal-db')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="space-y-3">
@@ -1740,31 +1802,150 @@
                 </div>
                 <button onclick="conectarSupabase()" class="w-full hero-gradient text-white font-semibold py-2.5 rounded-xl text-sm">Conectar e Sincronizar</button>
             </div>
+
+            <!-- AUTENTICAÇÃO PRIVADA (MAGIC LINK + RLS) -->
+            <div id="sb-auth-panel" class="pt-4 border-t border-slate-100 space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-extrabold text-forest uppercase tracking-wider flex items-center gap-1.5">
+                        <i data-lucide="lock" class="w-3.5 h-3.5"></i> Acesso Privado (Magic Link + RLS)
+                    </span>
+                    <span id="sb-auth-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Sem login</span>
+                </div>
+                <div id="sb-auth-logged-out" class="space-y-2">
+                    <p class="text-[11px] text-slate-500 leading-relaxed">
+                        Proteja seus dados no GitHub Pages: após rodar o SQL abaixo, entre com seu e-mail para receber um link de acesso único (sem senha).
+                    </p>
+                    <div class="flex gap-2">
+                        <input type="email" id="sb-auth-email" placeholder="seu@email.com" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                        <button type="button" onclick="enviarMagicLinkSupabase()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-sage-100 hover:bg-sage-200 text-forest transition whitespace-nowrap">Enviar Link</button>
+                    </div>
+                </div>
+                <div id="sb-auth-logged-in" class="hidden p-3 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <span class="text-[10px] font-bold uppercase text-forest block">Sessão Privada Ativa</span>
+                        <strong id="sb-auth-user-email" class="text-xs text-slate-800 truncate block"></strong>
+                    </div>
+                    <button type="button" onclick="sairSupabaseAuth()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-red-200 text-crimson hover:bg-red-50 transition shrink-0">Sair</button>
+                </div>
+            </div>
+
+            <!-- SCRIPT SQL DE MIGRAÇÃO ONDA 2 -->
+            <details class="pt-3 border-t border-slate-100 text-xs">
+                <summary class="font-bold text-slate-700 cursor-pointer hover:text-forest select-none">
+                    Script SQL de Migração — Onda 2 (Sincronização Total + RLS)
+                </summary>
+                <div class="mt-2.5 space-y-2">
+                    <p class="text-[11px] text-slate-500">
+                        Cole e execute no <strong>SQL Editor</strong> do seu painel Supabase. É seguro rodar mais de uma vez (idempotente) e mantém seus lançamentos antigos acessíveis após o login.
+                    </p>
+                    <pre id="sb-sql-onda2" class="bg-slate-900 text-emerald-200 p-3 rounded-xl text-[10px] overflow-x-auto leading-relaxed font-mono">-- 1. Colunas de sincronizacao total (Onda 2)
+ALTER TABLE transacoes ADD COLUMN IF NOT EXISTS bloco_orcamento text;
+ALTER TABLE transacoes ADD COLUMN IF NOT EXISTS status_pagamento text DEFAULT 'pago';
+ALTER TABLE reserva_movimentacoes ADD COLUMN IF NOT EXISTS afeta_caixa boolean DEFAULT true;
+ALTER TABLE configuracoes ADD COLUMN IF NOT EXISTS extras_config jsonb DEFAULT '{}'::jsonb;
+
+-- 2. Coluna user_id + RLS privado por usuario autenticado
+ALTER TABLE transacoes ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT auth.uid();
+ALTER TABLE categorias ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT auth.uid();
+ALTER TABLE configuracoes ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT auth.uid();
+ALTER TABLE investimentos ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT auth.uid();
+ALTER TABLE reserva_movimentacoes ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT auth.uid();
+ALTER TABLE sonhos ADD COLUMN IF NOT EXISTS user_id uuid DEFAULT auth.uid();
+
+DO $$
+DECLARE tbl text;
+BEGIN
+  FOREACH tbl IN ARRAY ARRAY['transacoes','categorias','configuracoes','investimentos','reserva_movimentacoes','sonhos']
+  LOOP
+    EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY;', tbl);
+    EXECUTE format('DROP POLICY IF EXISTS "mp_owner_access" ON %I;', tbl);
+    EXECUTE format(
+      'CREATE POLICY "mp_owner_access" ON %I FOR ALL USING (auth.uid() IS NOT NULL AND (user_id = auth.uid() OR user_id IS NULL)) WITH CHECK (auth.uid() IS NOT NULL AND (user_id = auth.uid() OR user_id IS NULL));',
+      tbl
+    );
+  END LOOP;
+END $$;</pre>
+                    <button type="button" onclick="copiarSqlMigracaoOnda2()" class="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Script SQL
+                    </button>
+                </div>
+            </details>
         </div>
     </div>
 
-    <!-- MODAL RÁPIDO: + NOVA MOVIMENTAÇÃO -->
+    <!-- MODAL RÁPIDO: LANÇAMENTO EXPRESSO (3 CAMPOS) + ATALHOS -->
     <div id="modal-quick-choice" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 text-center">
-            <h3 class="font-bold text-slate-800">Qual lançamento deseja fazer?</h3>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="irParaFormulario('entradas')" class="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 flex flex-col items-center gap-2 text-forest font-semibold text-sm">
-                    <i data-lucide="arrow-up-circle" class="w-6 h-6"></i> Entrada
-                </button>
-                <button onclick="irParaFormulario('saidas')" class="p-4 rounded-2xl border border-red-200 bg-red-50/50 hover:bg-red-50 flex flex-col items-center gap-2 text-crimson font-semibold text-sm">
-                    <i data-lucide="arrow-down-circle" class="w-6 h-6"></i> Saída
-                </button>
-                <button onclick="irParaFormulario('investimentos')" class="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-sage-50 flex flex-col items-center gap-2 text-slate-700 font-semibold text-sm">
-                    <i data-lucide="trending-up" class="w-6 h-6 text-forest"></i> Investimento
-                </button>
-                <button onclick="irParaFormulario('reserva')" class="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-sage-50 flex flex-col items-center gap-2 text-slate-700 font-semibold text-sm">
-                    <i data-lucide="shield-check" class="w-6 h-6 text-forest"></i> Reserva
-                </button>
-                <button onclick="irParaFormulario('sonhos')" class="col-span-2 p-3 rounded-2xl border border-sage-200 bg-sage-50/70 hover:bg-sage-100 flex items-center justify-center gap-2 text-forest font-semibold text-sm">
-                    <i data-lucide="target" class="w-5 h-5 text-forest"></i> Novo Sonho / Meta
-                </button>
+        <div class="bg-white rounded-3xl p-5 md:p-6 max-w-md w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-forest"></i> Lançamento Expresso
+                </h3>
+                <button type="button" onclick="closeModal('modal-quick-choice')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <button onclick="closeModal('modal-quick-choice')" class="text-xs text-slate-400 hover:text-slate-600">Cancelar</button>
+
+            <form id="form-saida-expressa" onsubmit="salvarSaidaExpressa(event)" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5 text-left">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Valor (R$)</label>
+                        <input type="number" step="0.01" min="0.01" id="exp-valor" required placeholder="0,00" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-extrabold text-crimson">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Pagamento</label>
+                        <select id="exp-pagamento" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700">
+                            <option value="Pix">Pix (À vista)</option>
+                            <option value="Cartão de Crédito">Cartão (Fatura)</option>
+                            <option value="Cartão de Débito">Débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Descrição</label>
+                    <input type="text" id="exp-descricao" required oninput="autoClassificarExpresso()" placeholder="Ex: Café, Mercado, Uber..." class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Conta</label>
+                        <select id="exp-conta" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700"></select>
+                    </div>
+                    <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Bloco do Orçamento</label>
+                    <select id="exp-bloco" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-forest">
+                        <option value="Custos fixos">2. Custos fixos (40%)</option>
+                        <option value="Conforto">3. Conforto (15%)</option>
+                        <option value="Metas">4. Metas (10%)</option>
+                        <option value="Prazeres">5. Prazeres (10%)</option>
+                        <option value="Conhecimento">6. Conhecimento (5%)</option>
+                        <option value="Lei de Anha">7. Lei de Anha (2%)</option>
+                        <option value="Outros gastos">8. Outros gastos (8%)</option>
+                    </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-2xs">
+                    Registrar Despesa Agora
+                </button>
+            </form>
+
+            <div class="pt-2 border-t border-slate-100 space-y-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block text-center">Ou abrir formulário completo</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button onclick="irParaFormulario('entradas')" class="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 flex items-center justify-center gap-1.5 text-forest font-semibold">
+                        <i data-lucide="arrow-up-circle" class="w-4 h-4"></i> Entrada
+                    </button>
+                    <button onclick="irParaFormulario('saidas')" class="p-2.5 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-50 flex items-center justify-center gap-1.5 text-crimson font-semibold">
+                        <i data-lucide="arrow-down-circle" class="w-4 h-4"></i> Saída Completa
+                    </button>
+                    <button onclick="irParaFormulario('investimentos')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-sage-50 flex items-center justify-center gap-1.5 text-slate-700 font-semibold">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-forest"></i> Investimento
+                    </button>
+                    <button onclick="irParaFormulario('reserva')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-sage-50 flex items-center justify-center gap-1.5 text-slate-700 font-semibold">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-forest"></i> Reserva
+                    </button>
+                    <button onclick="irParaFormulario('sonhos')" class="col-span-2 p-2.5 rounded-xl border border-sage-200 bg-sage-50/70 hover:bg-sage-100 flex items-center justify-center gap-1.5 text-forest font-semibold">
+                        <i data-lucide="target" class="w-4 h-4 text-forest"></i> Novo Sonho / Meta
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1902,6 +2083,63 @@
                 <button type="button" onclick="closeModal('modal-fechamento-mes')" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 transition">Fechar</button>
                 <button type="button" onclick="copiarResumoFechamentoMes()" class="px-4 py-2.5 rounded-xl text-xs font-extrabold text-white hero-gradient flex items-center gap-1.5 shadow-sm hover:opacity-95 transition">
                     <i data-lucide="copy" class="w-4 h-4"></i> Copiar Resumo em Texto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: IMPORTADOR DE EXTRATO / FATURA CSV (NUBANK, INTER, ITAÚ, GENÉRICO) -->
+    <div id="modal-importar-csv" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2 text-forest font-bold">
+                    <i data-lucide="file-up" class="w-5 h-5"></i>
+                    <h3>Importar Extrato ou Fatura Bancária (.csv)</h3>
+                </div>
+                <button type="button" onclick="closeModal('modal-importar-csv')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-500">
+                Compatível com arquivos CSV do <strong>Nubank, Inter, Itaú, C6, Bradesco</strong> ou planilhas com colunas <code>Data, Descrição, Valor</code>. Cada item é pré-classificado automaticamente nos seus 8 blocos.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Arquivo (.csv)</label>
+                    <input type="file" id="csv-file-input" accept=".csv,.txt,text/csv" onchange="processarArquivoCSVImportacao(event)" class="w-full text-[11px] bg-white border border-slate-200 rounded-xl p-1.5">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Origem do Arquivo</label>
+                    <select id="csv-origem-tipo" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-700">
+                        <option value="conta">Extrato de Conta (Pix/Débito • Pago)</option>
+                        <option value="cartao">Fatura de Cartão (Crédito • Pendente)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Conta Vinculada</label>
+                    <select id="csv-conta-select" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700"></select>
+                </div>
+            </div>
+
+            <div id="csv-preview-wrap" class="hidden space-y-3">
+                <div class="flex items-center justify-between text-xs">
+                    <strong id="csv-preview-count" class="text-forest">0 itens encontrados</strong>
+                    <button type="button" onclick="alternarTodosCSV()" class="text-[11px] font-bold text-slate-500 hover:text-forest">Marcar / Desmarcar todos</button>
+                </div>
+                <div class="max-h-64 overflow-y-auto border border-slate-200 rounded-2xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-50 sticky top-0">
+                            <tr class="border-b border-slate-200 text-[10px] uppercase text-slate-400">
+                                <th class="py-2 px-2">OK</th>
+                                <th class="py-2 px-2">Data</th>
+                                <th class="py-2 px-2">Descrição</th>
+                                <th class="py-2 px-2">Bloco</th>
+                                <th class="py-2 px-2 text-right">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csv-preview-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="confirmarImportacaoCSV()" class="w-full hero-gradient text-white font-bold py-3 rounded-xl text-sm shadow-sm hover:opacity-95 transition">
+                    Importar Lançamentos Selecionados
                 </button>
             </div>
         </div>
@@ -2127,9 +2365,12 @@
 
         function isTransacaoPendente(t) {
             if (!t || t.tipo !== 'saida') return false;
+            if (t.status_pagamento === 'pendente' || t.status_pagamento === 'pago') {
+                return t.status_pagamento === 'pendente';
+            }
             const mapa = obterMapaPendentes();
             if (t.id && mapa[String(t.id)] !== undefined) return !!mapa[String(t.id)];
-            return t.status_pagamento === 'pendente';
+            return false;
         }
 
         function definirStatusPagamentoLocal(id, isPendente) {
@@ -2140,28 +2381,839 @@
             safeSetStorage('mp_status_pendentes', JSON.stringify(mapa));
         }
 
-        function alternarStatusPagamento(id) {
+        async function alternarStatusPagamento(id) {
             const item = transacoes.find(t => String(t.id) === String(id));
             if (!item || item.tipo !== 'saida') return;
             const novoPendente = !isTransacaoPendente(item);
+            const novoStatus = novoPendente ? 'pendente' : 'pago';
             definirStatusPagamentoLocal(item.id, novoPendente);
-            item.status_pagamento = novoPendente ? 'pendente' : 'pago';
-            if (!supabaseClient) safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+            item.status_pagamento = novoStatus;
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.from('transacoes').update({ status_pagamento: novoStatus }).eq('id', item.id);
+                } catch (e) {
+                    console.warn('Status salvo localmente (execute o SQL da Onda 2 para sincronizar na nuvem):', e);
+                }
+            } else {
+                safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+            }
             atualizarInterfaceCompleta();
             showToast(novoPendente ? 'Marcado como ⏳ Pendente.' : 'Conta marcada como ✓ Paga!');
         }
 
+        let cartaoConfig = { nome: 'Cartão Principal', diaFechamento: 25, diaVencimento: 5, limite: 3000 };
+        try {
+            const cSalvo = JSON.parse(safeGetStorage('mp_cartao_config', '{}'));
+            if (cSalvo && typeof cSalvo === 'object') cartaoConfig = { ...cartaoConfig, ...cSalvo };
+        } catch (e) {}
+
+        function isCompraCartaoCredito(t) {
+            return !!t && t.tipo === 'saida' && String(t.forma_pagamento || '').toLowerCase().includes('crédito');
+        }
+
+        // Virada automática de fatura quando a compra no crédito ocorre após o dia de fechamento
+        function calcularDataFaturaCartao(dataISO) {
+            if (!dataISO) return { dataFatura: dataISO, virouMes: false, dataOriginalBR: '' };
+            const partes = String(dataISO).slice(0, 10).split('-').map(Number);
+            if (partes.length !== 3) return { dataFatura: dataISO, virouMes: false, dataOriginalBR: '' };
+            const [ano, mes, dia] = partes;
+            const diaFech = Math.min(31, Math.max(1, parseInt(cartaoConfig.diaFechamento, 10) || 25));
+            if (dia > diaFech) {
+                const prox = new Date(ano, mes, 1); // mês seguinte (0-indexed: mes já é +1)
+                const dataFatura = `${prox.getFullYear()}-${String(prox.getMonth() + 1).padStart(2, '0')}-01`;
+                return { dataFatura, virouMes: true, dataOriginalBR: `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}` };
+            }
+            return { dataFatura: dataISO, virouMes: false, dataOriginalBR: '' };
+        }
+
+        // ==================== MÚLTIPLAS CONTAS BANCÁRIAS & TRANSFERÊNCIAS ====================
+        const CONTAS_PADRAO = [
+            { id: 'cta_principal', nome: 'Conta Corrente', tipo: 'Banco', saldoInicial: 0 },
+            { id: 'cta_carteira', nome: 'Dinheiro / Carteira', tipo: 'Dinheiro', saldoInicial: 0 },
+            { id: 'cta_digital', nome: 'Carteira Digital', tipo: 'Digital', saldoInicial: 0 }
+        ];
+        let contasBancarias = [...CONTAS_PADRAO];
+        let mapaContaTransacao = {};
+        let transferenciasContas = [];
+        try {
+            const cs = JSON.parse(safeGetStorage('mp_contas_bancarias', 'null'));
+            if (Array.isArray(cs) && cs.length > 0) contasBancarias = cs;
+            const mct = JSON.parse(safeGetStorage('mp_conta_por_transacao', '{}'));
+            if (mct && typeof mct === 'object') mapaContaTransacao = mct;
+            const trc = JSON.parse(safeGetStorage('mp_transferencias_contas', '[]'));
+            if (Array.isArray(trc)) transferenciasContas = trc;
+        } catch (e) {}
+
+        function popularSelectsContas() {
+            const opts = contasBancarias.map(c => `<option value="${escapeHTML(c.id)}">${escapeHTML(c.nome)}</option>`).join('');
+            ['ent-conta', 'sai-conta', 'exp-conta', 'csv-conta-select'].forEach(elId => {
+                const el = document.getElementById(elId);
+                if (el) {
+                    const atual = el.value;
+                    el.innerHTML = opts;
+                    if (atual && contasBancarias.some(c => c.id === atual)) el.value = atual;
+                }
+            });
+        }
+
+        function registrarContaParaTransacao(txId, contaId) {
+            if (!txId || !contaId) return;
+            mapaContaTransacao[String(txId)] = contaId;
+            safeSetStorage('mp_conta_por_transacao', JSON.stringify(mapaContaTransacao));
+            agendarSyncExtrasNuvem();
+        }
+
+        function renderizarContasStripHero() {
+            const strip = document.getElementById('contas-saldos-strip');
+            if (!strip) return;
+            const idPrincipal = contasBancarias[0]?.id || 'cta_principal';
+            const saldos = {};
+            contasBancarias.forEach(c => { saldos[c.id] = toNum(c.saldoInicial); });
+
+            transacoes.forEach(t => {
+                const cId = (t.id && mapaContaTransacao[String(t.id)]) || idPrincipal;
+                if (saldos[cId] === undefined) saldos[cId] = 0;
+                if (t.tipo === 'entrada') saldos[cId] += toNum(t.valor);
+                else if (t.tipo === 'saida' && !isTransacaoPendente(t)) saldos[cId] -= toNum(t.valor);
+            });
+            reservaMovs.forEach(r => {
+                if (r.tipo === 'aporte' && isReservaAfetaCaixa(r)) {
+                    saldos[idPrincipal] = (saldos[idPrincipal] || 0) - toNum(r.valor);
+                }
+            });
+            transferenciasContas.forEach(tr => {
+                if (saldos[tr.origem] !== undefined) saldos[tr.origem] -= toNum(tr.valor);
+                if (saldos[tr.destino] !== undefined) saldos[tr.destino] += toNum(tr.valor);
+            });
+
+            strip.innerHTML = contasBancarias.map(c => `
+                <span class="px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-[10px] text-sage-100 font-semibold money-val">
+                    ${escapeHTML(c.nome)}: <strong class="text-white">${formatBRL(saldos[c.id] || 0)}</strong>
+                </span>
+            `).join('') + `
+                <button type="button" onclick="transferirEntreContasPrompt()" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] font-bold text-emerald-200 transition">⇄ Transferir</button>
+                <button type="button" onclick="adicionarContaBancariaPrompt()" class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] font-bold text-sage-200 transition">+ Conta</button>
+            `;
+        }
+
+        async function adicionarContaBancariaPrompt() {
+            const resp = await abrirDialogoCustom({
+                titulo: 'Nova Conta / Carteira',
+                mensagem: 'Digite o nome da nova conta (ex: Nubank, Inter, PicPay):',
+                comInput: true,
+                placeholder: 'Ex: Banco Inter',
+                textoConfirmar: 'Adicionar Conta'
+            });
+            if (!resp.confirmado || !resp.valor.trim()) return;
+            contasBancarias.push({ id: 'cta_' + Date.now(), nome: resp.valor.trim(), tipo: 'Banco', saldoInicial: 0 });
+            safeSetStorage('mp_contas_bancarias', JSON.stringify(contasBancarias));
+            agendarSyncExtrasNuvem();
+            popularSelectsContas();
+            renderizarContasStripHero();
+            showToast(`Conta "${resp.valor.trim()}" adicionada!`);
+        }
+
+        async function transferirEntreContasPrompt() {
+            if (contasBancarias.length < 2) return showToast('Cadastre ao menos 2 contas para transferir.', 'alerta');
+            const listaNomes = contasBancarias.map((c, idx) => `${idx + 1}=${c.nome}`).join(' | ');
+            const resp = await abrirDialogoCustom({
+                titulo: 'Transferência Neutra entre Contas',
+                mensagem: `Contas: ${listaNomes}. Digite Origem, Destino, Valor separados por vírgula (ex: 1, 2, 150) — não afeta orçamento nem metas:`,
+                comInput: true,
+                placeholder: '1, 2, 150',
+                textoConfirmar: 'Transferir'
+            });
+            if (!resp.confirmado || !resp.valor) return;
+            const p = resp.valor.split(',').map(x => x.trim());
+            const idxO = parseInt(p[0], 10) - 1;
+            const idxD = parseInt(p[1], 10) - 1;
+            const val = toNum(p[2]);
+            if (!contasBancarias[idxO] || !contasBancarias[idxD] || idxO === idxD || val <= 0) {
+                return showToast('Formato inválido. Use: número origem, número destino, valor (ex: 1, 2, 150).', 'erro');
+            }
+            transferenciasContas.push({
+                id: 'tr_' + Date.now(),
+                origem: contasBancarias[idxO].id,
+                destino: contasBancarias[idxD].id,
+                valor: val,
+                data: new Date().toISOString().slice(0, 10)
+            });
+            safeSetStorage('mp_transferencias_contas', JSON.stringify(transferenciasContas));
+            agendarSyncExtrasNuvem();
+            renderizarContasStripHero();
+            showToast(`Transferido ${formatBRL(val)} de ${contasBancarias[idxO].nome} para ${contasBancarias[idxD].nome}!`);
+        }
+
+        // ==================== AUTO-CLASSIFICAÇÃO DE BLOCO (EXPRESSO + CSV) ====================
+        function inferirBlocoPorTexto(textoRaw) {
+            const desc = String(textoRaw || '').toLowerCase();
+            const mapa = [
+                { termos: ['mercado', 'supermercado', 'atacad', 'padaria', 'açougue', 'acougue', 'feira', 'aluguel', 'condomín', 'energia', 'enel', 'cagece', 'água', 'agua', 'internet', 'vivo', 'claro', 'tim', 'gasolina', 'posto', 'combust', 'ônibus', 'onibus'], bloco: 'Custos fixos' },
+                { termos: ['uber', '99app', '99pop', 'ifood', 'rappi', 'delivery', 'academia', 'smartfit', 'whey', 'proteina', 'proteína', 'suplement', 'netflix', 'spotify', 'amazon prime', 'youtube', 'icloud', 'roupa', 'barbeiro', 'salão'], bloco: 'Conforto' },
+                { termos: ['viagem', 'passagem', 'hotel', 'airbnb', 'notebook', 'computador', 'carro', 'meta'], bloco: 'Metas' },
+                { termos: ['restaurante', 'pizza', 'burger', 'hamburguer', 'bar ', 'cafe', 'café', 'sorvete', 'açaí', 'acai', 'cinema', 'ingresso', 'steam', 'playstation', 'lazer'], bloco: 'Prazeres' },
+                { termos: ['livro', 'amazon livros', 'curso', 'udemy', 'hotmart', 'congresso', 'idioma', 'inglês', 'duolingo', 'apostila', 'faculdade', 'med'], bloco: 'Conhecimento' },
+                { termos: ['anha', 'amra', 'doação', 'doacao', 'dízimo', 'dizimo'], bloco: 'Lei de Anha' },
+                { termos: ['farmacia', 'farmácia', 'drogaria', 'pague menos', 'drogasil', 'remédio', 'remedio', 'consulta', 'exame', 'pet', 'ração', 'racao', 'veterin'], bloco: 'Outros gastos' }
+            ];
+            for (const item of mapa) {
+                if (item.termos.some(t => desc.includes(t))) return item.bloco;
+            }
+            return 'Outros gastos';
+        }
+
+        function autoClassificarExpresso() {
+            const desc = document.getElementById('exp-descricao')?.value || '';
+            if (desc.trim().length < 3) return;
+            const bloco = inferirBlocoPorTexto(desc);
+            const sel = document.getElementById('exp-bloco');
+            if (sel) sel.value = bloco;
+        }
+
+        // ==================== IMPORTADOR DE EXTRATO / FATURA CSV ====================
+        let itensCSVPreview = [];
+
+        function abrirModalImportarCSV() {
+            popularSelectsContas();
+            itensCSVPreview = [];
+            const wrap = document.getElementById('csv-preview-wrap');
+            if (wrap) wrap.classList.add('hidden');
+            const inp = document.getElementById('csv-file-input');
+            if (inp) inp.value = '';
+            openModal('modal-importar-csv');
+            lucide.createIcons();
+        }
+
+        function normalizarDataCSV(raw) {
+            const s = String(raw || '').trim().replace(/"/g, '');
+            if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+            const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+            if (m) {
+                const ano = m[3].length === 2 ? '20' + m[3] : m[3];
+                return `${ano}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+            }
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function normalizarValorCSV(raw) {
+            let s = String(raw || '').trim().replace(/[R$\s"]/g, '');
+            if (s.includes(',') && s.includes('.')) {
+                if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+                else s = s.replace(/,/g, '');
+            } else if (s.includes(',')) {
+                s = s.replace(',', '.');
+            }
+            const n = parseFloat(s);
+            return isFinite(n) ? n : 0;
+        }
+
+        function processarArquivoCSVImportacao(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const texto = String(e.target?.result || '').replace(/^﻿/, '');
+                const linhas = texto.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                if (linhas.length < 2) return showToast('Arquivo CSV vazio ou sem linhas de dados.', 'erro');
+
+                const sep = (linhas[0].split(';').length > linhas[0].split(',').length) ? ';' : ',';
+                const splitLinha = (l) => {
+                    const out = []; let cur = ''; let inQ = false;
+                    for (const ch of l) {
+                        if (ch === '"') inQ = !inQ;
+                        else if (ch === sep && !inQ) { out.push(cur.trim()); cur = ''; }
+                        else cur += ch;
+                    }
+                    out.push(cur.trim());
+                    return out;
+                };
+
+                const header = splitLinha(linhas[0]).map(h => h.toLowerCase());
+                let idxData = header.findIndex(h => h.includes('data') || h.includes('date'));
+                let idxDesc = header.findIndex(h => h.includes('desc') || h.includes('title') || h.includes('hist') || h.includes('estab') || h.includes('lanç') || h.includes('lanc'));
+                let idxVal = header.findIndex(h => h.includes('valor') || h.includes('amount') || h.includes('quantia'));
+                if (idxData < 0) idxData = 0;
+                if (idxDesc < 0) idxDesc = 1;
+                if (idxVal < 0) idxVal = Math.min(2, header.length - 1);
+
+                const origem = document.getElementById('csv-origem-tipo')?.value || 'conta';
+                itensCSVPreview = [];
+                for (let i = 1; i < linhas.length; i++) {
+                    const cols = splitLinha(linhas[i]);
+                    if (cols.length < 2) continue;
+                    const dataISO = normalizarDataCSV(cols[idxData]);
+                    const desc = (cols[idxDesc] || 'Lançamento CSV').replace(/^"|"$/g, '').trim();
+                    const valNum = normalizarValorCSV(cols[idxVal]);
+                    if (valNum === 0) continue;
+                    // No extrato bancário, negativo = saída e positivo = entrada; em fatura de cartão, positivo = saída
+                    const tipo = origem === 'cartao'
+                        ? (valNum < 0 ? 'entrada' : 'saida')
+                        : (valNum < 0 ? 'saida' : 'entrada');
+                    const valAbs = Math.abs(valNum);
+                    const dataComp = (tipo === 'saida' && origem === 'cartao') ? calcularDataFaturaCartao(dataISO).dataFatura : dataISO;
+                    const descNorm = desc.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 14);
+                    const isDuplicata = transacoes.some(t => {
+                        if (t.tipo !== tipo) return false;
+                        if (Math.abs(toNum(t.valor) - valAbs) > 0.01) return false;
+                        const dExist = String(t.data || '').slice(0, 10);
+                        if (dExist !== dataISO && dExist !== dataComp) return false;
+                        const existNorm = String(t.descricao || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                        return !descNorm || existNorm.includes(descNorm) || descNorm.includes(existNorm.slice(0, 10));
+                    });
+                    itensCSVPreview.push({
+                        selecionado: !isDuplicata,
+                        isDuplicata,
+                        data: dataISO,
+                        descricao: desc,
+                        valor: valAbs,
+                        tipo,
+                        bloco: tipo === 'saida' ? inferirBlocoPorTexto(desc) : 'Entrada'
+                    });
+                }
+
+                renderizarPreviewCSV();
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function renderizarPreviewCSV() {
+            const wrap = document.getElementById('csv-preview-wrap');
+            const tbody = document.getElementById('csv-preview-tbody');
+            const countEl = document.getElementById('csv-preview-count');
+            if (!wrap || !tbody) return;
+            if (itensCSVPreview.length === 0) {
+                wrap.classList.add('hidden');
+                return showToast('Nenhum lançamento válido encontrado no CSV.', 'alerta');
+            }
+            wrap.classList.remove('hidden');
+            const qtdDup = itensCSVPreview.filter(x => x.isDuplicata).length;
+            countEl.innerText = `${itensCSVPreview.filter(x => x.selecionado).length} novos selecionados` + (qtdDup > 0 ? ` • ${qtdDup} duplicata(s) desmarcada(s)` : '');
+            tbody.innerHTML = itensCSVPreview.map((it, idx) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-2"><input type="checkbox" ${it.selecionado ? 'checked' : ''} onchange="itensCSVPreview[${idx}].selecionado = this.checked; document.getElementById('csv-preview-count').innerText = itensCSVPreview.filter(x => x.selecionado).length + ' de ' + itensCSVPreview.length + ' itens selecionados';" class="accent-forest"></td>
+                    <td class="py-2 px-2 text-[11px] text-slate-500 whitespace-nowrap">${formatDataBR(it.data)}</td>
+                    <td class="py-2 px-2 font-semibold text-slate-800 max-w-[200px] truncate">${escapeHTML(it.descricao)}${it.isDuplicata ? ` <span class="ml-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[9px] font-extrabold">⚠️ Duplicata</span>` : ''}</td>
+                    <td class="py-2 px-2">
+                        ${it.tipo === 'entrada'
+                            ? `<span class="px-2 py-0.5 rounded bg-emerald-50 text-forest font-bold text-[10px]">Entrada</span>`
+                            : `<select onchange="itensCSVPreview[${idx}].bloco = this.value" class="bg-white border border-slate-200 rounded-lg px-1.5 py-1 text-[11px] font-semibold text-slate-700">${BLOCOS_ORCAMENTO_VALIDOS.map(b => `<option value="${b}" ${it.bloco === b ? 'selected' : ''}>${b}</option>`).join('')}</select>`
+                        }
+                    </td>
+                    <td class="py-2 px-2 text-right font-bold money-val ${it.tipo === 'entrada' ? 'text-forest' : 'text-crimson'}">${it.tipo === 'entrada' ? '+' : '-'} ${formatBRL(it.valor)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function alternarTodosCSV() {
+            const todosMarcados = itensCSVPreview.every(x => x.selecionado);
+            itensCSVPreview.forEach(x => { x.selecionado = !todosMarcados; });
+            renderizarPreviewCSV();
+        }
+
+        async function confirmarImportacaoCSV() {
+            const selecionados = itensCSVPreview.filter(x => x.selecionado);
+            if (selecionados.length === 0) return showToast('Selecione ao menos 1 lançamento para importar.', 'alerta');
+            const origem = document.getElementById('csv-origem-tipo')?.value || 'conta';
+            const contaId = document.getElementById('csv-conta-select')?.value || contasBancarias[0]?.id;
+            const isCartao = origem === 'cartao';
+
+            let importados = 0;
+            for (const it of selecionados) {
+                const isEnt = it.tipo === 'entrada';
+                let dataFinal = it.data;
+                let descFinal = it.descricao;
+                if (!isEnt && isCartao) {
+                    const fat = calcularDataFaturaCartao(it.data);
+                    dataFinal = fat.dataFatura;
+                    if (fat.virouMes) descFinal = `${it.descricao} [Compra ${fat.dataOriginalBR}]`;
+                }
+                const payload = {
+                    tipo: it.tipo,
+                    valor: it.valor,
+                    descricao: descFinal,
+                    categoria: isEnt ? 'Outros' : formatarCategoriaComBloco(it.bloco, it.bloco),
+                    data: dataFinal,
+                    recorrencia: isEnt ? 'Unica' : null,
+                    natureza: isEnt ? null : 'Variavel',
+                    essencialidade: isEnt ? null : mapearBlocoParaEssencialidadeDB(it.bloco),
+                    forma_pagamento: isEnt ? null : (isCartao ? 'Cartão de Crédito' : 'Pix')
+                };
+
+                try {
+                    if (supabaseClient) {
+                        let res = await supabaseClient.from('transacoes').insert([{
+                            ...payload,
+                            bloco_orcamento: isEnt ? null : it.bloco,
+                            status_pagamento: (!isEnt && isCartao) ? 'pendente' : 'pago'
+                        }]).select();
+                        if (res.error && /(bloco_orcamento|status_pagamento|column)/i.test(String(res.error.message || ''))) {
+                            res = await supabaseClient.from('transacoes').insert([payload]).select();
+                        }
+                        const idSalvo = res.data?.[0]?.id;
+                        if (idSalvo) {
+                            registrarContaParaTransacao(idSalvo, contaId);
+                            if (!isEnt) {
+                                salvarBlocoLocalTransacao(idSalvo, it.bloco);
+                                definirStatusPagamentoLocal(idSalvo, isCartao);
+                            }
+                        }
+                    } else {
+                        const novoId = crypto.randomUUID();
+                        transacoes.unshift({ id: novoId, ...payload, bloco_orcamento: isEnt ? null : it.bloco, status_pagamento: (!isEnt && isCartao) ? 'pendente' : 'pago' });
+                        registrarContaParaTransacao(novoId, contaId);
+                        if (!isEnt) {
+                            salvarBlocoLocalTransacao(novoId, it.bloco);
+                            definirStatusPagamentoLocal(novoId, isCartao);
+                        }
+                    }
+                    importados++;
+                } catch (e) { console.warn('Item CSV ignorado:', e); }
+            }
+            if (!supabaseClient) safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+            closeModal('modal-importar-csv');
+            showToast(`${importados} lançamento(s) importado(s) do CSV com sucesso!`);
+            await loadAllData();
+        }
+
+        // ==================== PWA INSTALÁVEL ====================
+        let deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const btn = document.getElementById('btn-install-pwa');
+            if (btn) { btn.classList.remove('hidden'); btn.classList.add('flex'); }
+        });
+
+        async function instalarPWA() {
+            if (!deferredInstallPrompt) return showToast('Use o menu do navegador → "Adicionar à tela inicial" para instalar.', 'alerta');
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            const btn = document.getElementById('btn-install-pwa');
+            if (btn) btn.classList.add('hidden');
+        }
+
+        // Registro seguro do Service Worker (ativo em HTTPS / GitHub Pages)
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+
+        // ==================== TENDÊNCIA DOS 8 BLOCOS (MÊS ATUAL VS. MÉDIA 3–6 MESES) ====================
+        function renderizarTendenciaBlocos(mesSelecionado) {
+            const container = document.getElementById('tendencia-blocos-container');
+            const badge = document.getElementById('tendencia-blocos-badge');
+            if (!container) return;
+
+            const mesesAnteriores = Array.from(new Set(
+                transacoes
+                    .filter(t => t.tipo === 'saida' && t.data && String(t.data).slice(0, 7) < mesSelecionado)
+                    .map(t => String(t.data).slice(0, 7))
+            )).sort().slice(-6);
+
+            if (mesesAnteriores.length === 0) {
+                if (badge) badge.innerText = 'Sem histórico anterior';
+                container.innerHTML = `<div class="col-span-full text-xs text-slate-400 py-2">Assim que você tiver ao menos 1 mês anterior com lançamentos, o comparativo de tendência aparece automaticamente aqui.</div>`;
+                return;
+            }
+
+            if (badge) badge.innerText = `Mês atual vs. média de ${mesesAnteriores.length} mês(es)`;
+            const saidasAtual = transacoes.filter(t => t.tipo === 'saida' && t.data && String(t.data).startsWith(mesSelecionado));
+
+            container.innerHTML = BLOCOS_ORCAMENTO_VALIDOS.map(bloco => {
+                const atual = saidasAtual.filter(s => identificarBlocoSaida(s) === bloco).reduce((a, b) => a + toNum(b.valor), 0);
+                const somaAnt = mesesAnteriores.reduce((acc, ym) => {
+                    const g = transacoes
+                        .filter(s => s.tipo === 'saida' && s.data && String(s.data).startsWith(ym) && identificarBlocoSaida(s) === bloco)
+                        .reduce((a, b) => a + toNum(b.valor), 0);
+                    return acc + g;
+                }, 0);
+                const media = somaAnt / mesesAnteriores.length;
+                const diffPerc = media > 0 ? Math.round(((atual - media) / media) * 100) : (atual > 0 ? 100 : 0);
+                const subindo = diffPerc > 10;
+                const caindo = diffPerc < -10;
+                const cor = subindo ? 'text-crimson bg-red-50 border-red-200' : (caindo ? 'text-forest bg-emerald-50 border-emerald-200' : 'text-slate-700 bg-slate-50 border-slate-200');
+                const seta = subindo ? `↑ +${diffPerc}%` : (caindo ? `↓ ${diffPerc}%` : `≈ ${diffPerc >= 0 ? '+' : ''}${diffPerc}%`);
+
+                return `
+                    <div class="p-3 rounded-2xl border ${cor} flex flex-col justify-between">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-xs font-extrabold truncate">${escapeHTML(bloco)}</span>
+                            <span class="text-[10px] font-extrabold whitespace-nowrap">${seta}</span>
+                        </div>
+                        <div class="mt-2 flex items-baseline justify-between gap-1 text-[11px]">
+                            <strong class="money-val text-sm">${formatBRL(atual)}</strong>
+                            <span class="opacity-75 money-val">Média: ${formatBRL(media)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== REBALANCEADOR INTELIGENTE DE CARTEIRA ====================
+        const ALOCACAO_ALVO_PADRAO = {
+            'Reserva de Emergência': 25,
+            'Tesouro Direto': 25,
+            'CDB / Renda Fixa': 20,
+            'Ações / FIIs': 20,
+            'Fundos': 5,
+            'Cripto / Outros': 5
+        };
+        let alocacaoAlvo = { ...ALOCACAO_ALVO_PADRAO };
+        try {
+            const aa = JSON.parse(safeGetStorage('mp_alocacao_alvo', 'null'));
+            if (aa && typeof aa === 'object') alocacaoAlvo = { ...ALOCACAO_ALVO_PADRAO, ...aa };
+        } catch (e) {}
+
+        function renderizarRebalanceadorCarteira(totalReserva = 0) {
+            const card = document.getElementById('rebalanceador-carteira-card');
+            if (!card) return;
+
+            const classes = Object.keys(ALOCACAO_ALVO_PADRAO);
+            const atualPorClasse = {};
+            classes.forEach(c => { atualPorClasse[c] = 0; });
+            atualPorClasse['Reserva de Emergência'] = Math.max(0, toNum(totalReserva));
+            investimentos.forEach(inv => {
+                const cl = inv.classe || 'CDB / Renda Fixa';
+                atualPorClasse[cl] = (atualPorClasse[cl] || 0) + Math.max(0, toNum(inv.saldo_atual));
+            });
+
+            const totalGeral = Object.values(atualPorClasse).reduce((a, b) => a + b, 0);
+            const itens = classes.map(cl => {
+                const atualVal = atualPorClasse[cl] || 0;
+                const atualPerc = totalGeral > 0 ? (atualVal / totalGeral) * 100 : 0;
+                const alvoPerc = toNum(alocacaoAlvo[cl]);
+                const valorIdeal = totalGeral * (alvoPerc / 100);
+                const faltaVal = valorIdeal - atualVal;
+                const gapPerc = alvoPerc - atualPerc;
+                return { cl, atualVal, atualPerc, alvoPerc, faltaVal, gapPerc };
+            }).filter(x => x.alvoPerc > 0 || x.atualVal > 0);
+
+            const prioridade = [...itens].sort((a, b) => b.gapPerc - a.gapPerc)[0];
+
+            card.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i data-lucide="compass" class="w-4 h-4 text-forest"></i>
+                            Rebalanceador Inteligente (Alvo vs. Atual)
+                        </h3>
+                        <p class="text-[11px] text-slate-400">Mostra onde aplicar seu próximo aporte para manter a carteira equilibrada</p>
+                    </div>
+                    <button type="button" onclick="configurarAlocacaoAlvoPrompt()" class="text-[11px] font-bold text-forest bg-sage-50 hover:bg-sage-100 border border-sage-200 px-3 py-1.5 rounded-xl transition">Configurar Alvos (%)</button>
+                </div>
+                ${totalGeral > 0 && prioridade && prioridade.gapPerc > 1 ? `
+                    <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-forest flex flex-wrap items-center justify-between gap-2">
+                        <span>🎯 <strong>Próximo aporte recomendado:</strong> <strong>${escapeHTML(prioridade.cl)}</strong> (está em ${prioridade.atualPerc.toFixed(1)}% vs. alvo ${prioridade.alvoPerc}%)</span>
+                        <strong class="money-val">Déficit: ${formatBRL(Math.max(0, prioridade.faltaVal))}</strong>
+                    </div>
+                ` : `<p class="text-xs text-slate-400">${totalGeral > 0 ? '✅ Sua carteira está equilibrada dentro dos percentuais-alvo!' : 'Cadastre seus ativos ou reserva para ativar a recomendação de aporte.'}</p>`}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    ${itens.map(x => `
+                        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs space-y-1">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="font-bold text-slate-700 truncate">${escapeHTML(x.cl)}</span>
+                                <span class="text-[10px] font-extrabold ${x.gapPerc > 3 ? 'text-amber-700' : 'text-forest'}">${x.atualPerc.toFixed(0)}% / ${x.alvoPerc}%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div class="h-full ${x.gapPerc > 3 ? 'bg-amber-500' : 'bg-forest'} rounded-full" style="width: ${Math.min(100, Math.round((x.atualPerc / Math.max(1, x.alvoPerc)) * 100))}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function configurarAlocacaoAlvoPrompt() {
+            const classes = Object.keys(ALOCACAO_ALVO_PADRAO);
+            const atualStr = classes.map(c => toNum(alocacaoAlvo[c])).join(', ');
+            const resp = await abrirDialogoCustom({
+                titulo: 'Alocação-Alvo da Carteira (%)',
+                mensagem: `Informe 6 percentuais (soma = 100) nesta ordem: ${classes.join(' | ')}`,
+                comInput: true,
+                valorInicial: atualStr,
+                textoConfirmar: 'Salvar Alvos'
+            });
+            if (!resp.confirmado || !resp.valor) return;
+            const nums = resp.valor.split(',').map(x => toNum(x.trim()));
+            if (nums.length !== classes.length) return showToast(`Informe exatamente ${classes.length} números separados por vírgula.`, 'erro');
+            const soma = Math.round(nums.reduce((a, b) => a + b, 0) * 10) / 10;
+            if (soma !== 100) return showToast(`A soma dos alvos deve fechar em 100% (atual: ${soma}%).`, 'erro');
+            classes.forEach((c, idx) => { alocacaoAlvo[c] = nums[idx]; });
+            safeSetStorage('mp_alocacao_alvo', JSON.stringify(alocacaoAlvo));
+            agendarSyncExtrasNuvem();
+            atualizarInterfaceCompleta();
+            showToast('Alocação-alvo da carteira atualizada!');
+        }
+
+        // Rollover Contínuo Multi-mês (Onda 3): acumula sobras em sequência de até 12 meses anteriores com lançamentos
         function calcularRolloverBloco(mesSelecionado, nomeBloco, percBloco) {
-            const mesAnt = obterMesAnteriorISO(mesSelecionado);
-            const transAnt = transacoes.filter(t => t.data && String(t.data).startsWith(mesAnt));
-            if (transAnt.length === 0) return 0;
-            const entRegAnt = transAnt.filter(t => t.tipo === 'entrada' && !isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
-            const baseAnt = Math.max(entRegAnt, toNum(config.renda_base_prevista) || 1500);
-            const metaAnt = baseAnt * (toNum(percBloco) / 100);
-            const gastoAnt = transAnt
-                .filter(t => t.tipo === 'saida' && identificarBlocoSaida(t) === nomeBloco)
-                .reduce((a, b) => a + toNum(b.valor), 0);
-            return Math.max(0, Math.round((metaAnt - gastoAnt) * 100) / 100);
+            const mesesAnterioresComDados = Array.from(new Set(
+                transacoes
+                    .filter(t => t.data && String(t.data).slice(0, 7) < mesSelecionado)
+                    .map(t => String(t.data).slice(0, 7))
+            )).sort().slice(-12);
+
+            if (mesesAnterioresComDados.length === 0) return 0;
+
+            let acumulado = 0;
+            for (const mes of mesesAnterioresComDados) {
+                const transDoMes = transacoes.filter(t => t.data && String(t.data).startsWith(mes));
+                const entReg = transDoMes
+                    .filter(t => t.tipo === 'entrada' && !isTransacaoExtra(t) && !isTransferenciaInterna(t))
+                    .reduce((a, b) => a + toNum(b.valor), 0);
+                const baseMes = Math.max(entReg, toNum(config.renda_base_prevista) || 1500);
+                const metaMes = baseMes * (toNum(percBloco) / 100);
+                const gastoMes = transDoMes
+                    .filter(t => t.tipo === 'saida' && identificarBlocoSaida(t) === nomeBloco)
+                    .reduce((a, b) => a + toNum(b.valor), 0);
+                acumulado = Math.max(0, Math.round((acumulado + metaMes - gastoMes) * 100) / 100);
+            }
+            return acumulado;
+        }
+
+        async function conciliarSaldoPrompt() {
+            const totalEntradasGlobal = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + toNum(t.valor), 0);
+            const totalSaidasPagasGlobal = transacoes.filter(t => t.tipo === 'saida' && !isTransacaoPendente(t)).reduce((acc, t) => acc + toNum(t.valor), 0);
+            const totalAportesReservaGlobal = reservaMovs.filter(r => r.tipo === 'aporte' && isReservaAfetaCaixa(r)).reduce((acc, r) => acc + toNum(r.valor), 0);
+            const saldoAtual = totalEntradasGlobal - totalSaidasPagasGlobal - totalAportesReservaGlobal;
+
+            const resp = await abrirDialogoCustom({
+                titulo: 'Conciliar Saldo com o Banco',
+                mensagem: `Saldo atual no app: ${formatBRL(saldoAtual)}. Informe o saldo exato que aparece hoje na sua conta bancária para lançarmos um ajuste neutro (não altera metas nem 50/50):`,
+                comInput: true,
+                tipoInput: 'number',
+                valorInicial: saldoAtual.toFixed(2),
+                placeholder: 'Ex: 842.50',
+                textoConfirmar: 'Conciliar Agora'
+            });
+            if (!resp.confirmado) return;
+            const saldoReal = toNum(resp.valor);
+            const diff = Math.round((saldoReal - saldoAtual) * 100) / 100;
+            if (Math.abs(diff) < 0.01) return showToast('Seu saldo já está 100% conciliado!');
+
+            const hojeStr = new Date().toISOString().slice(0, 10);
+            const isPos = diff > 0;
+            const payload = {
+                tipo: isPos ? 'entrada' : 'saida',
+                valor: Math.abs(diff),
+                descricao: 'Ajuste de Conciliação de Saldo',
+                categoria: isPos ? 'Conciliação de Saldo' : 'Outros gastos • Conciliação de Saldo',
+                data: hojeStr,
+                recorrencia: isPos ? 'Unica' : null,
+                natureza: isPos ? null : 'Variavel',
+                essencialidade: isPos ? null : 'Essencial',
+                forma_pagamento: isPos ? null : 'Pix'
+            };
+
+            try {
+                if (supabaseClient) {
+                    const res = await supabaseClient.from('transacoes').insert([payload]).select();
+                    if (res.error) throw new Error(res.error.message);
+                } else {
+                    transacoes.unshift({ id: crypto.randomUUID(), ...payload, status_pagamento: 'pago' });
+                    safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+                }
+                showToast(`Saldo conciliado para ${formatBRL(saldoReal)} (${diff > 0 ? '+' : ''}${formatBRL(diff)})!`);
+                await loadAllData();
+            } catch (err) {
+                showToast('Erro ao conciliar saldo: ' + err.message, 'erro');
+            }
+        }
+
+        async function configurarCartaoPrompt() {
+            const resp = await abrirDialogoCustom({
+                titulo: 'Configurar Cartão de Crédito',
+                mensagem: 'Informe Nome, Dia de Fechamento, Dia de Vencimento e Limite separados por vírgula (ex: Nubank, 25, 5, 3000):',
+                comInput: true,
+                valorInicial: `${cartaoConfig.nome}, ${cartaoConfig.diaFechamento}, ${cartaoConfig.diaVencimento}, ${cartaoConfig.limite}`,
+                textoConfirmar: 'Salvar Cartão'
+            });
+            if (!resp.confirmado || !resp.valor) return;
+            const p = resp.valor.split(',').map(x => x.trim());
+            cartaoConfig = {
+                nome: p[0] || 'Cartão Principal',
+                diaFechamento: Math.min(31, Math.max(1, parseInt(p[1], 10) || 25)),
+                diaVencimento: Math.min(31, Math.max(1, parseInt(p[2], 10) || 5)),
+                limite: Math.max(100, toNum(p[3]) || 3000)
+            };
+            safeSetStorage('mp_cartao_config', JSON.stringify(cartaoConfig));
+            agendarSyncExtrasNuvem();
+            atualizarInterfaceCompleta();
+            showToast(`Cartão "${cartaoConfig.nome}" atualizado!`);
+        }
+
+        async function pagarFaturaCartaoMes() {
+            const mesSelecionado = document.getElementById('month-filter').value;
+            const pendentesCartao = transacoes.filter(t =>
+                t.data && String(t.data).startsWith(mesSelecionado) &&
+                isCompraCartaoCredito(t) && isTransacaoPendente(t)
+            );
+            if (pendentesCartao.length === 0) return showToast('Não há fatura em aberto neste mês!', 'alerta');
+            const totalFatura = pendentesCartao.reduce((a, b) => a + toNum(b.valor), 0);
+
+            const resp = await abrirDialogoCustom({
+                titulo: `Pagar Fatura (${mesSelecionado})`,
+                mensagem: `Confirmar o pagamento da fatura de ${cartaoConfig.nome} no valor de ${formatBRL(totalFatura)} (${pendentesCartao.length} lançamento(s))? O valor será abatido do seu Saldo Disponível em conta.`,
+                textoConfirmar: `Pagar ${formatBRL(totalFatura)}`
+            });
+            if (!resp.confirmado) return;
+
+            for (const item of pendentesCartao) {
+                definirStatusPagamentoLocal(item.id, false);
+                item.status_pagamento = 'pago';
+            }
+            if (supabaseClient) {
+                try {
+                    const ids = pendentesCartao.map(x => x.id).filter(Boolean);
+                    if (ids.length > 0) {
+                        await supabaseClient.from('transacoes').update({ status_pagamento: 'pago' }).in('id', ids);
+                    }
+                } catch (e) {
+                    console.warn('Fatura quitada localmente:', e);
+                }
+            } else {
+                safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+            }
+            atualizarInterfaceCompleta();
+            showToast(`Fatura de ${formatBRL(totalFatura)} paga com sucesso!`);
+        }
+
+        function renderizarFaturaCartao(transMes) {
+            const card = document.getElementById('fatura-cartao-card');
+            if (!card) return;
+            const comprasCartao = transMes.filter(isCompraCartaoCredito);
+            const emAberto = comprasCartao.filter(isTransacaoPendente).reduce((a, b) => a + toNum(b.valor), 0);
+            const jaPago = comprasCartao.filter(t => !isTransacaoPendente(t)).reduce((a, b) => a + toNum(b.valor), 0);
+            const totalMesCartao = emAberto + jaPago;
+            const limite = Math.max(1, toNum(cartaoConfig.limite) || 3000);
+            const percLimite = Math.min(100, Math.round((totalMesCartao / limite) * 100));
+            const corBarra = percLimite >= 85 ? 'bg-crimson' : (percLimite >= 60 ? 'bg-amber-500' : 'bg-forest');
+
+            card.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="credit-card" class="w-4 h-4 text-forest"></i>
+                            <h3 class="font-bold text-slate-800 text-sm">${escapeHTML(cartaoConfig.nome)} — Fatura do Mês</h3>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Fecha dia ${cartaoConfig.diaFechamento} • Vence dia ${cartaoConfig.diaVencimento} • Limite: <strong class="money-val">${formatBRL(limite)}</strong></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="configurarCartaoPrompt()" class="text-[11px] font-semibold text-slate-500 hover:text-forest px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 transition">Configurar</button>
+                        ${emAberto > 0 ? `<button type="button" onclick="pagarFaturaCartaoMes()" class="text-xs font-bold text-white hero-gradient px-3.5 py-1.5 rounded-xl shadow-xs hover:opacity-95 transition">Pagar Fatura (${formatBRL(emAberto)})</button>` : `<span class="text-[11px] font-bold text-forest bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl">✓ Fatura em dia</span>`}
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 text-xs mb-3">
+                    <div class="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                        <span class="text-[10px] text-amber-800 font-bold uppercase block">Em Aberto</span>
+                        <strong class="text-sm font-extrabold text-amber-950 money-val">${formatBRL(emAberto)}</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                        <span class="text-[10px] text-forest font-bold uppercase block">Já Pago</span>
+                        <strong class="text-sm font-extrabold text-forest money-val">${formatBRL(jaPago)}</strong>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] text-slate-500 font-bold uppercase block">Uso do Limite</span>
+                        <strong class="text-sm font-extrabold text-slate-800">${percLimite}%</strong>
+                    </div>
+                </div>
+                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full ${corBarra} rounded-full transition-all" style="width: ${percLimite}%"></div>
+                </div>
+                ${(() => {
+                    const mesBase = document.getElementById('month-filter')?.value || new Date().toISOString().slice(0, 7);
+                    const [aBase, mBase] = mesBase.split('-').map(Number);
+                    const proximos6 = [];
+                    let soma6m = 0;
+                    for (let k = 1; k <= 6; k++) {
+                        const dFut = new Date(aBase, (mBase - 1) + k, 1);
+                        const ym = `${dFut.getFullYear()}-${String(dFut.getMonth() + 1).padStart(2, '0')}`;
+                        const lbl = dFut.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '');
+                        const tot = transacoes
+                            .filter(t => t.data && String(t.data).startsWith(ym) && isCompraCartaoCredito(t))
+                            .reduce((acc, t) => acc + toNum(t.valor), 0);
+                        soma6m += tot;
+                        proximos6.push({ lbl, tot });
+                    }
+                    return `
+                        <div class="mt-3.5 pt-3 border-t border-slate-100 space-y-2">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-bold text-slate-600">📅 Radar de Faturas Futuras (Próximos 6 meses)</span>
+                                <strong class="${soma6m > 0 ? 'text-amber-800' : 'text-forest'} money-val">Comprometido: ${formatBRL(soma6m)}</strong>
+                            </div>
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                                ${proximos6.map(p => `
+                                    <div class="p-1.5 rounded-xl text-center border ${p.tot > 0 ? 'bg-amber-50/70 border-amber-200' : 'bg-slate-50 border-slate-100'}">
+                                        <span class="text-[10px] font-bold uppercase text-slate-500 block">${p.lbl}</span>
+                                        <strong class="text-[11px] font-extrabold money-val ${p.tot > 0 ? 'text-amber-950' : 'text-slate-400'}">${p.tot > 0 ? formatBRL(p.tot) : 'R$ 0'}</strong>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                })()}
+            `;
+        }
+
+        async function salvarSaidaExpressa(e) {
+            e.preventDefault();
+            const valor = toNum(document.getElementById('exp-valor')?.value);
+            const descricao = (document.getElementById('exp-descricao')?.value || '').trim();
+            const bloco = document.getElementById('exp-bloco')?.value || 'Custos fixos';
+            const formaPgto = document.getElementById('exp-pagamento')?.value || 'Pix';
+            if (valor <= 0 || !descricao) return showToast('Preencha valor e descrição.', 'erro');
+
+            const isCredito = formaPgto === 'Cartão de Crédito';
+            const contaId = document.getElementById('exp-conta')?.value || contasBancarias[0]?.id;
+            const dataHoje = new Date().toISOString().slice(0, 10);
+            const fatInfo = isCredito ? calcularDataFaturaCartao(dataHoje) : { dataFatura: dataHoje, virouMes: false, dataOriginalBR: '' };
+            const descFinalExp = fatInfo.virouMes ? `${descricao} [Compra ${fatInfo.dataOriginalBR}]` : descricao;
+            const payload = {
+                tipo: 'saida',
+                valor,
+                descricao: descFinalExp,
+                categoria: formatarCategoriaComBloco(bloco, bloco),
+                data: fatInfo.dataFatura,
+                recorrencia: null,
+                natureza: 'Variavel',
+                essencialidade: mapearBlocoParaEssencialidadeDB(bloco),
+                forma_pagamento: formaPgto
+            };
+
+            try {
+                if (supabaseClient) {
+                    let res = await supabaseClient.from('transacoes').insert([{
+                        ...payload,
+                        bloco_orcamento: bloco,
+                        status_pagamento: isCredito ? 'pendente' : 'pago'
+                    }]).select();
+                    if (res.error && /(bloco_orcamento|status_pagamento|column)/i.test(String(res.error.message || ''))) {
+                        res = await supabaseClient.from('transacoes').insert([payload]).select();
+                    }
+                    if (res.error) throw new Error(res.error.message);
+                    const idSalvo = res.data?.[0]?.id;
+                    if (idSalvo) {
+                        registrarContaParaTransacao(idSalvo, contaId);
+                        salvarBlocoLocalTransacao(idSalvo, bloco);
+                        definirStatusPagamentoLocal(idSalvo, isCredito);
+                    }
+                } else {
+                    const novoId = crypto.randomUUID();
+                    transacoes.unshift({ id: novoId, ...payload, bloco_orcamento: bloco, status_pagamento: isCredito ? 'pendente' : 'pago' });
+                    registrarContaParaTransacao(novoId, contaId);
+                    salvarBlocoLocalTransacao(novoId, bloco);
+                    definirStatusPagamentoLocal(novoId, isCredito);
+                    safeSetStorage('mp_local_transacoes', JSON.stringify(transacoes));
+                }
+                document.getElementById('form-saida-expressa').reset();
+                closeModal('modal-quick-choice');
+                showToast(isCredito ? `Lançado na Fatura do Cartão (${formatBRL(valor)})!` : `Despesa de ${formatBRL(valor)} registrada!`);
+                await loadAllData();
+            } catch (err) {
+                showToast('Erro no lançamento expresso: ' + err.message, 'erro');
+            }
         }
 
         function atualizarVisibilidadeParcelas() {
@@ -2171,6 +3223,10 @@
             if (!wrap) return;
             const mostrar = pgto === 'Cartão de Crédito' && !idEdicao;
             wrap.classList.toggle('hidden', !mostrar);
+            const stEl = document.getElementById('sai-status-pagamento');
+            if (stEl && !idEdicao) {
+                stEl.value = pgto === 'Cartão de Crédito' ? 'pendente' : 'pago';
+            }
             if (!mostrar && document.getElementById('sai-parcelas')) {
                 document.getElementById('sai-parcelas').value = '1';
             }
@@ -2269,6 +3325,38 @@
             return 'Custos fixos';
         }
 
+        let timerSyncExtrasNuvem = null;
+
+        function montarExtrasConfigPayload() {
+            let atalhosCustom = [];
+            let simCarreiraConfig = {};
+            try { atalhosCustom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]')); } catch (e) {}
+            try { simCarreiraConfig = JSON.parse(safeGetStorage('mp_sim_carreira_config', '{}')); } catch (e) {}
+            return {
+                perc_conforto: toNum(config.perc_conforto),
+                perc_metas: toNum(config.perc_metas),
+                perc_conhecimento: toNum(config.perc_conhecimento),
+                perc_outros: toNum(config.perc_outros),
+                renda_base_prevista: toNum(config.renda_base_prevista) || 1500,
+                rollover_metas: !!config.rollover_metas,
+                rollover_conhecimento: !!config.rollover_conhecimento,
+                projConfig,
+                simCarreiraConfig,
+                atalhosCustom,
+                cartaoConfig,
+                contasBancarias,
+                mapaContaTransacao,
+                transferenciasContas,
+                alocacaoAlvo
+            };
+        }
+
+        function agendarSyncExtrasNuvem() {
+            if (!supabaseClient) return;
+            clearTimeout(timerSyncExtrasNuvem);
+            timerSyncExtrasNuvem = setTimeout(() => { persistirConfiguracoes(); }, 700);
+        }
+
         async function persistirConfiguracoes() {
             safeSetStorage('mp_local_config', JSON.stringify(config));
             if (supabaseClient) {
@@ -2282,7 +3370,11 @@
                         meses_meta_reserva: parseInt(config.meses_meta_reserva, 10) || 6,
                         custo_fixo_estimado: toNum(config.custo_fixo_estimado)
                     };
-                    await supabaseClient.from('configuracoes').upsert(payloadCompat);
+                    const payloadCompleto = { ...payloadCompat, extras_config: montarExtrasConfigPayload() };
+                    const res = await supabaseClient.from('configuracoes').upsert(payloadCompleto);
+                    if (res.error && String(res.error.message || '').toLowerCase().includes('extras_config')) {
+                        await supabaseClient.from('configuracoes').upsert(payloadCompat);
+                    }
                 } catch (e) {
                     console.warn('Aviso ao sincronizar configuracoes no Supabase:', e);
                 }
@@ -2322,9 +3414,7 @@
             atualizarDicaBlocoSaida();
         }
 
-        function sincronizarNaturezaPorBloco() {
-            atualizarDicaBlocoSaida();
-        }
+
 
         function autoClassificarPorDescricao() {
             const desc = (document.getElementById('sai-descricao')?.value || '').toLowerCase().trim();
@@ -2386,12 +3476,39 @@
         };
         const formatDataBR = (d) => d ? String(d).slice(0, 10).split('-').reverse().join('/') : '—';
 
+        function escapeHTML(val) {
+            return String(val ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function isTransferenciaInterna(t) {
+            if (!t) return false;
+            const cat = String(t.categoria || '').trim().toLowerCase();
+            const desc = String(t.descricao || '').trim().toLowerCase();
+            const rec = String(t.recorrencia || '').trim().toLowerCase();
+            return cat === 'resgate de reserva' || cat === 'conciliação de saldo' || rec === 'transferencia' || desc.startsWith('resgate da reserva') || desc.startsWith('ajuste de conciliação');
+        }
+
+        function isReservaAfetaCaixa(r) {
+            if (!r) return true;
+            if (r.afeta_caixa === false) return false;
+            return !String(r.onde_guardado || '').includes('[Saldo Anterior]');
+        }
+
+        function limparTagLocalReserva(str) {
+            return String(str || '').replace(/\s*\[Saldo Anterior\]/gi, '').trim() || 'Reserva de Emergência';
+        }
+
         function showToast(msg, tipo = 'sucesso') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const bgClass = tipo === 'erro' ? 'bg-crimson' : (tipo === 'alerta' ? 'bg-amber-600' : 'hero-gradient');
             toast.className = `${bgClass} text-white px-4 py-3 rounded-2xl shadow-lg text-xs font-semibold flex items-center justify-between gap-3 pointer-events-auto transition-all duration-300`;
-            toast.innerHTML = `<span>${msg}</span>`;
+            toast.innerHTML = `<span>${escapeHTML(msg)}</span>`;
             container.appendChild(toast);
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3800);
         }
@@ -2529,7 +3646,7 @@
             container.innerHTML = lista.map(a => `
                 <div class="inline-flex items-center rounded-xl bg-white border border-sage-200 shadow-2xs overflow-hidden">
                     <button type="button" onclick="usarAtalhoSaida('${a.id}')" class="px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-sage-100 hover:text-forest transition">
-                        ${a.label}
+                        ${escapeHTML(a.label)}
                     </button>
                     ${!a.padrao ? `<button type="button" onclick="removerAtalhoSaidaCustom('${a.id}')" title="Remover atalho" class="px-1.5 py-1 text-[10px] text-slate-400 hover:text-crimson border-l border-slate-100">×</button>` : ''}
                 </div>
@@ -2598,6 +3715,7 @@
                 padrao: false
             });
             safeSetStorage('mp_atalhos_saidas_custom', JSON.stringify(custom));
+            agendarSyncExtrasNuvem();
             renderizarAtalhosSaida();
             showToast(`Atalho "${nome}" criado na barra de 1 clique!`);
         }
@@ -2607,6 +3725,7 @@
             try { custom = JSON.parse(safeGetStorage('mp_atalhos_saidas_custom', '[]')); } catch (e) {}
             custom = custom.filter(x => String(x.id) !== String(id));
             safeSetStorage('mp_atalhos_saidas_custom', JSON.stringify(custom));
+            agendarSyncExtrasNuvem();
             renderizarAtalhosSaida();
             showToast('Atalho removido.');
         }
@@ -2740,6 +3859,7 @@
             projConfig.rendaAlvo40 = toNum(document.getElementById('proj-renda-alvo-40').value) || 5000;
             projConfig.valorPlantao = toNum(document.getElementById('proj-valor-plantao').value) || 1200;
             safeSetStorage('mp_proj_config', JSON.stringify(projConfig));
+            agendarSyncExtrasNuvem();
         }
 
         function toggleModoAporteProjecao() {
@@ -2747,6 +3867,70 @@
             const wrap = document.getElementById('proj-aporte-fixo-wrap');
             if (modo === 'fixo') wrap.classList.remove('hidden');
             else wrap.classList.add('hidden');
+        }
+
+        function atualizarUIAuthSupabase(session) {
+            const badge = document.getElementById('sb-auth-badge');
+            const boxOut = document.getElementById('sb-auth-logged-out');
+            const boxIn = document.getElementById('sb-auth-logged-in');
+            const emailEl = document.getElementById('sb-auth-user-email');
+            const statusNav = document.getElementById('db-status-text');
+
+            if (session && session.user) {
+                if (badge) {
+                    badge.innerText = 'Protegido (RLS)';
+                    badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-forest';
+                }
+                if (boxOut) boxOut.classList.add('hidden');
+                if (boxIn) boxIn.classList.remove('hidden');
+                if (emailEl) emailEl.innerText = session.user.email || 'Usuário autenticado';
+                if (statusNav) statusNav.innerText = 'Nuvem Privada (OK)';
+            } else {
+                if (badge) {
+                    badge.innerText = supabaseClient ? 'Sem login' : 'Offline';
+                    badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+                }
+                if (boxOut) boxOut.classList.remove('hidden');
+                if (boxIn) boxIn.classList.add('hidden');
+                if (statusNav && supabaseClient) statusNav.innerText = 'Supabase (Sem Login)';
+            }
+        }
+
+        async function enviarMagicLinkSupabase() {
+            if (!supabaseClient) return showToast('Conecte sua URL e Anon Key do Supabase primeiro.', 'alerta');
+            const email = (document.getElementById('sb-auth-email')?.value || '').trim();
+            if (!email || !email.includes('@')) return showToast('Informe um e-mail válido.', 'erro');
+            try {
+                const redirectUrl = window.location.href.split('#')[0].split('?')[0];
+                const { error } = await supabaseClient.auth.signInWithOtp({
+                    email,
+                    options: { emailRedirectTo: redirectUrl }
+                });
+                if (error) throw error;
+                showToast('Link mágico enviado! Abra seu e-mail e clique no link para entrar.');
+            } catch (err) {
+                showToast('Erro ao enviar link: ' + err.message, 'erro');
+            }
+        }
+
+        async function sairSupabaseAuth() {
+            if (!supabaseClient) return;
+            await supabaseClient.auth.signOut();
+            atualizarUIAuthSupabase(null);
+            showToast('Sessão encerrada com segurança.');
+            await loadAllData();
+        }
+
+        function copiarSqlMigracaoOnda2() {
+            const sqlText = document.getElementById('sb-sql-onda2')?.innerText || '';
+            if (!sqlText) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(sqlText)
+                    .then(() => showToast('Script SQL da Onda 2 copiado! Cole no SQL Editor do Supabase.'))
+                    .catch(() => fallbackCopyText(sqlText));
+            } else {
+                fallbackCopyText(sqlText);
+            }
         }
 
         function initSupabase() {
@@ -2758,9 +3942,21 @@
                 document.getElementById('sb-key').value = key;
                 supabaseClient = window.supabase.createClient(url, key);
                 document.getElementById('supabase-alert').classList.add('hidden');
-                document.getElementById('db-status-text').innerText = 'Supabase Conectado';
+                document.getElementById('db-status-text').innerText = 'Supabase (Sem Login)';
+
+                supabaseClient.auth.getSession().then(({ data }) => {
+                    atualizarUIAuthSupabase(data?.session || null);
+                    loadAllData();
+                }).catch(() => loadAllData());
+
+                supabaseClient.auth.onAuthStateChange((_event, session) => {
+                    atualizarUIAuthSupabase(session || null);
+                    if (_event === 'SIGNED_IN') loadAllData();
+                });
+                return;
             } else {
                 document.getElementById('supabase-alert').classList.remove('hidden');
+                atualizarUIAuthSupabase(null);
             }
             loadAllData();
         }
@@ -2794,7 +3990,43 @@
 
                     const localCfg = JSON.parse(safeGetStorage('mp_local_config', '{}'));
                     if (!resCfg.error && resCfg.data) {
-                        config = normalizarConfigOitoBlocos({ ...config, ...resCfg.data, ...localCfg });
+                        const extrasNuvem = (resCfg.data.extras_config && typeof resCfg.data.extras_config === 'object') ? resCfg.data.extras_config : {};
+                        config = normalizarConfigOitoBlocos({ ...config, ...localCfg, ...resCfg.data, ...extrasNuvem });
+                        safeSetStorage('mp_local_config', JSON.stringify(config));
+
+                        if (extrasNuvem.projConfig && typeof extrasNuvem.projConfig === 'object') {
+                            projConfig = { ...projConfig, ...extrasNuvem.projConfig };
+                            safeSetStorage('mp_proj_config', JSON.stringify(projConfig));
+                            carregarConfigProjecao();
+                        }
+                        if (extrasNuvem.simCarreiraConfig && typeof extrasNuvem.simCarreiraConfig === 'object') {
+                            safeSetStorage('mp_sim_carreira_config', JSON.stringify(extrasNuvem.simCarreiraConfig));
+                            carregarConfigSimCarreira();
+                        }
+                        if (Array.isArray(extrasNuvem.atalhosCustom)) {
+                            safeSetStorage('mp_atalhos_saidas_custom', JSON.stringify(extrasNuvem.atalhosCustom));
+                            renderizarAtalhosSaida();
+                        }
+                        if (extrasNuvem.cartaoConfig && typeof extrasNuvem.cartaoConfig === 'object') {
+                            cartaoConfig = { ...cartaoConfig, ...extrasNuvem.cartaoConfig };
+                            safeSetStorage('mp_cartao_config', JSON.stringify(cartaoConfig));
+                        }
+                        if (Array.isArray(extrasNuvem.contasBancarias) && extrasNuvem.contasBancarias.length > 0) {
+                            contasBancarias = extrasNuvem.contasBancarias;
+                            safeSetStorage('mp_contas_bancarias', JSON.stringify(contasBancarias));
+                        }
+                        if (extrasNuvem.mapaContaTransacao && typeof extrasNuvem.mapaContaTransacao === 'object') {
+                            mapaContaTransacao = extrasNuvem.mapaContaTransacao;
+                            safeSetStorage('mp_conta_por_transacao', JSON.stringify(mapaContaTransacao));
+                        }
+                        if (Array.isArray(extrasNuvem.transferenciasContas)) {
+                            transferenciasContas = extrasNuvem.transferenciasContas;
+                            safeSetStorage('mp_transferencias_contas', JSON.stringify(transferenciasContas));
+                        }
+                        if (extrasNuvem.alocacaoAlvo && typeof extrasNuvem.alocacaoAlvo === 'object') {
+                            alocacaoAlvo = { ...ALOCACAO_ALVO_PADRAO, ...extrasNuvem.alocacaoAlvo };
+                            safeSetStorage('mp_alocacao_alvo', JSON.stringify(alocacaoAlvo));
+                        }
                     } else {
                         config = normalizarConfigOitoBlocos({ ...config, ...localCfg });
                     }
@@ -2885,6 +4117,7 @@
 
         function isTransacaoExtra(t) {
             if (t.tipo !== 'entrada') return false;
+            if (isTransferenciaInterna(t)) return false;
             return t.recorrencia === 'Extra_50_50' || categoriasExtrasAuto.includes(t.categoria);
         }
 
@@ -3002,6 +4235,7 @@
             const aportesReservaMes = reservaMovs
                 .filter(r => {
                     if (r.tipo !== 'aporte') return false;
+                    if (!isReservaAfetaCaixa(r)) return false;
                     const og = String(r.onde_guardado || '');
                     if (og.startsWith('Investimento:') || og.startsWith('Sonho:')) return false;
                     const d = String(r.data || r.created_at || '');
@@ -3049,7 +4283,8 @@
 
         function renderizarAlertasComportamentais(params) {
             const {
-                mesSelecionado, rendaRegularMes, usandoRendaPadrao1500, entradasMesTotal,
+                mesSelecionado, rendaRegularMes, usandoRendaPadrao1500, rendaExtraMes = 0, entradasMesTotal,
+                rolloverMetas = 0, rolloverConhecimento = 0,
                 saidasMesLista, saidasMesTotal, metaEcoTotal,
                 gastoCustosFixos, metaDemTotal,
                 gastoConforto, metaConfortoTotal,
@@ -3203,23 +4438,25 @@
             const economiaProjetadaFimMes = Math.max(0, orcamentoGastoMaximo - projecaoFimMes);
             const valorSugeridoAporteExtra = Math.max(50, Math.round(economiaPotencialHoje > 25 ? economiaPotencialHoje : (economiaProjetadaFimMes * 0.4)));
 
+            // Termômetro mede exclusivamente o ritmo global do mês (gasto total vs. tempo decorrido)
             let estadoTermometro = 'verde';
-            if (percOrcamentoConsumido > 100 || deltaRitmo > 15 || blocosVermelhos.length >= 2) {
+            if (percOrcamentoConsumido > 100 || deltaRitmo > 15) {
                 estadoTermometro = 'vermelho';
-            } else if (deltaRitmo >= -3 || blocosVermelhos.length === 1 || blocosAmarelos.length >= 2) {
+            } else if (deltaRitmo >= -3) {
                 estadoTermometro = 'laranja';
             } else {
                 estadoTermometro = 'verde';
             }
 
+            const sufixoBlocosCriticos = blocosVermelhos.length > 0 ? ` • ⚠️ ${blocosVermelhos.length} bloco(s) estourado(s)` : '';
             if (estadoTermometro === 'vermelho') {
-                headerBadge.innerText = `🔴 Termômetro Vermelho (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.innerText = `🔴 Ritmo Acelerado (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)${sufixoBlocosCriticos}`;
                 headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-crimson';
             } else if (estadoTermometro === 'laranja') {
-                headerBadge.innerText = `🟠 Sinal Laranja: Atenção (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.innerText = `🟠 Ritmo no Limite (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)${sufixoBlocosCriticos}`;
                 headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800';
             } else {
-                headerBadge.innerText = `🟢 Sinal Verde: 8 Blocos Saudáveis (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)`;
+                headerBadge.innerText = `🟢 Ritmo Econômico (${percOrcamentoConsumido}% gasto em ${percTempoDecorrido}% do mês)${sufixoBlocosCriticos}`;
                 headerBadge.className = 'px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-forest';
             }
 
@@ -3234,6 +4471,9 @@
                 saidasMesTotal,
                 orcamentoGastoMaximo,
                 usandoOrcamentoRef,
+                rendaRegularMes,
+                rendaExtraMes,
+                rolloverTotal: rolloverMetas + rolloverConhecimento,
                 gastoDiarioMedio,
                 cotaDiariaOrcamento,
                 gastoEsperadoHoje,
@@ -3294,6 +4534,7 @@
                 estado, diaCorreto, diasNoMes, diasRestantesMes,
                 percTempoDecorrido, percOrcamentoConsumido, deltaRitmo,
                 saidasMesTotal, orcamentoGastoMaximo, usandoOrcamentoRef,
+                rendaRegularMes = 1500, rendaExtraMes = 0, rolloverTotal = 0,
                 gastoDiarioMedio, cotaDiariaOrcamento, gastoEsperadoHoje,
                 economiaPotencialHoje, economiaProjetadaFimMes, valorSugeridoAporteExtra,
                 diagnosticoOitoBlocos = [], gastosNaturezaFixaMes = 0, metaDemTotal = 600, totalReserva = 0,
@@ -3310,12 +4551,22 @@
             const diaEstouro = Math.min(diasNoMes, diaCorreto + diasAteZerar);
             const excessoAcimaDoEsperado = Math.max(0, saidasMesTotal - gastoEsperadoHoje);
 
-            // Contagem de saúde das 8 categorias
+            // Rótulo transparente da composição do teto de gastos (base + extra + rollover)
+            const partesComposicaoTeto = [];
+            if (usandoOrcamentoRef) partesComposicaoTeto.push(`base ${formatBRL(rendaRegularMes)}`);
+            if (rendaExtraMes > 0) partesComposicaoTeto.push(`+50% extra`);
+            if (rolloverTotal > 0) partesComposicaoTeto.push(`+rollover ${formatBRL(rolloverTotal)}`);
+            const detalheTetoTexto = partesComposicaoTeto.length > 0 ? ` — ${partesComposicaoTeto.join(' ')}` : '';
+
+            // Contagem de saúde das 8 categorias (separada do ritmo global)
             const qtdVerdes = diagnosticoOitoBlocos.filter(b => b.status === 'verde').length;
             const qtdAmarelos = diagnosticoOitoBlocos.filter(b => b.status === 'amarelo').length;
             const qtdVermelhos = diagnosticoOitoBlocos.filter(b => b.status === 'vermelho').length;
+            const blocosEstourados = diagnosticoOitoBlocos.filter(b => b.status === 'vermelho' && b.id !== 'investimentos');
+            const nomesEstouradosFormatados = blocosEstourados.map(b => `${b.corEmoji} <strong>${b.nome}</strong> (${b.perc}%)`).join(', ');
+            const nomesEstouradosSimples = blocosEstourados.map(b => b.nome).join(' e ');
             const nomesEmAlerta = diagnosticoOitoBlocos
-                .filter(b => b.status === 'vermelho' || b.status === 'amarelo')
+                .filter(b => (b.status === 'vermelho' || b.status === 'amarelo') && b.id !== 'investimentos')
                 .map(b => `${b.corEmoji} <strong>${b.nome}</strong> (${b.perc}%)`)
                 .join(', ');
 
@@ -3335,26 +4586,39 @@
                 ? `✅ <strong>Meta de 10% de Investimentos: OK!</strong> Você já destinou <strong>${formatBRL(totalInvestidoNoMes)}</strong> de ${formatBRL(metaEcoTotal)} neste mês (${resumoComposicaoInvTexto}).`
                 : `(3) Garanta seus <strong>10% de Investimentos (${formatBRL(metaEcoTotal)})</strong> — já alocado: <strong>${formatBRL(totalInvestidoNoMes)}</strong>, faltam <strong>${formatBRL(faltaPagarSe)}</strong> ${destinoRecomendadoInvest}.`;
 
+            // Alerta secundário dedicado a categorias estouradas quando o ritmo global NÃO é vermelho
+            const alertaBlocosSeparadoHTML = (blocosEstourados.length > 0 && estado !== 'vermelho') ? `
+                <div class="rounded-2xl p-3.5 bg-red-50/90 border border-red-200 flex items-start gap-2.5 text-xs text-red-900">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-crimson shrink-0 mt-0.5"></i>
+                    <div class="leading-relaxed">
+                        <strong class="text-red-950 block">Alerta de Categorias (independente do ritmo global):</strong>
+                        <span>${nomesEstouradosFormatados} passaram do teto individual. Como o ritmo total do mês segue sob controle, evite novos gastos nessas categorias e compense com a folga dos blocos verdes.</span>
+                    </div>
+                </div>
+            ` : '';
+
             let tema = {};
             if (estado === 'vermelho') {
+                const alvoPausaVermelho = blocosEstourados.length > 0
+                    ? `nos blocos estourados (${nomesEstouradosFormatados})`
+                    : `nos blocos variáveis`;
                 tema = {
                     cardBorder: 'border-red-300 bg-gradient-to-br from-white via-red-50/40 to-red-50/70 alert-pulse',
                     sinalBadgeBg: 'bg-crimson text-white shadow-sm',
-                    sinalTexto: 'SINAL VERMELHO • RITMO MUITO ACELERADO',
-                    titulo: 'Temperatura Crítica: Ritmo Acima da Previsão ou Categorias Estouradas',
+                    sinalTexto: 'SINAL VERMELHO • RITMO GLOBAL ACELERADO',
+                    titulo: 'Temperatura Crítica: Ritmo Global Acima da Previsão do Mês',
                     corPrimaria: '#C94A4A',
                     corSecundaria: '#FCA5A5',
                     corTextoDestaque: 'text-crimson',
                     corBarraGasto: 'bg-gradient-to-r from-amber-500 via-red-500 to-crimson',
-                    grauTemp: `${Math.min(42, (38.5 + Math.max(0, deltaRitmo) * 0.08)).toFixed(1)}°C`,
-                    rotuloTemp: 'Febre Orçamentária',
-                    motivoDiagnostico: `O termômetro está <strong class="text-crimson">vermelho</strong> porque você já consumiu <strong>${percOrcamentoConsumido}% da sua previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}) tendo decorrido <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}). ${nomesEmAlerta ? `Blocos exigindo atenção imediata: ${nomesEmAlerta}.` : `Seu gasto está ${formatBRL(excessoAcimaDoEsperado)} acima do teto proporcional de hoje e se esgotará no <strong>dia ${diaEstouro}</strong>.`}`,
+                    rotuloTemp: 'Ritmo Acelerado',
+                    motivoDiagnostico: `O termômetro global está <strong class="text-crimson">vermelho</strong> porque você já consumiu <strong>${percOrcamentoConsumido}% da previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${detalheTetoTexto}) tendo decorrido apenas <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}) — <strong>${formatBRL(excessoAcimaDoEsperado)}</strong> acima do teto proporcional de hoje (projeção de esgotar no <strong>dia ${diaEstouro}</strong>).${nomesEmAlerta ? ` Categorias pressionando o orçamento: ${nomesEmAlerta}.` : ''}`,
                     pilulaBg: 'bg-red-950 text-white border-red-800',
-                    pilulaTag: '💊 Pílula de Aconselhamento • Freio de Emergência nos Blocos Variados',
+                    pilulaTag: '💊 Pílula de Aconselhamento • Freio de Emergência Global',
                     pilulaTitulo: metaInvestimentoQuitada
-                        ? `10% de Investimentos já estão OK (${formatBRL(totalInvestidoNoMes)})! Agora freie os blocos estourados`
-                        : 'Congele Conforto e Prazeres por 72h e garanta seus R$ 150 de Investimentos',
-                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Pause gastos nos blocos variáveis (<strong>Conforto 15%</strong> e <strong>Prazeres 10%</strong>) por 72 horas; (2) Trave seu teto nos próximos ${diasRestantesMes} dias em no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; ${textoPasso3Invest}`,
+                        ? `10% de Investimentos já estão OK (${formatBRL(totalInvestidoNoMes)})! Agora freie ${blocosEstourados.length > 0 ? nomesEstouradosSimples : 'os gastos variáveis'}`
+                        : `Congele ${blocosEstourados.length > 0 ? nomesEstouradosSimples : 'gastos variáveis'} por 72h e garanta seus ${formatBRL(metaEcoTotal)} de Investimentos`,
+                    pilulaTexto: `Para esfriar o termômetro antes do fim do mês: (1) Pause novos gastos ${alvoPausaVermelho} por 72 horas; (2) Trave seu teto nos próximos ${diasRestantesMes} dias em no máximo <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; ${textoPasso3Invest}`,
                     btnAcaoTexto: metaInvestimentoQuitada
                         ? `10% Alocados no Mês: OK (${formatBRL(totalInvestidoNoMes)})`
                         : `Alocar 10% (Falta ${formatBRL(faltaPagarSe)})`,
@@ -3367,24 +4631,26 @@
                     btnSecFn: `acaoPilulaTermometro('auditar_saidas')`
                 };
             } else if (estado === 'laranja') {
+                const dicaBlocosLaranja = blocosEstourados.length > 0
+                    ? `Segure novos gastos em ${nomesEstouradosFormatados} e compense usando a folga dos blocos verdes`
+                    : `Se um bloco variável subir demais, compense usando a folga dos blocos verdes`;
                 tema = {
                     cardBorder: 'border-amber-300 bg-gradient-to-br from-white via-amber-50/30 to-amber-50/60',
                     sinalBadgeBg: 'bg-amber-500 text-white shadow-sm',
-                    sinalTexto: 'SINAL LARANJA • ESTADO DE ATENÇÃO',
-                    titulo: 'Temperatura Morna: Ritmo no Limite ou Categoria em Alerta',
+                    sinalTexto: 'SINAL LARANJA • RITMO GLOBAL NO LIMITE',
+                    titulo: 'Temperatura Morna: Ritmo Global Próximo do Limite do Calendário',
                     corPrimaria: '#D97706',
                     corSecundaria: '#FCD34D',
                     corTextoDestaque: 'text-amber-600',
                     corBarraGasto: 'bg-gradient-to-r from-emerald-500 via-amber-400 to-amber-600',
-                    grauTemp: `${(37.1 + Math.max(0, deltaRitmo + 3) * 0.07).toFixed(1)}°C`,
-                    rotuloTemp: 'Zona de Vigilância',
-                    motivoDiagnostico: `O sinal está <strong class="text-amber-600">laranja (atenção)</strong> com <strong>${percOrcamentoConsumido}% da previsão utilizada</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}) em <strong>${percTempoDecorrido}% do mês decorrido</strong> (Dia ${diaCorreto} de ${diasNoMes}). ${nomesEmAlerta ? `Categorias em vigilância/alerta: ${nomesEmAlerta}.` : `A margem entre gasto e calendário está estreita (${deltaRitmo >= 0 ? '+' + deltaRitmo : deltaRitmo}%).`}`,
+                    rotuloTemp: 'Ritmo no Limite',
+                    motivoDiagnostico: `O ritmo global está <strong class="text-amber-600">laranja (atenção)</strong> com <strong>${percOrcamentoConsumido}% da previsão utilizada</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${detalheTetoTexto}) em <strong>${percTempoDecorrido}% do mês decorrido</strong> (Dia ${diaCorreto} de ${diasNoMes}) — margem estreita de <strong>${deltaRitmo >= 0 ? '+' + deltaRitmo : deltaRitmo}%</strong> em relação ao calendário.`,
                     pilulaBg: 'bg-amber-950 text-white border-amber-800',
-                    pilulaTag: '💊 Pílula de Aconselhamento • Equilíbrio entre Blocos Fixos e Variados',
+                    pilulaTag: '💊 Pílula de Aconselhamento • Ajuste Fino do Ritmo',
                     pilulaTitulo: metaInvestimentoQuitada
-                        ? `✅ Meta de 10% Alocada (${formatBRL(totalInvestidoNoMes)})! Agora segure pequenos gastos variáveis`
-                        : 'Garanta os R$ 150 em Investimentos/Reserva e segure pequenos gastos',
-                    pilulaTexto: `Para retornar ao sinal verde: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) Se um bloco variável estiver amarelo/vermelho, compense usando a folga dos blocos verdes; ${textoPasso3Invest}`,
+                        ? `✅ Meta de 10% Alocada (${formatBRL(totalInvestidoNoMes)})! Segure ${blocosEstourados.length > 0 ? nomesEstouradosSimples : 'pequenos gastos variáveis'}`
+                        : `Garanta os ${formatBRL(metaEcoTotal)} em Investimentos/Reserva e segure pequenos gastos`,
+                    pilulaTexto: `Para retornar ao sinal verde: (1) Mantenha seus gastos dos próximos ${diasRestantesMes} dias abaixo de <strong>${formatBRL(cotaDiariaOrcamento)}/dia</strong>; (2) ${dicaBlocosLaranja}; ${textoPasso3Invest}`,
                     btnAcaoTexto: metaInvestimentoQuitada
                         ? `10% Alocados no Mês: OK (${formatBRL(totalInvestidoNoMes)})`
                         : `Alocar 10% (Falta ${formatBRL(faltaPagarSe)})`,
@@ -3397,24 +4663,34 @@
                     btnSecFn: `acaoPilulaTermometro('auditar_saidas')`
                 };
             } else {
+                const temBlocoEstouradoNoVerde = blocosEstourados.length > 0;
                 tema = {
                     cardBorder: 'border-emerald-300 bg-gradient-to-br from-white via-emerald-50/30 to-sage-50/70',
                     sinalBadgeBg: 'bg-forest text-white shadow-sm',
-                    sinalTexto: 'SINAL VERDE • RITMO LENTIFICADO & ECONÔMICO',
-                    titulo: 'Temperatura Ideal: Os 8 Blocos em Equilíbrio e Folga de Caixa',
+                    sinalTexto: 'SINAL VERDE • RITMO GLOBAL ECONÔMICO',
+                    titulo: temBlocoEstouradoNoVerde
+                        ? 'Ritmo Global Saudável — Atenção a Categoria(s) Estourada(s)'
+                        : 'Temperatura Ideal: Ritmo Saudável e Folga de Caixa',
                     corPrimaria: '#1B4332',
                     corSecundaria: '#6EE7B7',
                     corTextoDestaque: 'text-forest',
                     corBarraGasto: 'bg-gradient-to-r from-emerald-600 to-forest',
-                    grauTemp: '36.2°C',
-                    rotuloTemp: 'Saúde Financeira Ótima',
-                    motivoDiagnostico: `O sinal está <strong class="text-forest">verde</strong> porque seu ritmo está <strong>lentificado e saudável</strong>: decorreram <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}), mas você utilizou apenas <strong>${percOrcamentoConsumido}% da previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${usandoOrcamentoRef ? ' ref. R$ 1.500' : ''}), gerando uma <strong>folga acumulada de ${formatBRL(economiaPotencialHoje)}</strong>!`,
+                    rotuloTemp: 'Ritmo Econômico',
+                    motivoDiagnostico: `O termômetro global está <strong class="text-forest">verde</strong> porque seu ritmo total está <strong>econômico e saudável</strong>: decorreram <strong>${percTempoDecorrido}% do mês</strong> (Dia ${diaCorreto} de ${diasNoMes}), mas você utilizou apenas <strong>${percOrcamentoConsumido}% da previsão de gastos</strong> (${formatBRL(saidasMesTotal)} de ${formatBRL(orcamentoGastoMaximo)}${detalheTetoTexto}), gerando uma <strong>folga acumulada de ${formatBRL(economiaPotencialHoje)}</strong>!`,
                     pilulaBg: ' hero-gradient text-white border-emerald-800',
-                    pilulaTag: '💊 Pílula de Aconselhamento • Aceleração da Reserva & Patrimônio',
-                    pilulaTitulo: metaInvestimentoQuitada
-                        ? `✅ 10% do Mês: OK (${formatBRL(totalInvestidoNoMes)})! Aproveite a folga p/ aporte extra`
-                        : `Direcione seus 10% + sobra de ${formatBRL(valorSugeridoAporteExtra)} para Liquidez/Investimentos`,
-                    pilulaTexto: `Com suas categorias em saúde verde: (1) ${textoPasso3Invest} (2) Mantendo esse ritmo até o dia ${diasNoMes}, você economizará <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras no mês!`,
+                    pilulaTag: temBlocoEstouradoNoVerde
+                        ? '💊 Pílula de Aconselhamento • Realocação entre Blocos'
+                        : '💊 Pílula de Aconselhamento • Aceleração da Reserva & Patrimônio',
+                    pilulaTitulo: temBlocoEstouradoNoVerde
+                        ? (metaInvestimentoQuitada
+                            ? `✅ 10% do Mês: OK (${formatBRL(totalInvestidoNoMes)})! Segure ${nomesEstouradosSimples} até o fim do mês`
+                            : `Garanta seus ${formatBRL(metaEcoTotal)} de Investimentos e segure ${nomesEstouradosSimples}`)
+                        : (metaInvestimentoQuitada
+                            ? `✅ 10% do Mês: OK (${formatBRL(totalInvestidoNoMes)})! Aproveite a folga p/ aporte extra`
+                            : `Direcione seus 10% + sobra de ${formatBRL(valorSugeridoAporteExtra)} para Liquidez/Investimentos`),
+                    pilulaTexto: temBlocoEstouradoNoVerde
+                        ? `(1) Evite novos gastos em ${nomesEstouradosFormatados} — compense o excesso com a folga dos blocos verdes; (2) ${textoPasso3Invest} (3) Mantendo o ritmo global atual até o dia ${diasNoMes}, você ainda fecha o mês com <strong>${formatBRL(economiaProjetadaFimMes)}</strong> de folga!`
+                        : `Com seu ritmo global no verde: (1) ${textoPasso3Invest} (2) Mantendo esse ritmo até o dia ${diasNoMes}, você economizará <strong>${formatBRL(economiaProjetadaFimMes)}</strong> extras no mês!`,
                     btnAcaoTexto: metaInvestimentoQuitada
                         ? `10% Alocados: OK! (+ Aportar Sobra ${formatBRL(valorSugeridoAporteExtra)})`
                         : `Alocar 10% (Falta ${formatBRL(faltaPagarSe)})`,
@@ -3423,43 +4699,10 @@
                     btnAcaoFn: metaInvestimentoQuitada
                         ? `acaoPilulaTermometro('aportar_economia', ${valorSugeridoAporteExtra})`
                         : `abrirModalPagueSe()`,
-                    btnSecTexto: 'Ver Reserva & Carteira',
-                    btnSecFn: `switchTab('investimentos')`
+                    btnSecTexto: temBlocoEstouradoNoVerde ? 'Auditar Saídas por Bloco' : 'Ver Reserva & Carteira',
+                    btnSecFn: temBlocoEstouradoNoVerde ? `acaoPilulaTermometro('auditar_saidas')` : `switchTab('investimentos')`
                 };
             }
-
-            // Renderização dos 8 Mini-Cards de Saúde das Categorias (Com título sempre visível e composição de Reserva + Invest.)
-            const htmlSaudeOitoCategorias = diagnosticoOitoBlocos.map(b => {
-                const badgeStyle = b.status === 'vermelho'
-                    ? 'bg-red-50 border-red-300 text-red-900'
-                    : (b.status === 'amarelo' ? 'bg-amber-50 border-amber-300 text-amber-900' : 'bg-emerald-50/70 border-emerald-200 text-forest');
-                const barColor = b.status === 'vermelho' ? 'bg-crimson' : (b.status === 'amarelo' ? 'bg-amber-500' : 'bg-forest');
-                const wBar = Math.min(100, Math.max(4, b.perc));
-                const subDetalheInv = b.id === 'investimentos' && b.usado > 0
-                    ? `<span class="text-[9px] opacity-80 block truncate">Reserva: ${formatBRL(aportesReservaMes)} • Inv.: ${formatBRL(aportesCarteiraMes)}</span>`
-                    : '';
-                return `
-                    <div class="p-3 rounded-xl border ${badgeStyle} flex flex-col justify-between transition hover:shadow-2xs">
-                        <div>
-                            <div class="flex items-center justify-between gap-1 mb-0.5">
-                                <span class="text-xs font-extrabold truncate">${b.corEmoji} ${b.nome}</span>
-                                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/80 border border-black/5 shrink-0">${b.natureza} • ${b.percMeta}%</span>
-                            </div>
-                        </div>
-                        <div class="my-1.5">
-                            <div class="flex flex-wrap justify-between items-baseline gap-1 text-[11px]">
-                                <strong class="money-val font-extrabold text-sm">${formatBRL(b.usado)}</strong>
-                                <span class="text-[10px] opacity-80">de ${formatBRL(b.meta)} (${b.perc}%)</span>
-                            </div>
-                            ${subDetalheInv}
-                            <div class="w-full h-1.5 bg-white/90 rounded-full overflow-hidden mt-1.5 border border-black/5">
-                                <div class="h-full ${barColor} rounded-full transition-all" style="width: ${wBar}%"></div>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-bold block truncate">${b.label}</span>
-                    </div>
-                `;
-            }).join('');
 
             const percFixosComprometido = metaDemTotal > 0 ? Math.round((gastosNaturezaFixaMes / metaDemTotal) * 100) : 0;
 
@@ -3486,7 +4729,7 @@
                             <span class="w-3 h-3 rounded-full transition-all ${estado === 'vermelho' ? 'bg-red-500 ring-4 ring-red-500/30 scale-110' : 'bg-red-950 opacity-40'}"></span>
                         </div>
                         <div class="border-l border-white/15 pl-2.5 text-right">
-                            <span class="text-xs font-extrabold tracking-tight block leading-none">${tema.grauTemp}</span>
+                            <span class="text-[11px] font-extrabold tracking-tight block leading-none">${deltaRitmo > 0 ? '+' + deltaRitmo + '% ritmo' : (deltaRitmo < 0 ? Math.abs(deltaRitmo) + '% folga' : 'No ritmo')}</span>
                             <span class="text-[9px] text-slate-300 uppercase tracking-wider block">${tema.rotuloTemp}</span>
                         </div>
                     </div>
@@ -3571,6 +4814,8 @@
                                 ${tema.motivoDiagnostico}
                             </p>
                         </div>
+
+                        ${alertaBlocosSeparadoHTML}
 
                         <!-- PÍLULA DE ACONSELHAMENTO ACIONÁVEL -->
                         <div class="rounded-2xl p-4 border shadow-sm ${tema.pilulaBg} space-y-2.5">
@@ -3743,7 +4988,12 @@
             const blocoEscolhido = !isEntrada ? (document.getElementById('sai-essencialidade').value || 'Custos fixos') : null;
             const valorBaseInput = toNum(document.getElementById(isEntrada ? 'ent-valor' : 'sai-valor').value);
             const descBaseInput = document.getElementById(isEntrada ? 'ent-descricao' : 'sai-descricao').value.trim();
-            const dataBaseInput = document.getElementById(isEntrada ? 'ent-data' : 'sai-data').value;
+            const contaSelecionadaTx = document.getElementById(isEntrada ? 'ent-conta' : 'sai-conta')?.value || contasBancarias[0]?.id;
+            const dataRawInput = document.getElementById(isEntrada ? 'ent-data' : 'sai-data').value;
+            const fatInfoTx = (!isEntrada && !idEdicao && formaPgto === 'Cartão de Crédito')
+                ? calcularDataFaturaCartao(dataRawInput)
+                : { dataFatura: dataRawInput, virouMes: false, dataOriginalBR: '' };
+            const dataBaseInput = fatInfoTx.dataFatura;
             const formaPgto = !isEntrada ? (document.getElementById('sai-pagamento').value || 'Pix') : null;
             const statusPgtoInicial = !isEntrada ? (document.getElementById('sai-status-pagamento')?.value || 'pago') : 'pago';
             const numParcelas = (!isEntrada && !idEdicao && formaPgto === 'Cartão de Crédito')
@@ -3803,7 +5053,7 @@
                         payload: {
                             tipo,
                             valor: parte.valor,
-                            descricao: `${descBaseInput}${parte.sufixo}`,
+                            descricao: `${descBaseInput}${parte.sufixo}${fatInfoTx.virouMes ? ` [Compra ${fatInfoTx.dataOriginalBR}]` : ''}`,
                             categoria: catFinal,
                             data: dataBaseInput,
                             recorrencia: isEntrada ? (isExtraMarcado ? 'Extra_50_50' : document.getElementById('ent-recorrencia').value) : null,
@@ -3821,9 +5071,20 @@
                 for (const item of itensParaSalvar) {
                     const payload = item.payload;
                     if (supabaseClient) {
+                        const payloadNuvem = {
+                            ...payload,
+                            bloco_orcamento: !isEntrada ? item.bloco : null,
+                            status_pagamento: item.isPendente ? 'pendente' : 'pago'
+                        };
                         let res = idEdicao
-                            ? await supabaseClient.from('transacoes').update(payload).eq('id', idEdicao).select()
-                            : await supabaseClient.from('transacoes').insert([payload]).select();
+                            ? await supabaseClient.from('transacoes').update(payloadNuvem).eq('id', idEdicao).select()
+                            : await supabaseClient.from('transacoes').insert([payloadNuvem]).select();
+
+                        if (res.error && /(bloco_orcamento|status_pagamento|column)/i.test(String(res.error.message || ''))) {
+                            res = idEdicao
+                                ? await supabaseClient.from('transacoes').update(payload).eq('id', idEdicao).select()
+                                : await supabaseClient.from('transacoes').insert([payload]).select();
+                        }
 
                         if (res.error && String(res.error.message || '').includes('check constraint')) {
                             const payloadFallback = {
@@ -3838,6 +5099,7 @@
                         if (res.error) throw new Error(res.error.message);
 
                         const salvoId = (res.data && res.data[0] && res.data[0].id) ? res.data[0].id : idEdicao;
+                        if (salvoId) registrarContaParaTransacao(salvoId, contaSelecionadaTx);
                         if (!isEntrada && salvoId) {
                             salvarBlocoLocalTransacao(salvoId, item.bloco);
                             definirStatusPagamentoLocal(salvoId, item.isPendente);
@@ -3854,6 +5116,7 @@
                         } else {
                             const novoId = crypto.randomUUID();
                             transacoes.unshift({ id: novoId, ...localItem });
+                            registrarContaParaTransacao(novoId, contaSelecionadaTx);
                             if (!isEntrada) {
                                 salvarBlocoLocalTransacao(novoId, item.bloco);
                                 definirStatusPagamentoLocal(novoId, item.isPendente);
@@ -4087,19 +5350,40 @@
         }
 
         async function excluirInvestimento(id) {
+            const ativo = investimentos.find(i => String(i.id) === String(id));
+            const nomeAlvo = ativo ? `investimento: ${String(ativo.nome || '').trim().toLowerCase()}` : '';
+            const espelhos = nomeAlvo
+                ? reservaMovs.filter(r => r.tipo === 'aporte' && String(r.onde_guardado || '').trim().toLowerCase() === nomeAlvo)
+                : [];
+            const somaEstorno = espelhos.reduce((acc, r) => acc + toNum(r.valor), 0);
+            const msgExtra = somaEstorno > 0
+                ? ` Os aportes vinculados (${formatBRL(somaEstorno)}) serão estornados automaticamente no Saldo Disponível.`
+                : '';
+
             const resp = await abrirDialogoCustom({
                 titulo: 'Remover Ativo da Carteira',
-                mensagem: 'Deseja realmente remover este ativo da sua carteira de investimentos?',
+                mensagem: `Deseja realmente remover este ativo da sua carteira de investimentos?${msgExtra}`,
                 textoConfirmar: 'Remover Ativo',
                 corConfirmar: 'bg-crimson hover:bg-red-700'
             });
             if (!resp.confirmado) return;
-            if (supabaseClient) await supabaseClient.from('investimentos').delete().eq('id', id);
-            else {
+
+            if (supabaseClient) {
+                await supabaseClient.from('investimentos').delete().eq('id', id);
+                const idsEspelhos = espelhos.map(r => r.id).filter(Boolean);
+                if (idsEspelhos.length > 0) {
+                    await supabaseClient.from('reserva_movimentacoes').delete().in('id', idsEspelhos);
+                }
+            } else {
                 investimentos = investimentos.filter(i => String(i.id) !== String(id));
                 safeSetStorage('mp_local_investimentos', JSON.stringify(investimentos));
+                if (espelhos.length > 0) {
+                    const idsSet = new Set(espelhos.map(r => String(r.id)));
+                    reservaMovs = reservaMovs.filter(r => !idsSet.has(String(r.id)));
+                    safeSetStorage('mp_local_reserva', JSON.stringify(reservaMovs));
+                }
             }
-            showToast('Ativo removido.');
+            showToast(somaEstorno > 0 ? `Ativo removido e ${formatBRL(somaEstorno)} estornados ao caixa.` : 'Ativo removido.');
             await loadAllData();
         }
 
@@ -4107,16 +5391,17 @@
             e.preventDefault();
             const tipo = document.getElementById('res-tipo').value;
             const valor = toNum(document.getElementById('res-valor').value);
-            const local = document.getElementById('res-local').value.trim();
+            const localLimpo = document.getElementById('res-local').value.trim();
             const data = document.getElementById('res-data').value;
             const descontar = document.getElementById('res-descontar-saldo').checked;
 
             if (tipo === 'resgate' && descontar) {
+                // Transferência neutra: recompõe o saldo em conta sem inflar Renda Extra 50/50 nem cobrar 10% novamente
                 const transPayload = {
                     tipo: 'entrada',
                     valor: valor,
-                    descricao: `Resgate da Reserva (${local})`,
-                    categoria: 'Rendimentos',
+                    descricao: `Resgate da Reserva (${localLimpo})`,
+                    categoria: 'Resgate de Reserva',
                     data: data,
                     recorrencia: 'Unica'
                 };
@@ -4127,19 +5412,27 @@
                 }
             }
 
-            const payload = { tipo, valor, onde_guardado: local, data };
+            // Quando for aporte de saldo antigo (checkbox desmarcado), marca para não abater do Saldo Disponível atual
+            const ondeGuardadoFinal = (tipo === 'aporte' && !descontar)
+                ? `${localLimpo} [Saldo Anterior]`
+                : localLimpo;
+            const payload = { tipo, valor, onde_guardado: ondeGuardadoFinal, data };
 
             if (supabaseClient) {
-                const { error } = await supabaseClient.from('reserva_movimentacoes').insert([payload]);
+                let { error } = await supabaseClient.from('reserva_movimentacoes').insert([{ ...payload, afeta_caixa: descontar }]);
+                if (error && /afeta_caixa|column/i.test(String(error.message || ''))) {
+                    const retry = await supabaseClient.from('reserva_movimentacoes').insert([payload]);
+                    error = retry.error;
+                }
                 if (error) return showToast('Erro: ' + error.message, 'erro');
             } else {
-                reservaMovs.unshift({ id: crypto.randomUUID(), ...payload });
+                reservaMovs.unshift({ id: crypto.randomUUID(), ...payload, afeta_caixa: descontar });
                 safeSetStorage('mp_local_reserva', JSON.stringify(reservaMovs));
             }
 
             document.getElementById('form-reserva').reset();
             document.getElementById('res-data').value = new Date().toISOString().slice(0, 10);
-            showToast('Reserva e caixa atualizados!');
+            showToast(tipo === 'aporte' && !descontar ? 'Aporte registrado na reserva sem afetar o caixa do mês!' : 'Reserva e caixa atualizados!');
             await loadAllData();
         }
 
@@ -4271,14 +5564,14 @@
             // ENGENHARIA DE CAIXA REAL: Entradas - Saídas - Aportes de Patrimônio (Reserva/Investimentos)
             const totalEntradasGlobal = transacoes.filter(t => t.tipo === 'entrada').reduce((acc, t) => acc + toNum(t.valor), 0);
             const totalSaidasPagasGlobal = transacoes.filter(t => t.tipo === 'saida' && !isTransacaoPendente(t)).reduce((acc, t) => acc + toNum(t.valor), 0);
-            const totalAportesReservaGlobal = reservaMovs.filter(r => r.tipo === 'aporte').reduce((acc, r) => acc + toNum(r.valor), 0);
+            const totalAportesReservaGlobal = reservaMovs.filter(r => r.tipo === 'aporte' && isReservaAfetaCaixa(r)).reduce((acc, r) => acc + toNum(r.valor), 0);
             const saldoDisponivel = totalEntradasGlobal - totalSaidasPagasGlobal - totalAportesReservaGlobal;
 
             const transMes = transacoes.filter(t => t.data && String(t.data).startsWith(mesSelecionado));
             const entradasMesLista = transMes.filter(t => t.tipo === 'entrada');
             const saidasMesLista = transMes.filter(t => t.tipo === 'saida');
 
-            const rendaRegularMes = entradasMesLista.filter(t => !isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
+            const rendaRegularMes = entradasMesLista.filter(t => !isTransacaoExtra(t) && !isTransferenciaInterna(t)).reduce((a, b) => a + toNum(b.valor), 0);
             const rendaExtraMes = entradasMesLista.filter(t => isTransacaoExtra(t)).reduce((a, b) => a + toNum(b.valor), 0);
             const entradasMesTotal = rendaRegularMes + rendaExtraMes;
             const saidasMesTotal = saidasMesLista.reduce((a, b) => a + toNum(b.valor), 0);
@@ -4466,6 +5759,7 @@
             try {
                 renderizarAlertasComportamentais({
                     mesSelecionado, rendaRegularMes: rendaBaseCalculo, usandoRendaPadrao1500, rendaExtraMes, entradasMesTotal,
+                    rolloverMetas, rolloverConhecimento,
                     saidasMesLista, saidasMesTotal, metaEcoTotal,
                     gastoCustosFixos, metaDemTotal,
                     gastoConforto, metaConfortoTotal,
@@ -4480,6 +5774,10 @@
             } catch (e) { console.error('Erro em Alertas:', e); }
 
             try { renderizarTabelas(transMes); } catch (e) { console.error('Erro em Tabelas:', e); }
+            try { renderizarFaturaCartao(transMes); } catch (e) { console.error('Erro em Fatura Cartão:', e); }
+            try { popularSelectsContas(); renderizarContasStripHero(); } catch (e) { console.error('Erro em Contas:', e); }
+            try { renderizarTendenciaBlocos(mesSelecionado); } catch (e) { console.error('Erro em Tendência:', e); }
+            try { renderizarRebalanceadorCarteira(totalReserva); } catch (e) { console.error('Erro em Rebalanceador:', e); }
             try { renderizarGraficos(transMes); } catch (e) { console.error('Erro em Gráficos:', e); }
             try { renderizarGraficoSankey(transMes); } catch (e) { console.error('Erro em Sankey:', e); }
             try { renderizarModuloInvestimentos(totalInvestidoCarteira, totalAplicadoCarteira, totalReserva); } catch (e) { console.error('Erro em Investimentos:', e); }
@@ -4829,6 +6127,7 @@
                 descontarIpca: !!document.getElementById('sim-descontar-ipca')?.checked
             };
             safeSetStorage('mp_sim_carreira_config', JSON.stringify(payload));
+            agendarSyncExtrasNuvem();
         }
 
         function calcularDivisaoSeteBlocosFase(rendaTotal, valorAporte, modo) {
@@ -5278,10 +6577,10 @@
                     return `
                         <tr class="hover:bg-slate-50/80 transition">
                             <td class="py-3 px-2">
-                                <p class="font-semibold text-slate-800">${i.nome}</p>
-                                <span class="text-xs text-slate-400">${i.instituicao || 'Carteira Própria'} • Gera ~${formatBRL(passivaAtivoMes)}/mês (13%)</span>
+                                <p class="font-semibold text-slate-800">${escapeHTML(i.nome)}</p>
+                                <span class="text-xs text-slate-400">${escapeHTML(i.instituicao || 'Carteira Própria')} • Gera ~${formatBRL(passivaAtivoMes)}/mês (13%)</span>
                             </td>
-                            <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${i.classe || 'Renda Fixa'}</span></td>
+                            <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${escapeHTML(i.classe || 'Renda Fixa')}</span></td>
                             <td class="py-3 px-2 text-right text-slate-600 money-val">${formatBRL(valAp)}</td>
                             <td class="py-3 px-2 text-right font-bold text-forest money-val">${formatBRL(saldoAt)}</td>
                             <td class="py-3 px-2 text-right text-xs font-bold ${dif >= 0 ? 'text-forest' : 'text-crimson'}">${dif >= 0 ? '+' : ''}${p}%</td>
@@ -5370,7 +6669,7 @@
             // Agrupamento por Local de Custódia da Reserva
             const porLocal = {};
             movsReservaPura.forEach(r => {
-                const loc = r.onde_guardado || 'Reserva de Liquidez';
+                const loc = limparTagLocalReserva(r.onde_guardado);
                 const delta = r.tipo === 'aporte' ? toNum(r.valor) : -toNum(r.valor);
                 porLocal[loc] = (porLocal[loc] || 0) + delta;
             });
@@ -5381,7 +6680,7 @@
                     ? `<span class="text-xs text-slate-400">Nenhum saldo depositado por instituição ainda.</span>`
                     : entradasLocais.map(([loc, val]) => `
                         <div class="px-3 py-1.5 rounded-xl bg-sage-50 border border-sage-200 flex items-center gap-2 text-xs">
-                            <span class="font-medium text-slate-600">${loc}:</span>
+                            <span class="font-medium text-slate-600">${escapeHTML(loc)}:</span>
                             <strong class="text-forest money-val">${formatBRL(val)}</strong>
                         </div>
                     `).join('');
@@ -5390,23 +6689,26 @@
             const tbody = document.getElementById('lista-reserva-tbody');
             tbody.innerHTML = movsReservaPura.length === 0
                 ? `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Nenhuma movimentação na reserva ainda.</td></tr>`
-                : movsReservaPura.map(r => `
+                : movsReservaPura.map(r => {
+                    const semCaixa = r.tipo === 'aporte' && !isReservaAfetaCaixa(r);
+                    const localExibicao = escapeHTML(limparTagLocalReserva(r.onde_guardado));
+                    return `
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(r.data || r.created_at)}</td>
                         <td class="py-3 px-2">
                             <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${r.tipo === 'aporte' ? 'bg-emerald-50 text-forest' : 'bg-red-50 text-crimson'}">
-                                ${r.tipo === 'aporte' ? 'Depósito / Aporte (Pague-se 1º)' : 'Resgate'}
+                                ${r.tipo === 'aporte' ? (semCaixa ? 'Saldo Anterior (Sem Caixa)' : 'Depósito / Aporte (Pague-se 1º)') : 'Resgate'}
                             </span>
                         </td>
-                        <td class="py-3 px-2 font-medium text-slate-700">${r.onde_guardado || 'Reserva de Emergência'}</td>
+                        <td class="py-3 px-2 font-medium text-slate-700">${localExibicao}</td>
                         <td class="py-3 px-2 text-right font-bold money-val ${r.tipo === 'aporte' ? 'text-forest' : 'text-crimson'}">
                             ${r.tipo === 'aporte' ? '+' : '-'} ${formatBRL(r.valor)}
                         </td>
                         <td class="py-3 px-2 text-right">
-                            <button onclick="excluirMovReserva('${r.id}')" class="p-1 text-slate-400 hover:text-crimson"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="excluirMovReserva('${escapeHTML(r.id)}')" class="p-1 text-slate-400 hover:text-crimson"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </td>
-                    </tr>
-                `).join('');
+                    </tr>`;
+                }).join('');
         }
 
         function renderizarModuloSonhos() {
@@ -5436,7 +6738,7 @@
                                     <button onclick="excluirSonho('${s.id}')" class="p-1 text-slate-400 hover:text-crimson"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                                 </div>
                             </div>
-                            <h4 class="font-bold text-slate-800 text-base mt-2">${s.titulo}</h4>
+                            <h4 class="font-bold text-slate-800 text-base mt-2">${escapeHTML(s.titulo)}</h4>
                             <p class="text-xs text-slate-400">Prazo: ${formatDataBR(s.data_limite)} (${mesesRestantes} meses)</p>
                         </div>
 
@@ -5519,6 +6821,9 @@
             document.getElementById('total-registros-count').innerText = `${transMesFiltradas.length} lançamentos`;
             const badgeDiagnostico = (t) => {
                 if (t.tipo === 'entrada') {
+                    if (isTransferenciaInterna(t)) {
+                        return `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600">Transferência / Resgate (Neutro)</span>`;
+                    }
                     const extra = isTransacaoExtra(t);
                     const vPagueSe = extra ? toNum(t.valor) * 0.5 : toNum(t.valor) * (config.perc_economia / 100);
                     return extra
@@ -5541,8 +6846,8 @@
                 <div class="p-3.5 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-2">
                     <div class="flex items-start justify-between gap-2">
                         <div class="min-w-0">
-                            <p class="font-bold text-slate-800 text-sm truncate">${t.descricao}</p>
-                            <span class="text-[11px] text-slate-400 block">${formatDataBR(t.data)} • ${extrairCategoriaBase(t.categoria)}</span>
+                            <p class="font-bold text-slate-800 text-sm truncate">${escapeHTML(t.descricao)}</p>
+                            <span class="text-[11px] text-slate-400 block">${formatDataBR(t.data)} • ${escapeHTML(extrairCategoriaBase(t.categoria))}</span>
                         </div>
                         <strong class="text-sm font-extrabold whitespace-nowrap money-val ${t.tipo === 'entrada' ? 'text-forest' : 'text-crimson'}">
                             ${t.tipo === 'entrada' ? '+' : '-'} ${formatBRL(t.valor)}
@@ -5571,8 +6876,8 @@
                 : transMesFiltradas.map(t => `
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-3 px-2 text-xs text-slate-500 whitespace-nowrap">${formatDataBR(t.data)}</td>
-                        <td class="py-3 px-2 font-semibold text-slate-800">${t.descricao}</td>
-                        <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${extrairCategoriaBase(t.categoria)}</span></td>
+                        <td class="py-3 px-2 font-semibold text-slate-800">${escapeHTML(t.descricao)}</td>
+                        <td class="py-3 px-2"><span class="px-2.5 py-1 rounded-full text-xs bg-sage-50 text-forest font-medium">${escapeHTML(extrairCategoriaBase(t.categoria))}</span></td>
                         <td class="py-3 px-2">${badgeDiagnostico(t)}</td>
                         <td class="py-3 px-2 text-right font-bold whitespace-nowrap money-val ${t.tipo === 'entrada' ? 'text-forest' : 'text-crimson'}">
                             ${t.tipo === 'entrada' ? '+' : '-'} ${formatBRL(t.valor)}
@@ -5596,8 +6901,8 @@
                 : entMes.map(t => `
                     <tr>
                         <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(t.data)}</td>
-                        <td class="py-3 px-2 font-semibold text-slate-800">${t.descricao}</td>
-                        <td class="py-3 px-2 text-xs text-slate-600">${extrairCategoriaBase(t.categoria)}</td>
+                        <td class="py-3 px-2 font-semibold text-slate-800">${escapeHTML(t.descricao)}</td>
+                        <td class="py-3 px-2 text-xs text-slate-600">${escapeHTML(extrairCategoriaBase(t.categoria))}</td>
                         <td class="py-3 px-2">${badgeDiagnostico(t)}</td>
                         <td class="py-3 px-2 text-right font-bold text-forest money-val">+ ${formatBRL(t.valor)}</td>
                         <td class="py-3 px-2 text-right">
@@ -5619,8 +6924,8 @@
                 : saiMes.map(t => `
                     <tr>
                         <td class="py-3 px-2 text-xs text-slate-500">${formatDataBR(t.data)}</td>
-                        <td class="py-3 px-2 font-semibold text-slate-800">${t.descricao}</td>
-                        <td class="py-3 px-2 text-xs text-slate-600">${extrairCategoriaBase(t.categoria)}</td>
+                        <td class="py-3 px-2 font-semibold text-slate-800">${escapeHTML(t.descricao)}</td>
+                        <td class="py-3 px-2 text-xs text-slate-600">${escapeHTML(extrairCategoriaBase(t.categoria))}</td>
                         <td class="py-3 px-2">${badgeDiagnostico(t)}</td>
                         <td class="py-3 px-2 text-right font-bold text-crimson money-val">- ${formatBRL(t.valor)}</td>
                         <td class="py-3 px-2 text-right">
@@ -5944,7 +7249,7 @@
                 investimentos: 'Carteira de Investimentos & Renda Passiva (13% a.a.)',
                 reserva: 'Reserva de Emergência',
                 sonhos: 'Sonhos e Objetivos',
-                carreira: 'Simulador 2029: Janela de Ouro & Carro'
+                carreira: 'Projeções & Futuro (2029 / 40+)'
             };
             document.getElementById('page-title').innerText = titulos[tabId] || 'Dashboard';
 
@@ -6022,7 +7327,8 @@
                 document.getElementById('ent-data').value = new Date().toISOString().slice(0, 10);
             }
             calcularPreviaDistribuicao();
-            document.getElementById('ent-valor').focus();
+            switchTab('entradas');
+            setTimeout(() => document.getElementById('ent-valor')?.focus(), 80);
             showToast(`Plantão de ${formatBRL(total)} (Regra 50/50) preenchido no formulário! Clique em Salvar Entrada.`);
         }
 
@@ -6210,8 +7516,18 @@
                     'mp_status_pendentes',
                     'mp_atalhos_saidas_custom',
                     'mp_proj_config',
-                    'mp_sim_carreira_config'
+                    'mp_sim_carreira_config',
+                    'mp_cartao_config',
+                    'mp_contas_bancarias',
+                    'mp_conta_por_transacao',
+                    'mp_transferencias_contas',
+                    'mp_alocacao_alvo'
                 ];
+                alocacaoAlvo = { ...ALOCACAO_ALVO_PADRAO };
+                cartaoConfig = { nome: 'Cartão Principal', diaFechamento: 25, diaVencimento: 5, limite: 3000 };
+                contasBancarias = [...CONTAS_PADRAO];
+                mapaContaTransacao = {};
+                transferenciasContas = [];
                 chavesLimpar.forEach(k => {
                     try { window.localStorage.removeItem(k); } catch (e) {}
                 });
@@ -6268,6 +7584,11 @@
                 projConfig,
                 simCarreiraConfig,
                 atalhosCustom,
+                cartaoConfig,
+                contasBancarias,
+                mapaContaTransacao,
+                transferenciasContas,
+                alocacaoAlvo,
                 blocosLocais,
                 statusPendentes: obterMapaPendentes(),
                 categorias,
@@ -6341,6 +7662,26 @@
                     }
                     if (dados.statusPendentes) {
                         safeSetStorage('mp_status_pendentes', JSON.stringify(dados.statusPendentes));
+                    }
+                    if (dados.cartaoConfig && typeof dados.cartaoConfig === 'object') {
+                        cartaoConfig = { ...cartaoConfig, ...dados.cartaoConfig };
+                        safeSetStorage('mp_cartao_config', JSON.stringify(cartaoConfig));
+                    }
+                    if (Array.isArray(dados.contasBancarias) && dados.contasBancarias.length > 0) {
+                        contasBancarias = dados.contasBancarias;
+                        safeSetStorage('mp_contas_bancarias', JSON.stringify(contasBancarias));
+                    }
+                    if (dados.mapaContaTransacao && typeof dados.mapaContaTransacao === 'object') {
+                        mapaContaTransacao = dados.mapaContaTransacao;
+                        safeSetStorage('mp_conta_por_transacao', JSON.stringify(mapaContaTransacao));
+                    }
+                    if (Array.isArray(dados.transferenciasContas)) {
+                        transferenciasContas = dados.transferenciasContas;
+                        safeSetStorage('mp_transferencias_contas', JSON.stringify(transferenciasContas));
+                    }
+                    if (dados.alocacaoAlvo && typeof dados.alocacaoAlvo === 'object') {
+                        alocacaoAlvo = { ...ALOCACAO_ALVO_PADRAO, ...dados.alocacaoAlvo };
+                        safeSetStorage('mp_alocacao_alvo', JSON.stringify(alocacaoAlvo));
                     }
 
                     let msgRestore = 'Backup restaurado com sucesso!';

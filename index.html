@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1B4332">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -53,12 +53,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
 
     <style>
-        body { background-color: #F4F6F5; color: #1E293B; -webkit-tap-highlight-color: transparent; }
-        .card-shadow { box-shadow: 0 8px 30px -4px rgba(27, 67, 50, 0.04); }
-        .hero-gradient { background: linear-gradient(135deg, #1B4332 0%, #112A20 100%); }
-        .optimistic-gradient { background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%); }
-        .nav-active { background-color: #E1ECE4; color: #1B4332; font-weight: 700; }
+        body { background-color: #F4F6F5; color: #1E293B; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        .card-shadow { box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 10px 30px -8px rgba(27, 67, 50, 0.06); }
+        .hero-gradient { background: radial-gradient(circle at 88% 12%, rgba(110, 231, 183, 0.14) 0%, transparent 45%), linear-gradient(135deg, #1B4332 0%, #133124 52%, #0E231A 100%); }
+        .optimistic-gradient { background: radial-gradient(circle at 90% 10%, rgba(167, 243, 208, 0.16) 0%, transparent 45%), linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%); }
+        .nav-active { background-color: #E1ECE4; color: #1B4332; font-weight: 700; box-shadow: inset 3px 0 0 #1B4332; }
         .mobile-nav-active { color: #1B4332; font-weight: 700; }
+        .tab-content:not(.hidden) { animation: mpFadeIn 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes mpFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        [id^="modal-"]:not(.hidden) > div { animation: mpModalPop 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes mpModalPop { from { opacity: 0; transform: translateY(10px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        input:focus-visible, select:focus-visible, button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.16); }
+        .atalho-chip-active { background-color: #E1ECE4 !important; border-color: #1B4332 !important; color: #1B4332 !important; box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.15); }
+        .mobile-bottom-nav { padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)); }
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.28); border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(27, 67, 50, 0.45); }
         .privacy-blur { filter: blur(8px); user-select: none; transition: filter 0.2s ease; }
         .money-val { font-variant-numeric: tabular-nums; white-space: nowrap; }
         @keyframes pulse-border {
@@ -138,8 +149,11 @@
         body.dark-mode .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--mp-border); }
         body.dark-mode input,
         body.dark-mode select { background-color: var(--mp-input-bg); color: var(--mp-text); border-color: #284E3D; }
-        body.dark-mode .nav-active { background-color: #1E3F30; color: var(--mp-accent); }
+        body.dark-mode .bg-white\/95 { background-color: var(--mp-surface-glass); color: var(--mp-text); border-color: var(--mp-border); }
+        body.dark-mode .nav-active { background-color: #1E3F30; color: var(--mp-accent); box-shadow: inset 3px 0 0 var(--mp-accent); }
         body.dark-mode .mobile-nav-active { color: var(--mp-accent); }
+        body.dark-mode .atalho-chip-active { background-color: #1E3F30 !important; border-color: #6EE7B7 !important; color: #6EE7B7 !important; }
+        body.dark-mode input:focus-visible, body.dark-mode select:focus-visible, body.dark-mode button:focus-visible { box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.22); }
         body.dark-mode #spending-thermometer-card { background: linear-gradient(135deg, #12221B 0%, #172B22 100%); }
     </style>
 </head>
@@ -200,7 +214,7 @@
 
         <div class="pt-4 border-t border-slate-100 space-y-1">
             <button onclick="abrirModalViradaMes()" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
-                <i data-lucide="calendar-sync" class="w-4 h-4 shrink-0"></i>
+                <i data-lucide="calendar-range" class="w-4 h-4 shrink-0"></i>
                 <span class="truncate">Virada de Mês & Sobra</span>
             </button>
             <button onclick="abrirModalBackup()" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
@@ -213,7 +227,7 @@
             </button>
             <button onclick="openModal('modal-planejamento')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
                 <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
-                <span class="truncate">8 Blocos (10/40/15/10/10/5/2/8)</span>
+                <span class="truncate">Regras dos 8 Blocos</span>
             </button>
             <button onclick="openModal('modal-db')" class="w-full flex items-center gap-2.5 text-xs text-left text-slate-500 hover:text-forest py-2 px-3 rounded-lg hover:bg-sage-50 transition">
                 <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
@@ -226,31 +240,31 @@
     <main class="flex-1 md:ml-64 p-4 md:p-7 max-w-6xl mx-auto w-full min-w-0">
         
         <!-- HEADER SUPERIOR -->
-        <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 mb-6">
             <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-[11px] font-bold text-sage-600 uppercase tracking-wider">Fase Atual: Formação & Hábito</span>
-                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-sage-100 text-forest" id="header-burn-badge">10/10/2/78 + Extra 50/50</span>
+                    <span class="text-[11px] font-bold text-sage-600 uppercase tracking-wider">Fase Atual: Formação &amp; Hábito</span>
+                    <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-sage-100 text-forest" id="header-burn-badge">8 Blocos + Extra 50/50</span>
                 </div>
-                <h2 class="text-2xl font-extrabold text-slate-800 mt-0.5 truncate" id="page-title">Saldo &amp; Termômetro</h2>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight mt-0.5 leading-tight" id="page-title">Saldo &amp; Termômetro</h2>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
                 <button onclick="instalarPWA()" id="btn-install-pwa" title="Instalar Meu Patrimônio como aplicativo" class="hidden px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-forest text-xs font-bold hover:bg-emerald-100 transition items-center gap-1.5"><i data-lucide="smartphone" class="w-4 h-4"></i><span class="hidden sm:inline">Instalar App</span></button>
-                <button onclick="toggleDarkMode()" id="btn-dark-mode" title="Alternar Modo Escuro / Claro" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
+                <button onclick="toggleDarkMode()" id="btn-dark-mode" title="Alternar Modo Escuro / Claro" aria-label="Alternar Modo Escuro ou Claro" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest hover:border-sage-200 transition shadow-sm">
                     <i data-lucide="moon" id="dark-mode-icon" class="w-4 h-4"></i>
                 </button>
-                <button onclick="togglePrivacy()" title="Ocultar/Mostrar Valores" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
+                <button onclick="togglePrivacy()" title="Ocultar/Mostrar Valores" aria-label="Ocultar ou mostrar valores" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest hover:border-sage-200 transition shadow-sm">
                     <i data-lucide="eye" id="privacy-icon" class="w-4 h-4"></i>
                 </button>
 
-                <input type="month" id="month-filter" onchange="loadAllData()" class="min-w-[155px] bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs md:text-sm font-semibold text-slate-700 focus:outline-none focus:border-sage-500 shadow-2xs">
+                <input type="month" id="month-filter" onchange="loadAllData()" aria-label="Selecionar mês de referência" class="flex-1 sm:flex-none min-w-[178px] bg-white border border-slate-200/80 rounded-xl px-3 py-2 text-xs md:text-sm font-semibold text-slate-700 focus:outline-none focus:border-sage-500 shadow-sm">
                 
-                <button onclick="openModal('modal-config-hub')" title="Configurações, Backup, Reset e Supabase" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest transition shadow-2xs">
+                <button onclick="openModal('modal-config-hub')" title="Configurações, Backup, Reset e Supabase" aria-label="Abrir configurações" class="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-600 hover:text-forest hover:border-sage-200 transition shadow-sm">
                     <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
 
-                <button onclick="openNovaMovimentacao()" class="hero-gradient hover:opacity-95 text-white font-semibold px-4 py-2.5 rounded-xl text-xs md:text-sm flex items-center gap-2 shadow-sm transition whitespace-nowrap">
+                <button onclick="openNovaMovimentacao()" class="hero-gradient hover:opacity-95 active:scale-[0.98] text-white font-semibold px-3.5 sm:px-4 py-2.5 rounded-xl text-xs md:text-sm flex items-center gap-2 shadow-sm transition whitespace-nowrap">
                     <i data-lucide="plus" class="w-4 h-4 shrink-0"></i>
                     <span class="hidden sm:inline">Nova movimentação</span>
                 </button>
@@ -292,7 +306,7 @@
                     </div>
 
                     <!-- Bloco do Patrimônio Total com Olhinho Próprio (Oculto por padrão) -->
-                    <div class="bg-white/10 backdrop-blur-xs border border-white/15 px-4 py-3 rounded-2xl flex items-center justify-between gap-4 shrink-0">
+                    <div class="bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-3 rounded-2xl flex items-center justify-between gap-4 shrink-0">
                         <div>
                             <span class="text-[10px] text-sage-200 uppercase tracking-wider block">Patrimônio Líquido Acumulado</span>
                             <span class="text-lg font-extrabold text-white privacy-blur money-val block" id="ind-patrimonio-global">R$ 0,00</span>
@@ -307,7 +321,7 @@
                 <!-- Linha Inferior: 4 Sub-Cards de apoio -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-6">
                     <!-- Entradas -->
-                    <div class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between min-w-0">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 flex flex-col justify-between min-w-0">
                         <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
                             <span class="font-medium truncate">Entradas (Mês)</span>
                             <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-300 shrink-0"></i>
@@ -317,7 +331,7 @@
                     </div>
 
                     <!-- Saídas -->
-                    <div class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between min-w-0">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 flex flex-col justify-between min-w-0">
                         <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
                             <span class="font-medium truncate">Saídas (Mês)</span>
                             <i data-lucide="arrow-down-right" class="w-4 h-4 text-red-300 shrink-0"></i>
@@ -327,7 +341,7 @@
                     </div>
 
                     <!-- Investimentos (Soma Carteira + Reserva de Emergência) -->
-                    <div onclick="switchTab('investimentos')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
+                    <div onclick="switchTab('investimentos')" class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 hover:border-white/25 hover:-translate-y-0.5 transition-all duration-200 min-w-0">
                         <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
                             <span class="font-medium truncate">Investimentos (c/ Reserva)</span>
                             <i data-lucide="trending-up" class="w-4 h-4 text-sage-200 shrink-0"></i>
@@ -337,7 +351,7 @@
                     </div>
 
                     <!-- Reserva de Emergência -->
-                    <div onclick="switchTab('reserva')" class="bg-white/10 backdrop-blur-xs rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 transition min-w-0">
+                    <div onclick="switchTab('reserva')" class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 flex flex-col justify-between cursor-pointer hover:bg-white/15 hover:border-white/25 hover:-translate-y-0.5 transition-all duration-200 min-w-0">
                         <div class="flex items-center justify-between gap-2 text-xs text-sage-200 mb-1">
                             <span class="font-medium truncate">Reserva Emerg.</span>
                             <i data-lucide="shield-check" class="w-4 h-4 text-sage-200 shrink-0"></i>
@@ -360,7 +374,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-slate-800 text-sm">Fluxo de Caixa &amp; Velocidade</h3>
                         <div class="inline-flex rounded-xl bg-slate-100 p-1">
-                            <button onclick="setChartPeriod('semanal')" id="btn-chart-semanal" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs transition">Semanal</button>
+                            <button onclick="setChartPeriod('semanal')" id="btn-chart-semanal" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition">Semanal</button>
                             <button onclick="setChartPeriod('mensal')" id="btn-chart-mensal" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition">Semestral</button>
                         </div>
                     </div>
@@ -416,7 +430,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-2 shrink-0">
                         <button type="button" onclick="abrirModalViradaMes()" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-forest border border-emerald-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-                            <i data-lucide="calendar-sync" class="w-3.5 h-3.5"></i> Virada de Mês
+                            <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i> Virada de Mês
                         </button>
                         <button type="button" onclick="abrirModalFechamentoMes()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                             <i data-lucide="award" class="w-3.5 h-3.5"></i> Fechamento do Mês
@@ -788,12 +802,12 @@
                     <!-- ATALHOS DE 1 CLIQUE PARA GASTOS RECORRENTES / FIXOS -->
                     <div class="mb-4 p-3 rounded-2xl bg-sage-50/70 border border-sage-200/80 space-y-2">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-forest flex items-center gap-1">
-                                <i data-lucide="zap" class="w-3.5 h-3.5"></i> Atalhos 1 Clique (Fixos & Recorrentes)
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-forest flex items-center gap-1 min-w-0">
+                                <i data-lucide="zap" class="w-3.5 h-3.5 shrink-0"></i> <span class="truncate">Atalhos 1 Clique</span>
                             </span>
-                            <button type="button" onclick="criarAtalhoSaidaRapidaPrompt()" class="text-[10px] font-bold text-forest hover:underline">+ Criar atalho</button>
+                            <button type="button" onclick="criarAtalhoSaidaRapidaPrompt()" class="text-[11px] font-bold text-forest bg-white/80 hover:bg-white border border-sage-200 px-2.5 py-1 rounded-lg transition whitespace-nowrap shrink-0">+ Criar atalho</button>
                         </div>
-                        <div id="atalhos-saida-container" class="flex flex-wrap gap-1.5"></div>
+                        <div id="atalhos-saida-container" class="flex flex-wrap gap-2"></div>
                         <p class="text-[10px] text-slate-400 leading-tight">Toque em um atalho para preencher automaticamente valor, categoria e bloco (ou clique no "×" de um atalho criado para removê-lo).</p>
                     </div>
 
@@ -818,18 +832,18 @@
                         </div>
 
                         <div class="p-3 rounded-2xl bg-sage-50/60 border border-sage-200/80 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-xs font-bold text-forest">Bloco do Orçamento (Encaixe Automático)</label>
-                                <span class="text-[10px] font-semibold text-sage-600 bg-white px-2 py-0.5 rounded-full border border-sage-200">Auto-selecionado</span>
+                            <div class="flex items-center justify-between gap-2">
+                                <label class="block text-xs font-bold text-forest leading-snug">Bloco do Orçamento</label>
+                                <span class="text-[10px] font-semibold text-sage-600 bg-white px-2.5 py-0.5 rounded-full border border-sage-200 whitespace-nowrap shrink-0">Auto-selecionado</span>
                             </div>
                             <select id="sai-essencialidade" required onchange="atualizarDicaBlocoSaida(); avaliarImpactoSaidaTempoReal()" class="w-full bg-white border border-sage-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800">
-                                <option value="Custos fixos">2. Custos fixos (40% • R$ 600 — Essenciais)</option>
-                                <option value="Conforto">3. Conforto (15% • R$ 225 — Bem-estar & Rotina)</option>
-                                <option value="Metas">4. Metas (10% • R$ 150 — Projetos & Compras)</option>
-                                <option value="Prazeres">5. Prazeres (10% • R$ 150 — Lazer & Saídas)</option>
-                                <option value="Conhecimento">6. Conhecimento (5% • R$ 75 — Estudos & Livros)</option>
-                                <option value="Lei de Anha">7. Lei de Anha (2% • R$ 30 — Reserva Específica)</option>
-                                <option value="Outros gastos">8. Outros gastos (8% • R$ 120 — Saúde, Pet & Imprev.)</option>
+                                <option value="Custos fixos">2. Custos fixos (40% • Essenciais)</option>
+                                <option value="Conforto">3. Conforto (15% • Rotina)</option>
+                                <option value="Metas">4. Metas (10% • Projetos)</option>
+                                <option value="Prazeres">5. Prazeres (10% • Lazer)</option>
+                                <option value="Conhecimento">6. Conhecimento (5% • Estudos)</option>
+                                <option value="Lei de Anha">7. Lei de Anha (2% • Fixo)</option>
+                                <option value="Outros gastos">8. Outros gastos (8% • Imprevistos)</option>
                             </select>
                             <p id="sai-bloco-dica" class="text-[11px] text-slate-500 leading-snug">
                                 📌 <strong>O que entra aqui:</strong> Alimentação básica, supermercado, transporte, contas de casa e mensalidades essenciais.
@@ -1364,7 +1378,7 @@
                             Simula a sua jornada real: <strong>Fase 1</strong> (Hábito com R$ 1.500 até Dez/2028) → <strong>Fase 2: Janela de Ouro</strong> (Jan a Jun/2029 com suporte mantido) → <strong>Julho/2029: Compra do Carro + Mudança</strong> → <strong>Fase 3</strong> (Vida autônoma rumo ao milhão e desaceleração pós-40 anos).
                         </p>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-xs p-4 rounded-2xl border border-white/15 text-right">
+                    <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/15 text-right">
                         <span class="text-xs text-sage-200 block">Caixa acumulado em Junho/2029 (Antes do Carro)</span>
                         <strong class="text-2xl font-extrabold text-emerald-300 money-val" id="sim-caixa-jun2029">R$ 0,00</strong>
                         <span class="text-[11px] text-sage-200 block mt-1" id="sim-sobra-pos-carro">Reserva intacta pós-carro: R$ 0,00</span>
@@ -1572,7 +1586,7 @@
                                 <h3 class="font-extrabold text-slate-800 text-base mt-1">Simulador: Quanto Vale Este Plantão no Futuro?</h3>
                                 <p class="text-xs text-slate-500">Veja como cada plantão ou renda extra se divide hoje (50% Lazer Livre / 50% Investido) e quanto a metade investida cresce em 5 e 10 anos</p>
                             </div>
-                            <button type="button" onclick="preencherPlantaoSimuladoNoForm()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold hero-gradient text-white shadow-xs hover:opacity-95 transition flex items-center gap-1.5 shrink-0">
+                            <button type="button" onclick="preencherPlantaoSimuladoNoForm()" class="px-3.5 py-2 rounded-xl text-xs font-extrabold hero-gradient text-white shadow-sm hover:opacity-95 transition flex items-center gap-1.5 shrink-0">
                                 <i data-lucide="plus-circle" class="w-4 h-4"></i> Lançar Plantão na Conta
                             </button>
                         </div>
@@ -1601,7 +1615,7 @@
     </main>
 
     <!-- BARRA DE NAVEGAÇÃO INFERIOR (MOBILE - 5 ITENS + GAVETA MAIS) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex justify-around items-center z-30">
+    <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 pt-2 flex justify-around items-center z-30 shadow-lg">
         <button onclick="switchTab('dashboard')" data-tab="dashboard" class="mobile-nav-btn mobile-nav-active flex flex-col items-center gap-0.5 text-[10px] text-slate-500">
             <i data-lucide="wallet" class="w-5 h-5"></i><span>Saldo</span>
         </button>
@@ -1620,7 +1634,7 @@
     </nav>
 
     <!-- MODAL GAVETA "MAIS" (MOBILE) -->
-    <div id="modal-mobile-more" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50">
+    <div id="modal-mobile-more" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-end justify-center z-50">
         <div class="bg-white rounded-t-3xl p-5 w-full max-w-md space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
             <div class="flex items-center justify-between">
                 <h3 class="font-extrabold text-slate-800 text-base">Todas as Telas &amp; Ferramentas</h3>
@@ -1634,7 +1648,7 @@
                 <button onclick="closeModal('modal-mobile-more'); switchTab('carreira')" class="col-span-2 p-3 rounded-2xl hero-gradient text-white flex items-center justify-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4 shrink-0"></i> Projeções &amp; Futuro (2029 / 40+)</button>
             </div>
             <div class="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
-                <button onclick="closeModal('modal-mobile-more'); abrirModalViradaMes()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2"><i data-lucide="calendar-sync" class="w-4 h-4 text-forest shrink-0"></i> Virada de Mês</button>
+                <button onclick="closeModal('modal-mobile-more'); abrirModalViradaMes()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2"><i data-lucide="calendar-range" class="w-4 h-4 text-forest shrink-0"></i> Virada de Mês</button>
                 <button onclick="closeModal('modal-mobile-more'); abrirModalFechamentoMes()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2"><i data-lucide="award" class="w-4 h-4 text-amber-600 shrink-0"></i> Fechamento</button>
                 <button onclick="closeModal('modal-mobile-more'); openModal('modal-planejamento')" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-forest shrink-0"></i> 8 Blocos</button>
                 <button onclick="closeModal('modal-mobile-more'); abrirModalBackup()" class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2"><i data-lucide="hard-drive-download" class="w-4 h-4 text-forest shrink-0"></i> Backup &amp; Reset</button>
@@ -1644,7 +1658,7 @@
     </div>
 
     <!-- MODAL CENTRAL DE CONFIGURAÇÕES -->
-    <div id="modal-config-hub" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-config-hub" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-xl">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
@@ -1659,7 +1673,7 @@
                     <span>→</span>
                 </button>
                 <button onclick="closeModal('modal-config-hub'); abrirModalViradaMes()" class="w-full p-3 rounded-2xl bg-slate-50 hover:bg-sage-50 text-slate-700 flex items-center justify-between transition">
-                    <span class="flex items-center gap-2.5"><i data-lucide="calendar-sync" class="w-4 h-4 text-forest"></i> Virada de Mês &amp; Varrer Sobra</span>
+                    <span class="flex items-center gap-2.5"><i data-lucide="calendar-range" class="w-4 h-4 text-forest"></i> Virada de Mês &amp; Varrer Sobra</span>
                     <span>→</span>
                 </button>
                 <button onclick="closeModal('modal-config-hub'); abrirModalImportarCSV()" class="w-full p-3 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100 text-forest flex items-center justify-between transition border border-emerald-200/70">
@@ -1683,7 +1697,7 @@
     </div>
 
     <!-- MODAL: AÇÃO RÁPIDA "PAGUE-SE PRIMEIRO" COM ESCOLHA DE DESTINO -->
-    <div id="modal-pague-se" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-pague-se" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
@@ -1720,7 +1734,7 @@
     </div>
 
     <!-- MODAL: CONFIGURAÇÃO DOS 8 BLOCOS DA RENDA BASE -->
-    <div id="modal-planejamento" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-planejamento" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h3 class="font-bold text-slate-800">Distribuição Financeira em 8 Blocos</h3>
@@ -1782,7 +1796,7 @@
     </div>
 
     <!-- MODAL: CONFIGURAÇÃO SUPABASE (CONEXÃO + MAGIC LINK + SQL ONDA 2) -->
-    <div id="modal-db" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-db" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 max-h-[90vh] overflow-y-auto shadow-xl">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
@@ -1874,7 +1888,7 @@ END $$;</pre>
     </div>
 
     <!-- MODAL RÁPIDO: LANÇAMENTO EXPRESSO (3 CAMPOS) + ATALHOS -->
-    <div id="modal-quick-choice" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-quick-choice" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-5 md:p-6 max-w-md w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between">
                 <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
@@ -1921,7 +1935,7 @@ END $$;</pre>
                     </select>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-2xs">
+                <button type="submit" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">
                     Registrar Despesa Agora
                 </button>
             </form>
@@ -1950,7 +1964,7 @@ END $$;</pre>
     </div>
 
     <!-- MODAL: BACKUP COMPLETO E RESTAURAÇÃO (.JSON) -->
-    <div id="modal-backup" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-backup" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
@@ -2003,7 +2017,7 @@ END $$;</pre>
                         <i data-lucide="calendar-x-2" class="w-3.5 h-3.5 shrink-0"></i>
                         <span id="btn-reset-mes-label">Limpar Mês Atual</span>
                     </button>
-                    <button type="button" onclick="iniciarResetTotal()" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-2xs">
+                    <button type="button" onclick="iniciarResetTotal()" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5 shrink-0"></i>
                         <span>Reset Total (Zerar Tudo)</span>
                     </button>
@@ -2013,11 +2027,11 @@ END $$;</pre>
     </div>
 
     <!-- MODAL: VIRADA DE MÊS INTELIGENTE (CLONAR FIXOS + VARRER SOBRA) -->
-    <div id="modal-virada-mes" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-virada-mes" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
-                    <i data-lucide="calendar-sync" class="w-5 h-5"></i>
+                    <i data-lucide="calendar-range" class="w-5 h-5"></i>
                     <h3>Virada de Mês Inteligente</h3>
                 </div>
                 <button type="button" onclick="closeModal('modal-virada-mes')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -2067,7 +2081,7 @@ END $$;</pre>
     </div>
 
     <!-- MODAL: CARD DE FECHAMENTO DO MÊS (COPIÁVEL) -->
-    <div id="modal-fechamento-mes" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-fechamento-mes" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
@@ -2089,7 +2103,7 @@ END $$;</pre>
     </div>
 
     <!-- MODAL: IMPORTADOR DE EXTRATO / FATURA CSV (NUBANK, INTER, ITAÚ, GENÉRICO) -->
-    <div id="modal-importar-csv" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-importar-csv" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-forest font-bold">
@@ -2146,7 +2160,7 @@ END $$;</pre>
     </div>
 
     <!-- MODAL CUSTOMIZADO UNIVERSAL (SUBSTITUI PROMPT E CONFIRM NATIVOS) -->
-    <div id="modal-custom-dialog" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div id="modal-custom-dialog" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-xl">
             <div class="flex justify-between items-center">
                 <h3 id="dialog-title" class="font-bold text-slate-800 text-base">Confirmação</h3>
@@ -3102,7 +3116,7 @@ END $$;</pre>
                     </div>
                     <div class="flex items-center gap-2">
                         <button type="button" onclick="configurarCartaoPrompt()" class="text-[11px] font-semibold text-slate-500 hover:text-forest px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 transition">Configurar</button>
-                        ${emAberto > 0 ? `<button type="button" onclick="pagarFaturaCartaoMes()" class="text-xs font-bold text-white hero-gradient px-3.5 py-1.5 rounded-xl shadow-xs hover:opacity-95 transition">Pagar Fatura (${formatBRL(emAberto)})</button>` : `<span class="text-[11px] font-bold text-forest bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl">✓ Fatura em dia</span>`}
+                        ${emAberto > 0 ? `<button type="button" onclick="pagarFaturaCartaoMes()" class="text-xs font-bold text-white hero-gradient px-3.5 py-1.5 rounded-xl shadow-sm hover:opacity-95 transition">Pagar Fatura (${formatBRL(emAberto)})</button>` : `<span class="text-[11px] font-bold text-forest bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl">✓ Fatura em dia</span>`}
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3 text-xs mb-3">
@@ -3644,11 +3658,11 @@ END $$;</pre>
             } catch (e) { custom = []; }
             const lista = [...obterAtalhosSaidaPadrao(), ...custom];
             container.innerHTML = lista.map(a => `
-                <div class="inline-flex items-center rounded-xl bg-white border border-sage-200 shadow-2xs overflow-hidden">
-                    <button type="button" onclick="usarAtalhoSaida('${a.id}')" class="px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:bg-sage-100 hover:text-forest transition">
+                <div data-atalho-wrap="${a.id}" class="inline-flex items-center rounded-xl bg-white border border-sage-200 shadow-sm overflow-hidden transition">
+                    <button type="button" onclick="usarAtalhoSaida('${a.id}')" class="px-3 py-1.5 text-[11px] font-bold text-slate-700 hover:bg-sage-100 hover:text-forest active:scale-[0.98] transition">
                         ${escapeHTML(a.label)}
                     </button>
-                    ${!a.padrao ? `<button type="button" onclick="removerAtalhoSaidaCustom('${a.id}')" title="Remover atalho" class="px-1.5 py-1 text-[10px] text-slate-400 hover:text-crimson border-l border-slate-100">×</button>` : ''}
+                    ${!a.padrao ? `<button type="button" onclick="removerAtalhoSaidaCustom('${a.id}')" title="Remover atalho" aria-label="Remover atalho" class="px-2 py-1.5 text-xs text-slate-400 hover:text-crimson hover:bg-red-50 border-l border-slate-100 transition">×</button>` : ''}
                 </div>
             `).join('');
         }
@@ -3660,12 +3674,16 @@ END $$;</pre>
             const item = todos.find(x => String(x.id) === String(id));
             if (!item) return;
 
+            document.getElementById('sai-id').value = '';
+            const btnSubmit = document.getElementById('btn-submit-saida');
+            if (btnSubmit) btnSubmit.innerText = 'Salvar Saída';
+
             document.getElementById('sai-valor').value = toNum(item.valor).toFixed(2);
             document.getElementById('sai-descricao').value = item.descricao;
             const selectCat = document.getElementById('sai-categoria');
             if (selectCat) {
                 if (!Array.from(selectCat.options).some(o => o.value === item.categoria)) {
-                    selectCat.insertAdjacentHTML('beforeend', `<option value="${item.categoria}">${item.categoria}</option>`);
+                    selectCat.insertAdjacentHTML('beforeend', `<option value="${escapeHTML(item.categoria)}">${escapeHTML(item.categoria)}</option>`);
                 }
                 selectCat.value = item.categoria;
             }
@@ -3675,6 +3693,10 @@ END $$;</pre>
             if (!document.getElementById('sai-data').value) {
                 document.getElementById('sai-data').value = new Date().toISOString().slice(0, 10);
             }
+            document.querySelectorAll('[data-atalho-wrap]').forEach(el => {
+                el.classList.toggle('atalho-chip-active', el.getAttribute('data-atalho-wrap') === String(id));
+            });
+            atualizarVisibilidadeParcelas();
             atualizarDicaBlocoSaida();
             avaliarImpactoSaidaTempoReal();
             showToast(`Atalho "${item.descricao}" preenchido! Confira e clique em Salvar Saída.`);
@@ -4335,7 +4357,7 @@ END $$;</pre>
                     btnCardPagueSe.className = 'text-emerald-700 font-extrabold hover:underline shrink-0 text-[11px]';
                 }
                 if (cardBlocoInv) {
-                    cardBlocoInv.className = 'p-4 rounded-2xl bg-emerald-50/80 border-2 border-emerald-300 flex flex-col justify-between min-w-0 shadow-2xs';
+                    cardBlocoInv.className = 'p-4 rounded-2xl bg-emerald-50/80 border-2 border-emerald-300 flex flex-col justify-between min-w-0 shadow-sm';
                 }
             } else if (entradasMesTotal > 0 && faltaPagarSe > 1) {
                 statusCardPagueSe.innerText = `Falta ${formatBRL(faltaPagarSe)}`;
@@ -4349,7 +4371,7 @@ END $$;</pre>
                 }
 
                 alertasHTML.push(`
-                    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+                    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
                         <div class="flex items-start gap-3 max-w-3xl">
                             <i data-lucide="flame" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
                             <div>
@@ -4495,7 +4517,7 @@ END $$;</pre>
             if (blocosVermelhos.length > 0) {
                 const nomesEstourados = blocosVermelhos.map(b => `<strong>${b.nome}</strong> (${formatBRL(b.usado)} de ${formatBRL(b.meta)} • ${b.perc}%)`).join(', ');
                 alertasHTML.push(`
-                    <div class="bg-red-50 border-l-4 border-crimson rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
+                    <div class="bg-red-50 border-l-4 border-crimson rounded-2xl p-4 flex items-start gap-3 shadow-sm">
                         <i data-lucide="alert-octagon" class="w-5 h-5 text-crimson shrink-0 mt-0.5"></i>
                         <div>
                             <h4 class="text-xs font-extrabold text-red-950 uppercase tracking-wide">Alerta de Categoria no Vermelho: ${blocosVermelhos.length} bloco(s) acima do ritmo/limite</h4>
@@ -4511,7 +4533,7 @@ END $$;</pre>
             const somaImprevistos = gastosImprevistos.reduce((a, b) => a + toNum(b.valor), 0);
             if (somaImprevistos > 0 && (somaImprevistos > (entradasMesTotal * 0.10) || gastosImprevistos.length >= 2)) {
                 alertasHTML.push(`
-                    <div class="bg-slate-800 text-white rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
+                    <div class="bg-slate-800 text-white rounded-2xl p-4 flex items-start gap-3 shadow-sm">
                         <i data-lucide="siren" class="w-5 h-5 text-amber-400 shrink-0 mt-0.5"></i>
                         <div>
                             <h4 class="text-xs font-extrabold text-amber-300 uppercase tracking-wide">Radar de Imprevistos: ${gastosImprevistos.length} ocorrência(s) (${formatBRL(somaImprevistos)})</h4>
@@ -4736,12 +4758,12 @@ END $$;</pre>
                 </div>
 
                 <!-- Corpo Principal: Ilustração Artística do Termômetro + Diagnóstico + Pílula -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-5 items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-5 items-stretch">
                     
                     <!-- Coluna 1: Termômetro Artístico Visual (5 Colunas no Desktop) -->
-                    <div class="lg:col-span-5 bg-white/90 rounded-2xl p-4 border border-slate-200/80 shadow-2xs space-y-4">
+                    <div class="lg:col-span-5 bg-white/90 rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-4">
                         <div class="flex items-center justify-between text-[11px] font-bold text-slate-500">
-                            <span class="text-forest flex items-center gap-1">🟢 Lentificado (Investir)</span>
+                            <span class="text-forest flex items-center gap-1">🟢 Folga (Investir)</span>
                             <span class="text-amber-600">🟠 Atenção</span>
                             <span class="text-crimson flex items-center gap-1">🔴 Acelerado</span>
                         </div>
@@ -4756,7 +4778,7 @@ END $$;</pre>
 
                             <div class="relative flex-1 h-7 bg-slate-900 rounded-r-full border-4 border-l-0 border-slate-800 p-1 flex items-center shadow-inner overflow-visible">
                                 <div class="absolute inset-1 rounded-r-full opacity-35" style="background: linear-gradient(90deg, #10B981 0%, #10B981 40%, #F59E0B 45%, #F59E0B 68%, #EF4444 72%, #DC2626 100%);"></div>
-                                <div class="thermo-mercury relative h-full rounded-r-full shadow-xs" style="width: ${posPont}%; background: linear-gradient(90deg, #1B4332 0%, ${tema.corPrimaria} 100%);"></div>
+                                <div class="thermo-mercury relative h-full rounded-r-full shadow-sm" style="width: ${posPont}%; background: linear-gradient(90deg, #1B4332 0%, ${tema.corPrimaria} 100%);"></div>
 
                                 <div class="absolute inset-0 flex justify-between px-3 items-center pointer-events-none">
                                     <span class="w-0.5 h-2 bg-white/40"></span>
@@ -4832,7 +4854,7 @@ END $$;</pre>
                                 ${tema.pilulaTexto}
                             </p>
                             <div class="flex flex-wrap items-center gap-2.5 pt-1">
-                                <button type="button" onclick="${tema.btnAcaoFn}" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs flex items-center gap-1.5 ${tema.btnAcaoClass}">
+                                <button type="button" onclick="${tema.btnAcaoFn}" class="px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 ${tema.btnAcaoClass}">
                                     <i data-lucide="${tema.btnAcaoIcon || 'zap'}" class="w-4 h-4"></i>
                                     <span>${tema.btnAcaoTexto}</span>
                                 </button>
@@ -4980,6 +5002,7 @@ END $$;</pre>
             if (isSubmitting) return;
             isSubmitting = true;
 
+            try {
             const isEntrada = tipo === 'entrada';
             const idEdicao = document.getElementById(isEntrada ? 'ent-id' : 'sai-id').value;
             const isExtraMarcado = isEntrada && document.getElementById('ent-is-extra').checked;
@@ -4989,12 +5012,12 @@ END $$;</pre>
             const valorBaseInput = toNum(document.getElementById(isEntrada ? 'ent-valor' : 'sai-valor').value);
             const descBaseInput = document.getElementById(isEntrada ? 'ent-descricao' : 'sai-descricao').value.trim();
             const contaSelecionadaTx = document.getElementById(isEntrada ? 'ent-conta' : 'sai-conta')?.value || contasBancarias[0]?.id;
+            const formaPgto = !isEntrada ? (document.getElementById('sai-pagamento').value || 'Pix') : null;
             const dataRawInput = document.getElementById(isEntrada ? 'ent-data' : 'sai-data').value;
             const fatInfoTx = (!isEntrada && !idEdicao && formaPgto === 'Cartão de Crédito')
                 ? calcularDataFaturaCartao(dataRawInput)
                 : { dataFatura: dataRawInput, virouMes: false, dataOriginalBR: '' };
             const dataBaseInput = fatInfoTx.dataFatura;
-            const formaPgto = !isEntrada ? (document.getElementById('sai-pagamento').value || 'Pix') : null;
             const statusPgtoInicial = !isEntrada ? (document.getElementById('sai-status-pagamento')?.value || 'pago') : 'pago';
             const numParcelas = (!isEntrada && !idEdicao && formaPgto === 'Cartão de Crédito')
                 ? Math.max(1, parseInt(document.getElementById('sai-parcelas')?.value || '1', 10))
@@ -5004,7 +5027,6 @@ END $$;</pre>
             const splitAtivo = !isEntrada && !idEdicao && splitBox && !splitBox.classList.contains('hidden');
             const splitValor2 = splitAtivo ? toNum(document.getElementById('sai-split-valor2')?.value) : 0;
             if (splitAtivo && (splitValor2 <= 0 || splitValor2 >= valorBaseInput)) {
-                isSubmitting = false;
                 return showToast('No Split, o valor da Parte 2 deve ser maior que zero e menor que o total.', 'erro');
             }
 
@@ -5066,8 +5088,6 @@ END $$;</pre>
                     });
                 }
             });
-
-            try {
                 for (const item of itensParaSalvar) {
                     const payload = item.payload;
                     if (supabaseClient) {
@@ -5134,6 +5154,7 @@ END $$;</pre>
                 document.getElementById('sai-impact-warning').classList.add('hidden');
                 if (!isEntrada) {
                     if (splitBox && !splitBox.classList.contains('hidden')) toggleSplitSaida();
+                    document.querySelectorAll('[data-atalho-wrap]').forEach(el => el.classList.remove('atalho-chip-active'));
                     atualizarVisibilidadeParcelas();
                 }
 
@@ -6939,10 +6960,10 @@ END $$;</pre>
         function setChartPeriod(periodo) {
             chartPeriod = periodo;
             document.getElementById('btn-chart-semanal').className = periodo === 'semanal'
-                ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs transition'
+                ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition'
                 : 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition';
             document.getElementById('btn-chart-mensal').className = periodo === 'mensal'
-                ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-2xs transition'
+                ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-800 shadow-sm transition'
                 : 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 transition';
             atualizarInterfaceCompleta();
         }
@@ -7243,12 +7264,12 @@ END $$;</pre>
 
             const titulos = {
                 dashboard: 'Saldo & Termômetro',
-                orcamento: 'Orçamento (8 Blocos) & Extrato',
-                entradas: 'Entradas (Regra Pague-se 1º)',
-                saidas: 'Saídas (Parcelamento, Split & Trava)',
-                investimentos: 'Carteira de Investimentos & Renda Passiva (13% a.a.)',
+                orcamento: 'Orçamento (8 Blocos)',
+                entradas: 'Entradas',
+                saidas: 'Saídas',
+                investimentos: 'Investimentos & Renda Passiva',
                 reserva: 'Reserva de Emergência',
-                sonhos: 'Sonhos e Objetivos',
+                sonhos: 'Sonhos & Metas',
                 carreira: 'Projeções & Futuro (2029 / 40+)'
             };
             document.getElementById('page-title').innerText = titulos[tabId] || 'Dashboard';
@@ -7991,8 +8012,32 @@ END $$;</pre>
 
         function openNovaMovimentacao() { openModal('modal-quick-choice'); }
         function irParaFormulario(aba) { closeModal('modal-quick-choice'); switchTab(aba); }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+        }
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        }
+        document.addEventListener('keydown', (ev) => {
+            if (ev.key !== 'Escape') return;
+            const customDlg = document.getElementById('modal-custom-dialog');
+            if (customDlg && !customDlg.classList.contains('hidden')) {
+                fecharDialogoCustom(false);
+                return;
+            }
+            document.querySelectorAll('[id^="modal-"]:not(.hidden)').forEach(m => m.classList.add('hidden'));
+        });
+        document.addEventListener('click', (ev) => {
+            const target = ev.target;
+            if (!target || !target.id || !target.id.startsWith('modal-') || target.classList.contains('hidden')) return;
+            if (target.id === 'modal-custom-dialog') {
+                fecharDialogoCustom(false);
+            } else {
+                target.classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
